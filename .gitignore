@@ -1,0 +1,50 @@
+# Node
+node_modules/
+
+# React Native
+android/.gradle/
+android/app/build/
+android/build/
+ios/build/
+
+# Metro
+.metro-health-check*
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+
+# Coverage
+coverage/
+
+# Gradle
+.gradle/
+
+# Temporary
+tmp/
+temp/
+
+# Local caches
+**/.expo/
+**/.turbo/
