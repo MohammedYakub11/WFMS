@@ -1,4 +1,15 @@
-import { IsNotEmpty, IsUUID, IsInt, Min, Max, IsOptional, IsBoolean, IsString, IsDateString, ValidateIf } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsUUID,
+  IsInt,
+  Min,
+  Max,
+  IsOptional,
+  IsBoolean,
+  IsString,
+  IsDateString,
+  ValidateIf,
+} from 'class-validator';
 
 export class CreateEmployeeSkillDto {
   @IsUUID()

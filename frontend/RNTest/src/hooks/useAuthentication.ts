@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setAuthTokens } from '../store/authSlice';
 import apiClient from '../services/apiClient';
 
@@ -15,10 +16,13 @@ export const useAuthentication = () => {
       const response = await apiClient.post('/auth/login', data);
       const { accessToken, refreshToken, user } = response.data.data;
       dispatch(setAuthTokens({ accessToken, refreshToken, user }));
+      await AsyncStorage.setItem('authState', JSON.stringify({ accessToken, refreshToken, user }));
       return true;
     } catch (err: any) {
-      console.error('Login Error:', err);
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      console.log('Status:', err.response?.status);
+      console.log('Response:', err.response?.data);
+      console.log('Headers:', err.response?.headers);
+      console.error(err); setError(err.response?.data?.message || 'Login failed. Please try again.');
       return false;
     } finally {
       setIsLoading(false);

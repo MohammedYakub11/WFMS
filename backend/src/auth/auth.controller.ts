@@ -19,7 +19,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   logout() {
     // Client should discard the token. Real implementation might blacklist tokens.
-    return { success: true, message: 'Logged out successfully', data: {}, errors: null };
+    return {
+      success: true,
+      message: 'Logged out successfully',
+      data: {},
+      errors: null,
+    };
   }
 
   @Post('refresh-token')
@@ -37,6 +42,9 @@ export class AuthController {
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.newPassword);
+    return this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.newPassword,
+    );
   }
 }

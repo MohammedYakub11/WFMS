@@ -1,15 +1,25 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EmployeeSkill } from './entities/employee-skill.entity';
 import { CreateEmployeeSkillDto } from './dto/create-employee-skill.dto';
 import { UpdateEmployeeSkillDto } from './dto/update-employee-skill.dto';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/entities/notification.entity';
 
 @Injectable()
 export class EmployeeSkillsService {
+  private readonly logger = new Logger(EmployeeSkillsService.name);
+
   constructor(
     @InjectRepository(EmployeeSkill)
     private readonly employeeSkillRepository: Repository<EmployeeSkill>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(createDto: CreateEmployeeSkillDto): Promise<EmployeeSkill> {
@@ -20,8 +30,14 @@ export class EmployeeSkillsService {
     return this.employeeSkillRepository.save(employeeSkill);
   }
 
-  async findAll(page: number = 1, limit: number = 10, employeeId?: string, skillId?: string) {
-    const query = this.employeeSkillRepository.createQueryBuilder('employeeSkill')
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    employeeId?: string,
+    skillId?: string,
+  ) {
+    const query = this.employeeSkillRepository
+      .createQueryBuilder('employeeSkill')
       .leftJoinAndSelect('employeeSkill.skill', 'skill')
       .leftJoinAndSelect('skill.category', 'category')
       .leftJoinAndSelect('employeeSkill.employee', 'employee');
@@ -48,7 +64,8 @@ export class EmployeeSkillsService {
   }
 
   async findPending(page: number = 1, limit: number = 10) {
-    const query = this.employeeSkillRepository.createQueryBuilder('employeeSkill')
+    const query = this.employeeSkillRepository
+      .createQueryBuilder('employeeSkill')
       .leftJoinAndSelect('employeeSkill.skill', 'skill')
       .leftJoinAndSelect('skill.category', 'category')
       .leftJoinAndSelect('employeeSkill.employee', 'employee')
@@ -81,7 +98,10 @@ export class EmployeeSkillsService {
     return employeeSkill;
   }
 
-  async update(id: string, updateDto: UpdateEmployeeSkillDto): Promise<EmployeeSkill> {
+  async update(
+    id: string,
+    updateDto: UpdateEmployeeSkillDto,
+  ): Promise<EmployeeSkill> {
     const employeeSkill = await this.findOne(id);
     const prevStatus = employeeSkill.approvalStatus;
 
@@ -90,8 +110,8 @@ export class EmployeeSkillsService {
     // If a skill is updated, it typically goes back to pending/resubmitted
     // But since the DTO doesn't explicitly enforce state here, we'll let specific actions handle it
     if (prevStatus === 'changes_requested') {
-       employeeSkill.approvalStatus = 'pending';
-       employeeSkill.resubmittedAt = new Date();
+      employeeSkill.approvalStatus = 'pending';
+      employeeSkill.resubmittedAt = new Date();
     }
 
     return this.employeeSkillRepository.save(employeeSkill);
@@ -103,7 +123,11 @@ export class EmployeeSkillsService {
   }
 
   // Manager Approval Workflow Methods
-  async approve(id: string, reviewerId: string, comments?: string): Promise<EmployeeSkill> {
+  async approve(
+    id: string,
+    reviewerId: string,
+    comments?: string,
+  ): Promise<EmployeeSkill> {
     const skill = await this.findOne(id);
     if (skill.approvalStatus === 'approved') {
       throw new BadRequestException('Skill is already approved.');
@@ -113,10 +137,32 @@ export class EmployeeSkillsService {
     skill.reviewedBy = reviewerId;
     skill.reviewedAt = new Date();
     if (comments) skill.reviewComments = comments;
-    return this.employeeSkillRepository.save(skill);
+    const saved = await this.employeeSkillRepository.save(skill);
+
+    try {
+      await this.notificationsService.create({
+        employeeId: skill.employeeId,
+        title: 'Skill Approved',
+        message: comments
+          ? `Your skill submission was approved. ${comments}`
+          : 'Your skill submission was approved.',
+        type: NotificationType.SKILL_APPROVAL,
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to send skill approval notification for employeeSkill ${id}`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
+
+    return saved;
   }
 
-  async reject(id: string, reviewerId: string, comments?: string): Promise<EmployeeSkill> {
+  async reject(
+    id: string,
+    reviewerId: string,
+    comments?: string,
+  ): Promise<EmployeeSkill> {
     const skill = await this.findOne(id);
     if (skill.approvalStatus === 'rejected') {
       throw new BadRequestException('Skill is already rejected.');
@@ -126,16 +172,56 @@ export class EmployeeSkillsService {
     skill.reviewedBy = reviewerId;
     skill.reviewedAt = new Date();
     if (comments) skill.reviewComments = comments;
-    return this.employeeSkillRepository.save(skill);
+    const saved = await this.employeeSkillRepository.save(skill);
+
+    try {
+      await this.notificationsService.create({
+        employeeId: skill.employeeId,
+        title: 'Skill Rejected',
+        message: comments
+          ? `Your skill submission was rejected. ${comments}`
+          : 'Your skill submission was rejected.',
+        type: NotificationType.SKILL_REJECTION,
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to send skill rejection notification for employeeSkill ${id}`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
+
+    return saved;
   }
 
-  async requestChanges(id: string, reviewerId: string, comments: string): Promise<EmployeeSkill> {
+  async requestChanges(
+    id: string,
+    reviewerId: string,
+    comments: string,
+  ): Promise<EmployeeSkill> {
     const skill = await this.findOne(id);
     skill.previousStatus = skill.approvalStatus;
     skill.approvalStatus = 'changes_requested';
     skill.reviewedBy = reviewerId;
     skill.reviewedAt = new Date();
     if (comments) skill.reviewComments = comments;
-    return this.employeeSkillRepository.save(skill);
+    const saved = await this.employeeSkillRepository.save(skill);
+
+    try {
+      await this.notificationsService.create({
+        employeeId: skill.employeeId,
+        title: 'Changes Requested',
+        message: comments
+          ? `Changes were requested on your skill submission. ${comments}`
+          : 'Changes were requested on your skill submission.',
+        type: NotificationType.SKILL_APPROVAL,
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to send changes-requested notification for employeeSkill ${id}`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
+
+    return saved;
   }
 }

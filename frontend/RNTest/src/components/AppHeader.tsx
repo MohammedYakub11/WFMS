@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import { useDispatch } from 'react-redux';
 import { toggleDrawer } from '../store/uiSlice';
+import { useUnreadNotificationCount } from '../hooks/useNotifications';
 
 interface AppHeaderProps {
   title?: string;
@@ -26,6 +27,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 }) => {
   const navigation = useNavigation<any>();
   const dispatch = useDispatch();
+  // Called unconditionally to satisfy the Rules of Hooks (never call a hook
+  // behind an early return / conditional). The query itself is gated via
+  // `enabled: showNotification` inside the hook, so screens that render
+  // AppHeader without the bell never fire the network request.
+  const { data: liveUnreadCount } = useUnreadNotificationCount(showNotification);
+  const displayedCount = liveUnreadCount ?? notificationCount ?? 0;
 
   return (
     <View style={styles.container}>
@@ -35,7 +42,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             <AppText style={styles.icon}>←</AppText>
           </TouchableOpacity>
         )}
-        
+
         {showDrawer && (
           <TouchableOpacity onPress={() => dispatch(toggleDrawer())} style={styles.iconButton}>
             <AppText style={styles.icon}>≡</AppText>
@@ -49,11 +56,14 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
       <View style={styles.rightSection}>
         {showNotification && (
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate('NotificationCenter')}
+          >
             <AppText style={styles.icon}>🔔</AppText>
-            {notificationCount > 0 && (
+            {displayedCount > 0 && (
               <View style={styles.badge}>
-                <AppText style={styles.badgeText}>{notificationCount > 9 ? '9+' : notificationCount}</AppText>
+                <AppText style={styles.badgeText}>{displayedCount > 9 ? '9+' : displayedCount}</AppText>
               </View>
             )}
           </TouchableOpacity>

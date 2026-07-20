@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl, Keyboard } from 'react-native';
-import { Searchbar, FAB, Text, useTheme, ActivityIndicator, Button } from 'react-native-paper';
+import { FAB, useTheme } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../../store';
@@ -9,8 +9,13 @@ import { useEmployeeSkills } from '../../hooks/useSkills';
 import { SkillCard } from '../../components/skills/SkillCard';
 import { SkillSkeleton } from '../../components/skills/SkillSkeleton';
 import { SkillFiltersModal } from '../../components/skills/SkillFiltersModal';
+import { AppHeader } from '../../components/AppHeader';
+import { AppTextField } from '../../components/AppTextField';
+import { StatCard } from '../../components/Cards';
+import { EmptyState } from '../../components/EmptyState';
+import { Loader } from '../../components/Loader';
 
-// Temporary Mock ID for current user until Auth is fully integrated
+
 const CURRENT_EMPLOYEE_ID = 'CURRENT_USER_ID'; 
 
 export const MySkillsScreen = () => {
@@ -25,11 +30,10 @@ export const MySkillsScreen = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  // Debounce search
   useEffect(() => {
     const handler = setTimeout(() => {
       dispatch(setSearchQuery(localSearch));
-      setPage(1); // Reset page on new search
+      setPage(1); 
     }, 500);
     return () => clearTimeout(handler);
   }, [localSearch, dispatch]);
@@ -44,10 +48,13 @@ export const MySkillsScreen = () => {
     sort: sortOption,
   }), [page, limit, searchQuery, selectedCategoryId, selectedProficiency, sortOption]);
 
-  const { data, isLoading, isError, refetch, isFetching, error } = useEmployeeSkills(queryParams);
+  const { data, isLoading, isError, refetch, isFetching } = useEmployeeSkills(queryParams);
 
   const skills = data?.data?.data || [];
   const total = data?.data?.total || 0;
+  
+  const approvedCount = skills.filter((s: any) => s.approvalStatus === 'approved').length;
+  const pendingCount = skills.filter((s: any) => s.approvalStatus === 'pending').length;
 
   const handleRefresh = useCallback(() => {
     setPage(1);
@@ -63,8 +70,7 @@ export const MySkillsScreen = () => {
   const renderItem = useCallback(({ item }: any) => (
     <SkillCard 
       employeeSkill={item} 
-      onEdit={(skill: any) => console.log('Edit', skill.id)}
-      onDelete={(skill: any) => console.log('Delete', skill.id)}
+      onEdit={(skill: any) => navigation.navigate('EditSkill', { id: skill.id })}
       onPress={(skill: any) => navigation.navigate('SkillDetails', { id: skill.id })}
     />
   ), [navigation]);
@@ -72,56 +78,77 @@ export const MySkillsScreen = () => {
   const renderEmptyState = () => {
     if (isLoading) return null;
     return (
-      <View style={styles.emptyContainer}>
-        <Text variant="titleMedium" style={styles.emptyTitle}>No skills found</Text>
-        <Text variant="bodyMedium" style={styles.emptySubtitle}>Try adjusting your search or filters.</Text>
-        <Button mode="outlined" onPress={() => { setLocalSearch(''); dispatch(setSearchQuery('')); }}>Clear Search</Button>
-      </View>
+      <EmptyState
+        title="No skills found"
+        description="Try adjusting your search or filters to find what you're looking for."
+        actionTitle="Clear Search"
+        onAction={() => { setLocalSearch(''); dispatch(setSearchQuery('')); }}
+      />
     );
   };
 
   const renderFooter = () => {
     if (!isFetching || isLoading || page === 1) return null;
-    return <ActivityIndicator style={{ marginVertical: 16 }} />;
+    return <Loader style={styles.loader} />;
   };
 
-  return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+  const renderHeader = () => (
+    <View style={styles.headerContent}>
+      <View style={styles.statsRow}>
+        <StatCard title="Total Skills" value={total} />
+        <StatCard title="Approved" value={approvedCount} />
+        <StatCard title="Pending" value={pendingCount} />
+      </View>
       <View style={styles.searchContainer}>
-        <Searchbar
+        <AppTextField
+          label=""
           placeholder="Search skills..."
-          onChangeText={setLocalSearch}
           value={localSearch}
-          style={styles.searchBar}
-          icon="magnify"
-          clearIcon="close"
-        />
-        <FAB
-          icon="filter-variant"
-          size="small"
-          style={[styles.filterFab, (selectedCategoryId || selectedProficiency) ? { backgroundColor: theme.colors.primaryContainer } : null]}
-          onPress={() => setIsFilterVisible(true)}
+          onChangeText={setLocalSearch}
+          style={styles.searchField}
+          rightIcon={
+            <FAB
+              icon="filter-variant"
+              size="small"
+              style={[
+                styles.filterFab,
+                (selectedCategoryId || selectedProficiency) ? { backgroundColor: theme.colors.primaryContainer } : null
+              ]}
+              onPress={() => setIsFilterVisible(true)}
+            />
+          }
         />
       </View>
+    </View>
+  );
 
+  return (
+    <View style={styles.container}>
+      <AppHeader title="My Skills" showDrawer showNotification />
+      
       {isLoading && page === 1 ? (
-        <FlatList
-          data={[1, 2, 3, 4, 5]}
-          keyExtractor={(item) => item.toString()}
-          renderItem={() => <SkillSkeleton />}
-          contentContainerStyle={styles.listContent}
-        />
-      ) : isError ? (
-        <View style={styles.emptyContainer}>
-          <Text variant="titleMedium" style={{ color: theme.colors.error, marginBottom: 8 }}>Failed to load skills</Text>
-          <Text variant="bodyMedium" style={styles.emptySubtitle}>{(error as any)?.message || 'An error occurred.'}</Text>
-          <Button mode="contained" onPress={handleRefresh}>Retry</Button>
+        <View style={styles.container}>
+          {renderHeader()}
+          <FlatList
+            data={[1, 2, 3, 4, 5]}
+            keyExtractor={(item) => item.toString()}
+            renderItem={() => <SkillSkeleton />}
+            contentContainerStyle={styles.listContent}
+          />
         </View>
+      ) : isError ? (
+        <EmptyState
+          title="Failed to load skills"
+          description="An error occurred while fetching your skills. Please try again."
+          actionTitle="Retry"
+          onAction={handleRefresh}
+        />
       ) : (
         <FlatList
           data={skills}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
+          ListHeaderComponent={renderHeader}
           contentContainerStyle={styles.listContent}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
@@ -143,51 +170,47 @@ export const MySkillsScreen = () => {
         icon="plus"
         style={styles.fab}
         onPress={() => navigation.navigate('AddSkill')}
-        label="Add Skill"
+        color="#FFF"
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  loader: { marginVertical: 16 },
   container: {
     flex: 1,
+    backgroundColor: '#F8FAFC',
+  },
+  headerContent: {
+    padding: 16,
+    paddingBottom: 0,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    gap: 8,
   },
   searchContainer: {
-    flexDirection: 'row',
-    padding: 16,
-    alignItems: 'center',
-    gap: 12,
+    marginBottom: 8,
   },
-  searchBar: {
+  searchField: {
     flex: 1,
-    elevation: 2,
   },
   filterFab: {
-    elevation: 2,
+    elevation: 0,
+    backgroundColor: 'transparent',
+    marginRight: 4,
   },
   listContent: {
-    paddingBottom: 80, // Space for bottom FAB
+    paddingBottom: 80,
   },
   fab: {
     position: 'absolute',
     margin: 16,
     right: 0,
     bottom: 0,
+    backgroundColor: '#22C55E', // primary
   },
-  emptyContainer: {
-    padding: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 40,
-  },
-  emptyTitle: {
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 24,
-  }
 });

@@ -12,7 +12,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    
+
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -24,15 +24,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : 'Internal server error';
 
     const errorResponse =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : null;
+      exception instanceof HttpException ? exception.getResponse() : null;
 
     response.status(status).json({
       success: false,
       message,
       data: null,
-      errors: typeof errorResponse === 'object' && errorResponse !== null && 'message' in errorResponse ? (errorResponse as any).message : errorResponse || message,
+      errors:
+        typeof errorResponse === 'object' &&
+        errorResponse !== null &&
+        'message' in errorResponse
+          ? (errorResponse as any).message
+          : errorResponse || message,
     });
   }
 }

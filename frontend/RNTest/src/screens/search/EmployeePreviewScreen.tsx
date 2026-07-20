@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Text, Card, Avatar, useTheme, Chip, Divider, Button } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
 import { useEmployeeProfile } from '../../hooks/useEmployee';
+import { useNavigation } from '@react-navigation/native';
 
 export const EmployeePreviewScreen = () => {
   const theme = useTheme();
@@ -80,7 +81,7 @@ export const EmployeePreviewScreen = () => {
       </Card>
 
       <View style={{ padding: 16 }}>
-        <Button mode="contained" onPress={() => { /* Navigate to full profile when implemented */ }}>
+        <Button mode="contained" onPress={() => navigation.navigate('EmployeeDetails', { employeeId })}>
           View Full Profile
         </Button>
       </View>
@@ -142,7 +143,8 @@ const styles = StyleSheet.create({
   },
   skillChip: {
     marginBottom: 8,
+  },
   container: {
     padding: 16,
-  },
+  }
 });

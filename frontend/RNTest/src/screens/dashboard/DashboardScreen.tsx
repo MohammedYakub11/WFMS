@@ -3,7 +3,9 @@ import { View, StyleSheet, ScrollView, RefreshControl, ActivityIndicator } from 
 import { AppText } from '../../components/AppText';
 import { AppHeader } from '../../components/AppHeader';
 import { StatCard, Card } from '../../components/Cards';
-import { useDashboardSummary } from '../../hooks/useDashboard';
+import { DashboardChart } from '../../components/DashboardChart';
+import { RecentActivityList } from '../../components/RecentActivityList';
+import { useDashboardAnalytics, useDashboardSummary } from '../../hooks/useDashboard';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { lightTheme as theme } from '../../theme/theme';
@@ -12,9 +14,11 @@ import { EmptyState } from '../../components/EmptyState';
 export const DashboardScreen = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { data: summary, isLoading, error, refetch } = useDashboardSummary();
+  const { data: analytics, refetch: refetchAnalytics } = useDashboardAnalytics();
 
   const handleRefresh = () => {
     refetch();
+    refetchAnalytics();
   };
 
   const renderContent = () => {
@@ -52,14 +56,14 @@ export const DashboardScreen = () => {
             <StatCard
               title="Total Employees"
               value={summary.totalEmployees}
-              trend="12%"
-              trendPositive={true}
+              trend={`${summary.employeeTrend.percentage}%`}
+              trendPositive={summary.employeeTrend.positive}
             />
             <StatCard
               title="Total Skills"
               value={summary.totalSkills}
-              trend="18%"
-              trendPositive={true}
+              trend={`${summary.skillTrend.percentage}%`}
+              trendPositive={summary.skillTrend.positive}
             />
           </View>
           <View style={styles.statsRow}>
@@ -79,16 +83,26 @@ export const DashboardScreen = () => {
             <AppText variant="h2">Top Skills</AppText>
             <AppText style={styles.viewAll}>View All</AppText>
           </View>
-          {summary.topSkills.map((skill: { name: string; count: number }, index: number) => (
-            <View key={index} style={styles.skillRow}>
-              <AppText style={styles.skillName}>{skill.name}</AppText>
-              <View style={styles.progressBarBg}>
-                <View style={[styles.progressBarFill, { width: `${Math.min(100, (skill.count / 300) * 100)}%` }]} />
+          {(() => {
+            const maxSkillCount = Math.max(...summary.topSkills.map((s: { name: string; count: number }) => s.count), 1);
+            return summary.topSkills.map((skill: { name: string; count: number }, index: number) => (
+              <View key={index} style={styles.skillRow}>
+                <AppText style={styles.skillName}>{skill.name}</AppText>
+                <View style={styles.progressBarBg}>
+                  <View style={[styles.progressBarFill, { width: `${Math.min(100, (skill.count / maxSkillCount) * 100)}%` }]} />
+                </View>
+                <AppText style={styles.skillCount}>{skill.count}</AppText>
               </View>
-              <AppText style={styles.skillCount}>{skill.count}</AppText>
-            </View>
-          ))}
+            ));
+          })()}
         </Card>
+
+        <DashboardChart
+          title="Skills by Category"
+          data={(analytics?.skillsByCategory ?? []).map((c: { categoryName: string; count: number }) => ({ label: c.categoryName, value: c.count }))}
+        />
+
+        <RecentActivityList items={analytics?.recentActivity ?? []} />
 
         <Card style={styles.completionCard}>
           <View style={styles.completionContent}>
@@ -107,7 +121,7 @@ export const DashboardScreen = () => {
 
   return (
     <View style={styles.container}>
-      <AppHeader showDrawer showNotification notificationCount={3} />
+      <AppHeader showDrawer showNotification />
       {renderContent()}
     </View>
   );

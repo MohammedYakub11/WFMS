@@ -14,13 +14,57 @@ import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('window');
 const DRAWER_WIDTH = width * 0.75;
 
-const menuItems = [
+interface MenuItem {
+  key: string;
+  label: string;
+  icon: string;
+  route: string;
+  roles?: string[];
+}
+
+// 'Skills'/'WorkforceSearch' are the actual registered route names — the previous
+// 'MySkills'/'EmployeeSearch' values didn't match any screen. 'Analytics'/'Settings'
+// were removed entirely since no such routes/screens exist anywhere in the app.
+const menuItems: MenuItem[] = [
   { key: 'Dashboard', label: 'Dashboard', icon: '🏠', route: 'Dashboard' },
-  { key: 'MySkills', label: 'My Skills', icon: '⚡', route: 'MySkills' },
+  { key: 'Skills', label: 'My Skills', icon: '⚡', route: 'Skills' },
   { key: 'PendingApprovals', label: 'Pending Approvals', icon: '✅', route: 'PendingApprovals' },
-  { key: 'EmployeeSearch', label: 'Employee Search', icon: '🔍', route: 'EmployeeSearch' },
-  { key: 'Analytics', label: 'Analytics', icon: '📊', route: 'Analytics' },
-  { key: 'Settings', label: 'Settings', icon: '⚙️', route: 'Settings' },
+  { key: 'WorkforceSearch', label: 'Employee Search', icon: '🔍', route: 'WorkforceSearch' },
+  {
+    key: 'EmployeeDirectory',
+    label: 'Employee Directory',
+    icon: '👥',
+    route: 'EmployeeDirectory',
+    roles: ['Workforce Manager', 'Resource Manager', 'Administrator'],
+  },
+  {
+    key: 'skillAdmin',
+    label: 'Skill Administration',
+    icon: '🛠️',
+    route: 'SkillAdminDirectory',
+    roles: ['Workforce Manager', 'Resource Manager', 'Administrator'],
+  },
+  {
+    key: 'skillCategories',
+    label: 'Skill Categories',
+    icon: '📂',
+    route: 'SkillCategoryManagement',
+    roles: ['Workforce Manager', 'Resource Manager', 'Administrator'],
+  },
+  {
+    key: 'RoleManagement',
+    label: 'Role Management',
+    icon: '🛡️',
+    route: 'RoleManagement',
+    roles: ['Administrator'],
+  },
+  {
+    key: 'AdminOverview',
+    label: 'Admin Overview',
+    icon: '📊',
+    route: 'AdminOverview',
+    roles: ['Administrator'],
+  },
 ];
 
 export const DrawerNavigator = () => {
@@ -71,7 +115,9 @@ export const DrawerNavigator = () => {
 
             {/* Menu Items */}
             <View style={styles.menuList}>
-              {menuItems.map((item) => (
+              {menuItems
+                .filter((item) => !item.roles || (!!user?.role && item.roles.includes(user.role)))
+                .map((item) => (
                 <TouchableOpacity
                   key={item.key}
                   style={styles.menuItem}

@@ -37,10 +37,20 @@ export class EmployeeSkill {
   @Column({ name: 'is_certified', type: 'boolean', default: false })
   isCertified: boolean;
 
-  @Column({ name: 'certification_name', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'certification_name',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   certificationName: string;
 
-  @Column({ name: 'issuing_organization', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'issuing_organization',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   issuingOrganization: string;
 
   @Column({ name: 'issue_date', type: 'date', nullable: true })
@@ -53,7 +63,12 @@ export class EmployeeSkill {
   lastUsedDate: Date;
 
   @Index('idx_emp_skill_approval')
-  @Column({ name: 'approval_status', type: 'varchar', length: 50, default: 'pending' })
+  @Column({
+    name: 'approval_status',
+    type: 'varchar',
+    length: 50,
+    default: 'pending',
+  })
   approvalStatus: string;
 
   @Column({ name: 'remarks', type: 'text', nullable: true })
@@ -74,7 +89,12 @@ export class EmployeeSkill {
   @Column({ name: 'review_comments', type: 'text', nullable: true })
   reviewComments: string;
 
-  @Column({ name: 'previous_status', type: 'varchar', length: 50, nullable: true })
+  @Column({
+    name: 'previous_status',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
   previousStatus: string;
 
   @Column({ name: 'submitted_at', type: 'timestamp', nullable: true })

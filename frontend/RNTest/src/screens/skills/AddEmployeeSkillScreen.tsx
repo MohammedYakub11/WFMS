@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { Text, TextInput, Button, Switch, HelperText } from 'react-native-paper';
+import { Switch } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -9,6 +9,12 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { useCreateEmployeeSkill } from '../../hooks/useSkills';
 import { SkillProficiencyRating } from '../../components/skills/SkillProficiencyRating';
+import { AppHeader } from '../../components/AppHeader';
+import { AppTextField } from '../../components/AppTextField';
+import { AppText } from '../../components/AppText';
+import { PrimaryButton } from '../../components/PrimaryButton';
+import { Card } from '../../components/Cards';
+import { lightTheme as theme } from '../../theme/theme';
 
 const schema = yup.object({
   categoryId: yup.string().required('Skill category is required'),
@@ -52,139 +58,171 @@ export const AddEmployeeSkillScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text variant="headlineMedium" style={styles.title}>Add New Skill</Text>
-        
-        <Controller
-          control={control}
-          name="categoryId"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              label="Category ID (Temp)"
-              value={value}
-              onChangeText={onChange}
-              error={!!errors.categoryId}
-              style={styles.input}
+    <View style={styles.container}>
+      <AppHeader title="Add New Skill" showBack />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardView}>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          
+          <Card style={styles.sectionCard}>
+            <AppText variant="h3" style={styles.sectionTitle}>Skill Details</AppText>
+            <Controller
+              control={control}
+              name="categoryId"
+              render={({ field: { onChange, value } }) => (
+                <AppTextField
+                  label="Category ID"
+                  placeholder="Enter category ID"
+                  value={value}
+                  onChangeText={onChange}
+                  error={errors.categoryId?.message}
+                />
+              )}
             />
-          )}
-        />
-        {errors.categoryId && <HelperText type="error">{errors.categoryId.message}</HelperText>}
 
-        <Controller
-          control={control}
-          name="skillId"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              label="Skill ID (Temp)"
-              value={value}
-              onChangeText={onChange}
-              error={!!errors.skillId}
-              style={styles.input}
+            <Controller
+              control={control}
+              name="skillId"
+              render={({ field: { onChange, value } }) => (
+                <AppTextField
+                  label="Skill ID"
+                  placeholder="Enter skill ID"
+                  value={value}
+                  onChangeText={onChange}
+                  error={errors.skillId?.message}
+                />
+              )}
             />
-          )}
-        />
-        {errors.skillId && <HelperText type="error">{errors.skillId.message}</HelperText>}
+          </Card>
 
-        <View style={styles.ratingContainer}>
-          <Text variant="titleMedium">Proficiency Rating</Text>
-          <Controller
-            control={control}
-            name="proficiencyRating"
-            render={({ field: { onChange, value } }) => (
-              <SkillProficiencyRating
-                rating={value}
-                readonly={false}
-                onRatingChange={onChange}
+          <Card style={styles.sectionCard}>
+            <AppText variant="h3" style={styles.sectionTitle}>Experience & Rating</AppText>
+            
+            <View style={styles.ratingContainer}>
+              <AppText variant="inputLabel" style={styles.ratingLabel}>Proficiency Rating</AppText>
+              <Controller
+                control={control}
+                name="proficiencyRating"
+                render={({ field: { onChange, value } }) => (
+                  <SkillProficiencyRating
+                    rating={value}
+                    readonly={false}
+                    onRatingChange={onChange}
+                    size={32}
+                  />
+                )}
               />
-            )}
-          />
-          {errors.proficiencyRating && <HelperText type="error">{errors.proficiencyRating.message}</HelperText>}
-        </View>
+              {errors.proficiencyRating && (
+                <AppText variant="caption" color={theme.colors.error} style={styles.errorText}>
+                  {errors.proficiencyRating.message}
+                </AppText>
+              )}
+            </View>
 
-        <Controller
-          control={control}
-          name="yearsOfExperience"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              label="Years of Experience"
-              value={value ? String(value) : ''}
-              onChangeText={onChange}
-              keyboardType="numeric"
-              error={!!errors.yearsOfExperience}
-              style={styles.input}
+            <Controller
+              control={control}
+              name="yearsOfExperience"
+              render={({ field: { onChange, value } }) => (
+                <AppTextField
+                  label="Years of Experience"
+                  placeholder="e.g. 3"
+                  value={value ? String(value) : ''}
+                  onChangeText={onChange}
+                  keyboardType="numeric"
+                  error={errors.yearsOfExperience?.message}
+                />
+              )}
             />
-          )}
-        />
-        {errors.yearsOfExperience && <HelperText type="error">{errors.yearsOfExperience.message}</HelperText>}
 
-        <View style={styles.switchContainer}>
-          <Text variant="bodyLarge">Set as Primary Skill</Text>
-          <Controller
-            control={control}
-            name="isPrimary"
-            render={({ field: { onChange, value } }) => (
-              <Switch value={value} onValueChange={onChange} />
-            )}
+            <View style={styles.switchContainer}>
+              <AppText variant="bodyText" style={{ color: theme.colors.textPrimary }}>Set as Primary Skill</AppText>
+              <Controller
+                control={control}
+                name="isPrimary"
+                render={({ field: { onChange, value } }) => (
+                  <Switch value={value || false} onValueChange={onChange} color={theme.colors.primary} />
+                )}
+              />
+            </View>
+          </Card>
+
+          <Card style={styles.sectionCard}>
+            <AppText variant="h3" style={styles.sectionTitle}>Additional Information</AppText>
+            <Controller
+              control={control}
+              name="notes"
+              render={({ field: { onChange, value } }) => (
+                <AppTextField
+                  label="Notes"
+                  placeholder="Add any additional details or context..."
+                  value={value || ''}
+                  onChangeText={onChange}
+                  multiline
+                  numberOfLines={4}
+                  style={styles.textArea}
+                  error={errors.notes?.message}
+                />
+              )}
+            />
+          </Card>
+        </ScrollView>
+
+        <View style={styles.footer}>
+          <PrimaryButton 
+            title="Submit for Approval" 
+            onPress={handleSubmit(onSubmit)} 
+            isLoading={createMutation.isPending}
+            disabled={createMutation.isPending}
           />
         </View>
-
-        <Controller
-          control={control}
-          name="notes"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              label="Notes"
-              value={value || ''}
-              onChangeText={onChange}
-              multiline
-              numberOfLines={3}
-              error={!!errors.notes}
-              style={styles.input}
-            />
-          )}
-        />
-        {errors.notes && <HelperText type="error">{errors.notes.message}</HelperText>}
-
-        <Button 
-          mode="contained" 
-          onPress={handleSubmit(onSubmit)} 
-          style={styles.button}
-          loading={createMutation.isPending}
-          disabled={createMutation.isPending}
-        >
-          Submit for Approval
-        </Button>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
+  },
+  keyboardView: {
+    flex: 1,
   },
   scrollContent: {
     padding: 16,
+    paddingBottom: 40,
   },
-  title: {
-    marginBottom: 24,
-    fontWeight: 'bold',
+  sectionCard: {
+    marginBottom: 16,
   },
-  input: {
-    marginBottom: 8,
+  sectionTitle: {
+    marginBottom: 16,
+    color: theme.colors.primary,
   },
   ratingContainer: {
-    marginVertical: 16,
+    marginBottom: 20,
+  },
+  ratingLabel: {
+    color: theme.colors.textSecondary,
+    marginBottom: 8,
+  },
+  errorText: {
+    marginTop: 4,
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 16,
+    marginVertical: 12,
   },
-  button: {
-    marginTop: 24,
+  textArea: {
+    height: 100,
+    alignItems: 'flex-start',
+    paddingVertical: 12,
+  },
+  footer: {
+    padding: 16,
+    backgroundColor: theme.colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.divider,
   },
 });

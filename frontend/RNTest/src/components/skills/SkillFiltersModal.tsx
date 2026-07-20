@@ -1,11 +1,15 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Modal, Portal, Text, Button, Chip, RadioButton, Divider, useTheme } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Modal, Portal, Divider } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { setSelectedCategoryId, setSelectedProficiency, setSortOption, clearFilters } from '../../store/skillsSlice';
 import { SkillCategory } from '../../types/skills';
 import { useSkillCategories } from '../../hooks/useSkills';
+import { AppText } from '../AppText';
+import { PrimaryButton } from '../PrimaryButton';
+import { SecondaryButton } from '../SecondaryButton';
+import { lightTheme as theme } from '../../theme/theme';
 
 interface SkillFiltersModalProps {
   visible: boolean;
@@ -21,91 +25,85 @@ const SORT_OPTIONS = [
 ];
 
 export const SkillFiltersModal: React.FC<SkillFiltersModalProps> = ({ visible, onDismiss }) => {
-  const theme = useTheme();
   const dispatch = useDispatch();
   
   const { selectedCategoryId, selectedProficiency, sortOption } = useSelector((state: RootState) => state.skills);
   const { data: categoriesData } = useSkillCategories();
-  const categories: SkillCategory[] = categoriesData?.data?.data || [];
+  const categories: SkillCategory[] = categoriesData?.items || [];
+
+  const renderChip = (label: string, isSelected: boolean, onPress: () => void) => (
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={onPress}
+      style={[
+        styles.chip,
+        isSelected ? styles.chipSelected : styles.chipUnselected
+      ]}
+    >
+      <AppText
+        variant="caption"
+        style={{
+          color: isSelected ? theme.colors.primaryButtonText : theme.colors.textSecondary,
+          fontFamily: theme.typography.fontFamily.semiBold
+        }}
+      >
+        {label}
+      </AppText>
+    </TouchableOpacity>
+  );
 
   return (
     <Portal>
       <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modalContainer}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text variant="titleLarge" style={styles.header}>Sort & Filter Skills</Text>
+          <AppText variant="h2" style={styles.header}>Sort & Filter Skills</AppText>
           
-          {/* Sorting Section */}
-          <Text variant="titleMedium" style={styles.sectionTitle}>Sort By</Text>
-          <RadioButton.Group 
-            onValueChange={value => dispatch(setSortOption(value))} 
-            value={sortOption}
-          >
-            {SORT_OPTIONS.map((option) => (
-              <RadioButton.Item 
-                key={option.value} 
-                label={option.label} 
-                value={option.value} 
-                position="leading"
-                labelStyle={styles.radioLabel}
-              />
-            ))}
-          </RadioButton.Group>
-
-          <Divider style={styles.divider} />
-
-          {/* Filtering Section - Category */}
-          <Text variant="titleMedium" style={styles.sectionTitle}>Category</Text>
+          <AppText variant="h3" style={styles.sectionTitle}>Sort By</AppText>
           <View style={styles.chipContainer}>
-            <Chip 
-              selected={selectedCategoryId === null}
-              onPress={() => dispatch(setSelectedCategoryId(null))}
-              style={styles.chip}
-            >
-              All Categories
-            </Chip>
-            {categories.map((cat: SkillCategory) => (
-              <Chip
-                key={cat.id}
-                selected={selectedCategoryId === cat.id}
-                onPress={() => dispatch(setSelectedCategoryId(cat.id))}
-                style={styles.chip}
-              >
-                {cat.categoryName}
-              </Chip>
-            ))}
+            {SORT_OPTIONS.map((option) => 
+              renderChip(
+                option.label, 
+                sortOption === option.value, 
+                () => dispatch(setSortOption(option.value))
+              )
+            )}
           </View>
 
           <Divider style={styles.divider} />
 
-          {/* Filtering Section - Proficiency */}
-          <Text variant="titleMedium" style={styles.sectionTitle}>Minimum Proficiency</Text>
+          <AppText variant="h3" style={styles.sectionTitle}>Category</AppText>
           <View style={styles.chipContainer}>
-            <Chip 
-              selected={selectedProficiency === null}
-              onPress={() => dispatch(setSelectedProficiency(null))}
-              style={styles.chip}
-            >
-              Any
-            </Chip>
-            {[1, 2, 3, 4, 5].map((level) => (
-              <Chip
-                key={level}
-                selected={selectedProficiency === level}
-                onPress={() => dispatch(setSelectedProficiency(level))}
-                style={styles.chip}
-              >
-                {level}+ Stars
-              </Chip>
-            ))}
+            {renderChip('All Categories', selectedCategoryId === null, () => dispatch(setSelectedCategoryId(null)))}
+            {categories.map((cat: SkillCategory) => 
+              renderChip(
+                cat.categoryName, 
+                selectedCategoryId === cat.id, 
+                () => dispatch(setSelectedCategoryId(cat.id))
+              )
+            )}
+          </View>
+
+          <Divider style={styles.divider} />
+
+          <AppText variant="h3" style={styles.sectionTitle}>Minimum Proficiency</AppText>
+          <View style={styles.chipContainer}>
+            {renderChip('Any', selectedProficiency === null, () => dispatch(setSelectedProficiency(null)))}
+            {[1, 2, 3, 4, 5].map((level) => 
+              renderChip(
+                `${level}+ Stars`, 
+                selectedProficiency === level, 
+                () => dispatch(setSelectedProficiency(level))
+              )
+            )}
           </View>
           
           <View style={styles.actionContainer}>
-            <Button mode="outlined" onPress={() => dispatch(clearFilters())} style={styles.actionButton}>
-              Clear All
-            </Button>
-            <Button mode="contained" onPress={onDismiss} style={styles.actionButton}>
-              Apply
-            </Button>
+            <View style={styles.actionButton}>
+              <SecondaryButton title="Clear All" onPress={() => dispatch(clearFilters())} />
+            </View>
+            <View style={styles.actionButton}>
+              <PrimaryButton title="Apply" onPress={onDismiss} />
+            </View>
           </View>
         </ScrollView>
       </Modal>
@@ -115,27 +113,25 @@ export const SkillFiltersModal: React.FC<SkillFiltersModalProps> = ({ visible, o
 
 const styles = StyleSheet.create({
   modalContainer: {
-    backgroundColor: 'white',
-    padding: 20,
+    backgroundColor: theme.colors.surface,
+    padding: 24,
     margin: 20,
-    borderRadius: 8,
-    maxHeight: '80%',
+    borderRadius: theme.radius.l,
+    maxHeight: '85%',
   },
   header: {
-    fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: 'center',
+    color: theme.colors.textPrimary,
   },
   sectionTitle: {
-    fontWeight: 'bold',
     marginTop: 8,
     marginBottom: 12,
-  },
-  radioLabel: {
-    textAlign: 'left',
+    color: theme.colors.textPrimary,
   },
   divider: {
-    marginVertical: 16,
+    marginVertical: 20,
+    backgroundColor: theme.colors.divider,
   },
   chipContainer: {
     flexDirection: 'row',
@@ -143,12 +139,23 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  chipSelected: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  chipUnselected: {
+    backgroundColor: 'transparent',
+    borderColor: theme.colors.border,
   },
   actionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 24,
+    marginTop: 32,
     gap: 16,
   },
   actionButton: {

@@ -1,7 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, OneToOne, OneToMany, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
+  OneToOne,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ProfileMetadata } from './profile-metadata.entity';
 import { EmployeeSkill } from '../../employee-skills/entities/employee-skill.entity';
+import { EmployeeRole } from '../../roles/entities/employee-role.entity';
 
 @Entity('employees')
 export class Employee {
@@ -51,7 +66,9 @@ export class Employee {
   @Column({ default: 'active' })
   status: string;
 
-  @OneToOne(() => ProfileMetadata, metadata => metadata.employee, { cascade: true })
+  @OneToOne(() => ProfileMetadata, (metadata) => metadata.employee, {
+    cascade: true,
+  })
   profile_metadata: ProfileMetadata;
 
   @CreateDateColumn()
@@ -62,6 +79,23 @@ export class Employee {
 
   @OneToMany(() => EmployeeSkill, (employeeSkill) => employeeSkill.employee)
   employeeSkills: EmployeeSkill[];
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: Date;
+
+  @Index('idx_employee_reporting_manager')
+  @Column({ name: 'reporting_manager_id', type: 'uuid', nullable: true })
+  reportingManagerId: string | null;
+
+  @ManyToOne(() => Employee, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'reporting_manager_id' })
+  reportingManager: Employee;
+
+  @OneToMany(() => Employee, (employee) => employee.reportingManager)
+  directReports: Employee[];
+
+  @OneToMany(() => EmployeeRole, (er) => er.employee)
+  employeeRoles: EmployeeRole[];
 
   // Hash password before inserting or updating if it has been changed
   @BeforeInsert()

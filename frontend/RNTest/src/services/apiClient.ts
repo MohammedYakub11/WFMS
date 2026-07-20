@@ -6,7 +6,7 @@ import { getBaseUrl } from '../utils/network';
 // Use environment variable or default to localhost
 // For Android emulator to access local machine, use 10.0.2.2. For iOS simulator, use localhost.
 const BASE_URL = getBaseUrl();
-
+console.log('BASE_URL =', BASE_URL);
 export const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -81,13 +81,14 @@ apiClient.interceptors.response.use(
 
         const newAccessToken = response.data.data.accessToken;
         const newRefreshToken = response.data.data.refreshToken;
+        const refreshedUser = response.data.data.user;
 
-        store.dispatch(setAuthTokens({ accessToken: newAccessToken, refreshToken: newRefreshToken }));
-        await AsyncStorage.setItem('authState', JSON.stringify({ accessToken: newAccessToken, refreshToken: newRefreshToken }));
+        store.dispatch(setAuthTokens({ accessToken: newAccessToken, refreshToken: newRefreshToken, user: refreshedUser }));
+        await AsyncStorage.setItem('authState', JSON.stringify({ accessToken: newAccessToken, refreshToken: newRefreshToken, user: refreshedUser }));
 
         processQueue(null, newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        
+
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);

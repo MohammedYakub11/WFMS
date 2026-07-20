@@ -33,7 +33,7 @@ async function bootstrap() {
   await app.close();
 }
 
-bootstrap().catch(err => {
+bootstrap().catch((err) => {
   console.error('Error seeding admin user:', err);
   process.exit(1);
 });

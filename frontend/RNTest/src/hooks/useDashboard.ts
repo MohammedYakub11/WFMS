@@ -1,21 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
-import apiClient from '../services/apiClient';
+import { dashboardService } from '../services/dashboard.service';
 
-export interface DashboardSummary {
-  totalEmployees: number;
-  totalSkills: number;
-  departments: number;
-  openRoles: number;
-  topSkills: Array<{ name: string; count: number }>;
-  profileCompletion: number;
-}
+const DASHBOARD_STALE_TIME_MS = 60 * 1000;
 
 export const useDashboardSummary = () => {
   return useQuery({
     queryKey: ['dashboardSummary'],
-    queryFn: async (): Promise<DashboardSummary> => {
-      const { data } = await apiClient.get('/dashboard/summary');
-      return data.data as DashboardSummary;
-    },
+    queryFn: () => dashboardService.getSummary(),
+    staleTime: DASHBOARD_STALE_TIME_MS,
+  });
+};
+
+export const useDashboardAnalytics = () => {
+  return useQuery({
+    queryKey: ['dashboardAnalytics'],
+    queryFn: () => dashboardService.getAnalytics(),
+    staleTime: DASHBOARD_STALE_TIME_MS,
   });
 };

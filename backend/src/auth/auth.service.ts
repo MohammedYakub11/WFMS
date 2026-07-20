@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { EmployeesService } from '../employees/employees.service';
+import { RolesService } from '../roles/roles.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ConfigService } from '@nestjs/config';
@@ -9,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 export class AuthService {
   constructor(
     private readonly employeesService: EmployeesService,
+    private readonly rolesService: RolesService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -29,11 +31,14 @@ export class AuthService {
 
   async refreshToken(refreshTokenDto: RefreshTokenDto) {
     try {
-      const payload = this.jwtService.verify(refreshTokenDto.refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      }) as { sub: string; email: string };
-      
-      const employee = await this.employeesService.findById(String(payload.sub));
+      const payload = this.jwtService.verify<{ sub: string; email: string }>(
+        refreshTokenDto.refreshToken,
+        { secret: this.configService.get<string>('JWT_REFRESH_SECRET') },
+      );
+
+      const employee = await this.employeesService.findById(
+        String(payload.sub),
+      );
       if (!employee) {
         throw new UnauthorizedException('Invalid refresh token');
       }
@@ -48,21 +53,32 @@ export class AuthService {
     const employee = await this.employeesService.findByEmail(email);
     if (!employee) {
       // For security, don't reveal if user exists, just return success
-      return { message: 'If an account exists, a password reset link has been sent.' };
+      return {
+        message: 'If an account exists, a password reset link has been sent.',
+      };
     }
     // TODO: Implement actual email sending logic and token generation
-    return { message: 'If an account exists, a password reset link has been sent.' };
+    return {
+      message: 'If an account exists, a password reset link has been sent.',
+    };
   }
 
   async resetPassword(_token: string, _newPassword: string) {
     // TODO: Implement actual token verification and password update
-    await new Promise(resolve => setTimeout(resolve, 10)); // Dummy await to fix ESLint
+    await new Promise((resolve) => setTimeout(resolve, 10)); // Dummy await to fix ESLint
     return { message: 'Password has been successfully reset.' };
   }
 
   private async generateTokens(userId: string, email: string) {
-    const payload = { email, sub: userId };
-    
+    const { roleName, permissionCodes } =
+      await this.rolesService.getEffectivePermissions(userId);
+    const payload = {
+      email,
+      sub: userId,
+      role: roleName,
+      permissions: permissionCodes,
+    };
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('JWT_SECRET'),
@@ -70,7 +86,10 @@ export class AuthService {
       }),
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRES_IN', 604800),
+        expiresIn: this.configService.get<number>(
+          'JWT_REFRESH_EXPIRES_IN',
+          604800,
+        ),
       }),
     ]);
 
@@ -80,9 +99,14 @@ export class AuthService {
       data: {
         accessToken,
         refreshToken,
-        user: { id: userId, email }
+        user: {
+          id: userId,
+          email,
+          role: roleName,
+          permissions: permissionCodes,
+        },
       },
-      errors: null
+      errors: null,
     };
   }
 }

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { skillService } from '../services/skill.service';
-import { SkillCategory, Skill, EmployeeSkill } from '../types/skills';
+import { EmployeeSkill } from '../types/skills';
 
 export const useSkillCategories = (params?: any) => {
   return useQuery({

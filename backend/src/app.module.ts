@@ -10,6 +10,7 @@ import { EmployeesModule } from './employees/employees.module';
 import { Employee } from './employees/entities/employee.entity';
 import { ProfileMetadata } from './employees/entities/profile-metadata.entity';
 import { Notification } from './notifications/entities/notification.entity';
+import { NotificationPreference } from './notifications/entities/notification-preference.entity';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { SkillCategory } from './skill-categories/entities/skill-category.entity';
 import { Skill } from './skills/entities/skill.entity';
@@ -18,12 +19,22 @@ import { SkillCategoriesModule } from './skill-categories/skill-categories.modul
 import { SkillsModule } from './skills/skills.module';
 import { EmployeeSkillsModule } from './employee-skills/employee-skills.module';
 import { SearchModule } from './search/search.module';
+import { Role } from './roles/entities/role.entity';
+import { Permission } from './roles/entities/permission.entity';
+import { RolePermission } from './roles/entities/role-permission.entity';
+import { EmployeeRole } from './roles/entities/employee-role.entity';
+import { AuditLog } from './audit-logs/entities/audit-log.entity';
+import { RolesModule } from './roles/roles.module';
+import { AuditLogModule } from './audit-logs/audit-log.module';
+import { NotificationsModule } from './notifications/notifications.module';
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -36,9 +47,23 @@ import { SearchModule } from './search/search.module';
           username: configService.get<string>('DB_USERNAME', 'postgres'),
           password: configService.get<string>('DB_PASSWORD', ''),
           database: configService.get<string>('DB_DATABASE', 'wfms_db'),
-          entities: [Employee, ProfileMetadata, Notification, SkillCategory, Skill, EmployeeSkill],
+          entities: [
+            Employee,
+            ProfileMetadata,
+            Notification,
+            NotificationPreference,
+            SkillCategory,
+            Skill,
+            EmployeeSkill,
+            Role,
+            Permission,
+            RolePermission,
+            EmployeeRole,
+            AuditLog,
+          ],
           synchronize: false,
-          migrationsRun: configService.get<string>('MIGRATIONS_RUN', 'true') === 'true',
+          migrationsRun:
+            configService.get<string>('MIGRATIONS_RUN', 'true') === 'true',
         };
 
         return config;
@@ -51,6 +76,9 @@ import { SearchModule } from './search/search.module';
     SkillsModule,
     EmployeeSkillsModule,
     SearchModule,
+    RolesModule,
+    AuditLogModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -61,4 +89,4 @@ import { SearchModule } from './search/search.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

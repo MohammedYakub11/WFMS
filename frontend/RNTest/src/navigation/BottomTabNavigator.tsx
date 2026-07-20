@@ -4,14 +4,15 @@ import { StyleSheet, View } from 'react-native';
 import { lightTheme as theme } from '../theme/theme';
 import { AppText } from '../components/AppText';
 import { Svg, Path, Circle, Rect } from 'react-native-svg';
-import { DashboardScreen } from '../screens/dashboard/DashboardScreen';
+import { DashboardTabScreen } from '../screens/dashboard/DashboardTabScreen';
 import { MyProfileScreen } from '../screens/profile/MyProfileScreen';
 
 import { MySkillsScreen } from '../screens/skills/MySkillsScreen';
+import { NotificationCenterScreen } from '../screens/notifications/NotificationCenterScreen';
+import { useUnreadNotificationCount } from '../hooks/useNotifications';
 
 // Placeholder Screens
 const SearchScreen = () => <View style={styles.screen}><AppText>Search Screen</AppText></View>;
-const NotificationsScreen = () => <View style={styles.screen}><AppText>Notifications Screen</AppText></View>;
 
 export type BottomTabParamList = {
   Dashboard: undefined;
@@ -84,6 +85,8 @@ interface BottomTabNavigatorProps {
 }
 
 export const BottomTabNavigator = (_props: BottomTabNavigatorProps) => {
+  const { data: unreadCount } = useUnreadNotificationCount();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -105,10 +108,14 @@ export const BottomTabNavigator = (_props: BottomTabNavigatorProps) => {
         tabBarIcon: ({ color, focused }) => <TabIcon name={route.name} color={color} focused={focused} />,
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen name="Dashboard" component={DashboardTabScreen} />
       <Tab.Screen name="Skills" component={MySkillsScreen} />
       <Tab.Screen name="Search" component={SearchScreen} />
-      <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarBadge: 3 }} />
+      <Tab.Screen
+        name="Notifications"
+        component={NotificationCenterScreen}
+        options={{ tabBarBadge: unreadCount && unreadCount > 0 ? unreadCount : undefined }}
+      />
       <Tab.Screen name="Profile" component={MyProfileScreen} />
     </Tab.Navigator>
   );

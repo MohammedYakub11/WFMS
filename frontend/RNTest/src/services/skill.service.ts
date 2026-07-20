@@ -1,40 +1,81 @@
 import apiClient from './apiClient';
-import { SkillCategory, Skill, EmployeeSkill, PaginatedResponse } from '../types/skills';
+import { SkillCategory, Skill, EmployeeSkill, PaginatedResponse, PaginatedListResult } from '../types/skills';
 
 export const skillService = {
   // Categories
-  getCategories: async (params?: any) => {
-    const response = await apiClient.get<PaginatedResponse<SkillCategory>>('/skill-categories', { params });
-    return response.data;
+  getCategories: async (params?: any): Promise<PaginatedListResult<SkillCategory>> => {
+    const response = await apiClient.get('/skill-categories', { params });
+    return response.data.data;
   },
-  createCategory: async (data: Partial<SkillCategory>) => {
-    const response = await apiClient.post<SkillCategory>('/skill-categories', data);
-    return response.data;
+  getCategory: async (id: string): Promise<SkillCategory> => {
+    const response = await apiClient.get(`/skill-categories/${id}`);
+    return response.data.data as SkillCategory;
   },
-  updateCategory: async (id: string, data: Partial<SkillCategory>) => {
-    const response = await apiClient.put<SkillCategory>(`/skill-categories/${id}`, data);
-    return response.data;
+  createCategory: async (data: Partial<SkillCategory>): Promise<SkillCategory> => {
+    const response = await apiClient.post('/skill-categories', data);
+    return response.data.data;
+  },
+  updateCategory: async (id: string, data: Partial<SkillCategory>): Promise<SkillCategory> => {
+    const response = await apiClient.put(`/skill-categories/${id}`, data);
+    return response.data.data;
   },
   deleteCategory: async (id: string) => {
     await apiClient.delete(`/skill-categories/${id}`);
   },
+  restoreCategory: (id: string) =>
+    apiClient.post(`/skill-categories/${id}/restore`).then((r) => r.data.data as SkillCategory),
+  activateCategory: (id: string) =>
+    apiClient.patch(`/skill-categories/${id}/activate`).then((r) => r.data.data as SkillCategory),
+  deactivateCategory: (id: string) =>
+    apiClient.patch(`/skill-categories/${id}/deactivate`).then((r) => r.data.data as SkillCategory),
+  bulkCategoryStatus: (ids: string[], action: 'activate' | 'deactivate') =>
+    apiClient
+      .post('/skill-categories/bulk-status', { ids, action })
+      .then((r) => r.data.data as { requested: number; affected: number }),
+  bulkDeleteCategories: (ids: string[]) =>
+    apiClient
+      .post('/skill-categories/bulk-delete', { ids })
+      .then((r) => r.data.data as { requested: number; affected: number }),
+  exportCategories: (format: 'csv' | 'xlsx', params?: Record<string, unknown>) =>
+    apiClient
+      .get('/skill-categories/export', { params: { ...params, format }, responseType: 'blob' })
+      .then((r) => r.data),
 
   // Skills
-  getSkills: async (params?: any) => {
-    const response = await apiClient.get<PaginatedResponse<Skill>>('/skills', { params });
-    return response.data;
+  getSkills: async (params?: any): Promise<PaginatedListResult<Skill>> => {
+    const response = await apiClient.get('/skills', { params });
+    return response.data.data;
   },
-  createSkill: async (data: Partial<Skill>) => {
-    const response = await apiClient.post<Skill>('/skills', data);
-    return response.data;
+  getSkill: async (id: string): Promise<Skill> => {
+    const response = await apiClient.get(`/skills/${id}`);
+    return response.data.data as Skill;
   },
-  updateSkill: async (id: string, data: Partial<Skill>) => {
-    const response = await apiClient.put<Skill>(`/skills/${id}`, data);
-    return response.data;
+  createSkill: async (data: Partial<Skill>): Promise<Skill> => {
+    const response = await apiClient.post('/skills', data);
+    return response.data.data;
+  },
+  updateSkill: async (id: string, data: Partial<Skill>): Promise<Skill> => {
+    const response = await apiClient.put(`/skills/${id}`, data);
+    return response.data.data;
   },
   deleteSkill: async (id: string) => {
     await apiClient.delete(`/skills/${id}`);
   },
+  restoreSkill: (id: string) => apiClient.post(`/skills/${id}/restore`).then((r) => r.data.data as Skill),
+  activateSkill: (id: string) => apiClient.patch(`/skills/${id}/activate`).then((r) => r.data.data as Skill),
+  deactivateSkill: (id: string) => apiClient.patch(`/skills/${id}/deactivate`).then((r) => r.data.data as Skill),
+  bulkSkillStatus: (ids: string[], action: 'activate' | 'deactivate') =>
+    apiClient
+      .post('/skills/bulk-status', { ids, action })
+      .then((r) => r.data.data as { requested: number; affected: number }),
+  bulkDeleteSkills: (ids: string[]) =>
+    apiClient
+      .post('/skills/bulk-delete', { ids })
+      .then((r) => r.data.data as { requested: number; affected: number }),
+  exportSkills: (format: 'csv' | 'xlsx', params?: Record<string, unknown>) =>
+    apiClient
+      .get('/skills/export', { params: { ...params, format }, responseType: 'blob' })
+      .then((r) => r.data),
 
   // Employee Skills
   getEmployeeSkills: async (params?: any) => {

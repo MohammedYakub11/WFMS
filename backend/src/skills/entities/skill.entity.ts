@@ -33,6 +33,17 @@ export class Skill {
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
 
+  @Column({ name: 'skill_code', type: 'varchar', length: 50, nullable: true })
+  skillCode: string | null;
+
+  @Column({
+    name: 'required_certification',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  requiredCertification: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

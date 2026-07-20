@@ -4,6 +4,9 @@ import themeReducer from './themeSlice';
 import skillsReducer from './skillsSlice';
 import searchReducer from './searchSlice';
 import uiReducer from './uiSlice';
+import employeeDirectoryReducer from './employeeDirectorySlice';
+import skillAdminDirectoryReducer from './skillAdminDirectorySlice';
+import notificationsUiReducer from './notificationsUiSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +15,9 @@ export const store = configureStore({
     skills: skillsReducer,
     search: searchReducer,
     ui: uiReducer,
+    employeeDirectory: employeeDirectoryReducer,
+    skillAdminDirectory: skillAdminDirectoryReducer,
+    notificationsUi: notificationsUiReducer,
   },
 });
 

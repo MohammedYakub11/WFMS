@@ -1,6 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
-import { Card } from 'react-native-paper';
+import { Card } from '../Cards';
+import { lightTheme as theme } from '../../theme/theme';
+
+const smallChipStyle = { width: 60 };
 
 export const SkillSkeleton = () => {
   const animatedValue = React.useRef(new Animated.Value(0)).current;
@@ -31,56 +34,58 @@ export const SkillSkeleton = () => {
 
   return (
     <Card style={styles.card}>
-      <Card.Content>
-        <View style={styles.header}>
-          <Animated.View style={[styles.skeletonLine, styles.titleSkeleton, { opacity }]} />
+      <View style={styles.header}>
+        <Animated.View style={[styles.skeletonLine, styles.titleSkeleton, { opacity }]} />
+        <View style={styles.actions}>
+          <Animated.View style={[styles.skeletonIcon, { opacity }]} />
           <Animated.View style={[styles.skeletonIcon, { opacity }]} />
         </View>
-        <View style={styles.categoryRow}>
-          <Animated.View style={[styles.skeletonChip, { opacity }]} />
-          <Animated.View style={[styles.skeletonChip, { opacity }]} />
+      </View>
+      <View style={styles.categoryRow}>
+        <Animated.View style={[styles.skeletonChip, { opacity }]} />
+        <Animated.View style={[styles.skeletonChip, [{ opacity }, smallChipStyle]]} />
+      </View>
+      <View style={styles.detailsRow}>
+        <View style={styles.detailItem}>
+          <Animated.View style={[styles.skeletonLine, styles.labelSkeleton, { opacity }]} />
+          <Animated.View style={[styles.skeletonLine, styles.valueSkeleton, { opacity }]} />
         </View>
-        <View style={styles.detailsRow}>
-          <View style={styles.detailItem}>
-            <Animated.View style={[styles.skeletonLine, styles.labelSkeleton, { opacity }]} />
-            <Animated.View style={[styles.skeletonLine, styles.valueSkeleton, { opacity }]} />
-          </View>
-          <View style={styles.detailItem}>
-            <Animated.View style={[styles.skeletonLine, styles.labelSkeleton, { opacity }]} />
-            <Animated.View style={[styles.skeletonLine, styles.valueSkeleton, { opacity }]} />
-          </View>
+        <View style={styles.detailItem}>
+          <Animated.View style={[styles.skeletonLine, styles.labelSkeleton, { opacity }]} />
+          <Animated.View style={[styles.skeletonLine, styles.valueSkeleton, { opacity }]} />
         </View>
-      </Card.Content>
+      </View>
     </Card>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    marginVertical: 8,
     marginHorizontal: 16,
-    elevation: 1,
-    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   skeletonLine: {
-    backgroundColor: '#E0E0E0',
+    backgroundColor: theme.colors.border,
     borderRadius: 4,
   },
   titleSkeleton: {
-    width: '60%',
+    width: '50%',
     height: 24,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: 8,
   },
   skeletonIcon: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: theme.colors.border,
   },
   categoryRow: {
     flexDirection: 'row',
@@ -89,9 +94,9 @@ const styles = StyleSheet.create({
   },
   skeletonChip: {
     width: 80,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#E0E0E0',
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: theme.colors.border,
   },
   detailsRow: {
     flexDirection: 'row',

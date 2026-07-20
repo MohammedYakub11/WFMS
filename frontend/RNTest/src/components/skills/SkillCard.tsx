@@ -1,7 +1,12 @@
 import React, { memo } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Card, Text, Chip, IconButton, useTheme, MD3Theme } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Chip, IconButton } from 'react-native-paper';
+import { Card } from '../Cards';
+import { AppText } from '../AppText';
 import { EmployeeSkill } from '../../types/skills';
+import { lightTheme as theme } from '../../theme/theme';
+
+import { SkillProficiencyRating } from './SkillProficiencyRating';
 
 interface SkillCardProps {
   employeeSkill: EmployeeSkill;
@@ -10,85 +15,77 @@ interface SkillCardProps {
   onPress?: (skill: EmployeeSkill) => void;
 }
 
-const getStatusColor = (status: string | undefined, theme: MD3Theme) => {
-  switch (status) {
-    case 'approved': return theme.colors.primary;
-    case 'pending': return theme.colors.tertiary;
-    case 'rejected': return theme.colors.error;
-    default: return theme.colors.secondary;
+const getStatusColor = (status: string | undefined) => {
+  switch (status?.toLowerCase()) {
+    case 'approved': return theme.colors.statusApproved;
+    case 'pending': return theme.colors.statusPending;
+    case 'rejected': return theme.colors.statusRejected;
+    default: return theme.colors.statusDraft;
   }
 };
 
 const SkillCardComponent: React.FC<SkillCardProps> = ({ employeeSkill, onEdit, onDelete, onPress }) => {
-  const theme = useTheme();
-  
   const skillName = employeeSkill.skill?.skillName || 'Unknown Skill';
   const categoryName = employeeSkill.skill?.category?.categoryName || 'Uncategorized';
   
-  const statusColor = getStatusColor(employeeSkill.approvalStatus, theme);
+  const statusColor = getStatusColor(employeeSkill.approvalStatus);
   const formattedDate = new Date(employeeSkill.updatedAt).toLocaleDateString();
 
   return (
     <Card style={styles.card} onPress={() => onPress && onPress(employeeSkill)}>
-      <Card.Content>
-        <View style={styles.header}>
-          <View style={styles.titleContainer}>
-            <Text variant="titleMedium" style={styles.title} numberOfLines={1}>{skillName}</Text>
-            {employeeSkill.isCertified && (
-              <Chip icon="certificate" compact style={styles.certChip} textStyle={styles.certText}>
-                Certified
-              </Chip>
-            )}
-          </View>
-          <View style={styles.actions}>
-            {onEdit && <IconButton icon="pencil" size={20} onPress={() => onEdit(employeeSkill)} />}
-            {onDelete && <IconButton icon="delete" size={20} iconColor={theme.colors.error} onPress={() => onDelete(employeeSkill)} />}
-          </View>
-        </View>
-
-        <View style={styles.categoryRow}>
-          <Chip style={styles.categoryChip}>{categoryName}</Chip>
-          {employeeSkill.approvalStatus && (
-            <Chip style={[styles.statusChip, { backgroundColor: statusColor }]} textStyle={styles.statusText}>
-              {employeeSkill.approvalStatus.toUpperCase()}
-            </Chip>
+      <View style={styles.header}>
+        <View style={styles.titleContainer}>
+          <AppText variant="h2" style={styles.title} numberOfLines={1}>{skillName}</AppText>
+          {employeeSkill.isCertified && (
+            <View style={styles.certBadge}>
+              <AppText variant="caption" style={styles.certText}>Certified</AppText>
+            </View>
           )}
         </View>
-
-        <View style={styles.detailsRow}>
-          <View style={styles.detailItem}>
-            <Text variant="labelSmall" style={styles.detailLabel}>Proficiency</Text>
-            <View style={styles.ratingContainer}>
-              {[...Array(5)].map((_, i) => (
-                <IconButton 
-                  key={i} 
-                  icon={i < employeeSkill.proficiencyRating ? "star" : "star-outline"} 
-                  size={16} 
-                  style={styles.starIcon}
-                  iconColor={i < employeeSkill.proficiencyRating ? "#FFD700" : theme.colors.outline}
-                />
-              ))}
-            </View>
-          </View>
-          <View style={styles.detailItem}>
-            <Text variant="labelSmall" style={styles.detailLabel}>Experience</Text>
-            <Text variant="bodyMedium">{employeeSkill.yearsOfExperience || 0} years</Text>
-          </View>
+        <View style={styles.actions}>
+          {onEdit && <IconButton icon="pencil" size={20} iconColor={theme.colors.textSecondary} onPress={() => onEdit(employeeSkill)} />}
+          {onDelete && <IconButton icon="delete" size={20} iconColor={theme.colors.error} onPress={() => onDelete(employeeSkill)} />}
         </View>
+      </View>
 
-        <View style={styles.footer}>
-          <Text variant="bodySmall" style={styles.dateText}>Last updated: {formattedDate}</Text>
+      <View style={styles.categoryRow}>
+        <Chip 
+          style={styles.categoryChip} 
+          textStyle={styles.chipText}
+          compact
+        >
+          {categoryName}
+        </Chip>
+        {employeeSkill.approvalStatus && (
+          <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+            <AppText variant="caption" style={styles.statusText}>
+              {employeeSkill.approvalStatus.toUpperCase()}
+            </AppText>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.detailsRow}>
+        <View style={styles.detailItem}>
+          <AppText variant="caption" style={styles.detailLabel}>Proficiency</AppText>
+          <SkillProficiencyRating rating={employeeSkill.proficiencyRating} readonly size={16} />
         </View>
-      </Card.Content>
+        <View style={styles.detailItem}>
+          <AppText variant="caption" style={styles.detailLabel}>Experience</AppText>
+          <AppText style={styles.detailValue}>{employeeSkill.yearsOfExperience || 0} years</AppText>
+        </View>
+      </View>
+
+      <View style={styles.footer}>
+        <AppText variant="caption" style={styles.dateText}>Last updated: {formattedDate}</AppText>
+      </View>
     </Card>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    marginVertical: 8,
     marginHorizontal: 16,
-    elevation: 2,
   },
   header: {
     flexDirection: 'row',
@@ -103,38 +100,43 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   title: {
-    fontWeight: 'bold',
     marginRight: 8,
   },
-  certChip: {
+  certBadge: {
     backgroundColor: '#E8F5E9',
-    height: 24,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    justifyContent: 'center',
   },
   certText: {
-    fontSize: 10,
     color: '#2E7D32',
+    fontFamily: theme.typography.fontFamily.bold,
   },
   actions: {
     flexDirection: 'row',
     marginRight: -16,
-    marginTop: -16,
+    marginTop: -8,
   },
   categoryRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 16,
     flexWrap: 'wrap',
     gap: 8,
   },
   categoryChip: {
-    marginRight: 8,
+    backgroundColor: theme.colors.border,
   },
-  statusChip: {
-    height: 28,
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
   },
   statusText: {
-    color: '#FFF',
+    color: '#FFFFFF',
+    fontFamily: theme.typography.fontFamily.bold,
     fontSize: 10,
-    fontWeight: 'bold',
   },
   detailsRow: {
     flexDirection: 'row',
@@ -145,29 +147,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   detailLabel: {
-    color: '#666',
+    color: theme.colors.textSecondary,
     marginBottom: 4,
   },
-  ratingContainer: {
-    flexDirection: 'row',
-    marginLeft: -12, // adjust for icon button padding
-  },
-  starIcon: {
-    margin: 0,
-    padding: 0,
-    width: 24,
-    height: 24,
+  detailValue: {
+    fontFamily: theme.typography.fontFamily.medium,
   },
   footer: {
     borderTopWidth: 1,
-    borderTopColor: '#EEE',
+    borderTopColor: theme.colors.divider,
     paddingTop: 12,
     marginTop: 4,
   },
   dateText: {
-    color: '#888',
+    color: theme.colors.textSecondary,
     fontStyle: 'italic',
-  }
+  },
+  chipText: {
+    color: theme.colors.textSecondary,
+    fontFamily: theme.typography.fontFamily.medium,
+    fontSize: 12,
+  },
 });
 
 export const SkillCard = memo(SkillCardComponent);

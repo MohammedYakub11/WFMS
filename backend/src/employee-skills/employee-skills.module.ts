@@ -3,9 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeeSkillsService } from './employee-skills.service';
 import { EmployeeSkillsController } from './employee-skills.controller';
 import { EmployeeSkill } from './entities/employee-skill.entity';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EmployeeSkill])],
+  imports: [TypeOrmModule.forFeature([EmployeeSkill]), NotificationsModule],
   controllers: [EmployeeSkillsController],
   providers: [EmployeeSkillsService],
   exports: [EmployeeSkillsService],

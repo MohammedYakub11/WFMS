@@ -16,7 +16,14 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_DATABASE || 'wfms_db',
-  entities: [Employee, ProfileMetadata, Notification, SkillCategory, Skill, EmployeeSkill],
+  entities: [
+    Employee,
+    ProfileMetadata,
+    Notification,
+    SkillCategory,
+    Skill,
+    EmployeeSkill,
+  ],
   migrations: ['src/migrations/*.ts'],
   synchronize: false,
 });

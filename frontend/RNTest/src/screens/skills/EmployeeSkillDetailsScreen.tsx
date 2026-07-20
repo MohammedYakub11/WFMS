@@ -1,30 +1,63 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { Text, useTheme, Button, Divider, Chip } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useEmployeeSkillDetail, useDeleteEmployeeSkill } from '../../hooks/useSkills';
 import { SkillProficiencyRating } from '../../components/skills/SkillProficiencyRating';
 import { SkillTimeline } from '../../components/common/SkillTimeline';
+import { AppHeader } from '../../components/AppHeader';
+import { Card } from '../../components/Cards';
+import { AppText } from '../../components/AppText';
+import { PrimaryButton } from '../../components/PrimaryButton';
+import { SecondaryButton } from '../../components/SecondaryButton';
+import { Loader } from '../../components/Loader';
+import { EmptyState } from '../../components/EmptyState';
+import { lightTheme } from '../../theme/theme';
 
 export const EmployeeSkillDetailsScreen = () => {
-  const theme = useTheme();
+  
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   const { id } = route.params;
 
-  const { data: skill, isLoading, error } = useEmployeeSkillDetail(id);
+  const { data: skillResponse, isLoading, error } = useEmployeeSkillDetail(id);
   const deleteMutation = useDeleteEmployeeSkill();
+  
+  const skill = skillResponse?.data;
 
-  if (isLoading) return <ActivityIndicator style={{ flex: 1 }} size="large" />;
-  if (error || !skill) return <Text style={{ padding: 16 }}>Error loading skill details.</Text>;
+  if (isLoading) return <Loader style={styles.loader} />;
+  if (error || !skill) return (
+    <View style={styles.container}>
+      <AppHeader title="Skill Details" showBack />
+      <EmptyState
+        title="Error loading details"
+        description="We couldn't fetch the details for this skill."
+        actionTitle="Go Back"
+        onAction={() => navigation.goBack()}
+      />
+    </View>
+  );
 
-  const handleDelete = async () => {
-    try {
-      await deleteMutation.mutateAsync(id);
-      navigation.goBack();
-    } catch (e) {
-      console.error(e);
-    }
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Skill",
+      "Are you sure you want to delete this skill?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Delete", 
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteMutation.mutateAsync(id);
+              navigation.goBack();
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        }
+      ]
+    );
   };
 
   const timelineEvents = [
@@ -33,107 +66,137 @@ export const EmployeeSkillDetailsScreen = () => {
   ];
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text variant="headlineMedium" style={styles.title}>{skill.skill?.name || 'Unknown Skill'}</Text>
-        {skill.isPrimary && <Chip icon="star" style={styles.primaryChip}>Primary</Chip>}
-      </View>
+    <View style={styles.container}>
+      <AppHeader title="Skill Profile" showBack />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        
+        <View style={styles.header}>
+          <AppText variant="h1" style={styles.title}>{skill.skill?.skillName || skill.skill?.name || 'Unknown Skill'}</AppText>
+          {skill.isCertified && (
+            <View style={styles.certBadge}>
+              <AppText variant="caption" style={styles.certText}>Certified</AppText>
+            </View>
+          )}
+        </View>
 
-      <View style={styles.section}>
-        <Text variant="titleMedium" style={styles.sectionTitle}>Proficiency</Text>
-        <SkillProficiencyRating rating={skill.proficiencyRating} readonly />
-      </View>
-
-      <Divider style={styles.divider} />
-
-      <View style={styles.section}>
-        <Text variant="titleMedium" style={styles.sectionTitle}>Experience</Text>
-        <Text variant="bodyLarge">{skill.yearsOfExperience} years</Text>
-      </View>
-
-      <Divider style={styles.divider} />
-
-      <View style={styles.section}>
-        <Text variant="titleMedium" style={styles.sectionTitle}>Status</Text>
-        <Text variant="bodyLarge">{skill.status}</Text>
-      </View>
-
-      <Divider style={styles.divider} />
-
-      {skill.notes && (
-        <>
-          <View style={styles.section}>
-            <Text variant="titleMedium" style={styles.sectionTitle}>Notes</Text>
-            <Text variant="bodyMedium">{skill.notes}</Text>
+        <Card style={styles.sectionCard}>
+          <AppText variant="h3" style={styles.sectionTitle}>Skill Information</AppText>
+          
+          <View style={styles.detailRow}>
+            <AppText variant="caption" style={styles.detailLabel}>Category</AppText>
+            <AppText style={styles.detailValue}>{skill.skill?.category?.categoryName || 'Uncategorized'}</AppText>
           </View>
-          <Divider style={styles.divider} />
-        </>
-      )}
+          
+          <View style={styles.detailRow}>
+            <AppText variant="caption" style={styles.detailLabel}>Proficiency</AppText>
+            <SkillProficiencyRating rating={skill.proficiencyRating} readonly />
+          </View>
+        </Card>
 
-      <View style={styles.section}>
-        <Text variant="titleMedium" style={styles.sectionTitle}>History</Text>
-        <SkillTimeline events={timelineEvents} />
-      </View>
+        <Card style={styles.sectionCard}>
+          <AppText variant="h3" style={styles.sectionTitle}>Experience & Status</AppText>
+          
+          <View style={styles.detailRow}>
+            <AppText variant="caption" style={styles.detailLabel}>Years of Experience</AppText>
+            <AppText style={styles.detailValue}>{skill.yearsOfExperience || 0} years</AppText>
+          </View>
 
+          <View style={styles.detailRow}>
+            <AppText variant="caption" style={styles.detailLabel}>Approval Status</AppText>
+            <AppText style={styles.detailValue}>
+              {skill.approvalStatus ? skill.approvalStatus.toUpperCase() : 'PENDING'}
+            </AppText>
+          </View>
+          
+          {skill.notes && (
+            <View style={styles.detailRow}>
+              <AppText variant="caption" style={styles.detailLabel}>Notes</AppText>
+              <AppText style={styles.detailValue}>{skill.notes}</AppText>
+            </View>
+          )}
+        </Card>
+
+        <Card style={styles.sectionCard}>
+          <AppText variant="h3" style={styles.sectionTitle}>History</AppText>
+          <SkillTimeline events={timelineEvents} />
+        </Card>
+
+      </ScrollView>
+      
       <View style={styles.actionButtons}>
-        <Button 
-          mode="outlined" 
-          onPress={() => navigation.navigate('EditSkill', { id })}
-          style={styles.button}
-        >
-          Edit
-        </Button>
-        <Button 
-          mode="contained" 
-          buttonColor={theme.colors.error}
-          onPress={handleDelete}
-          loading={deleteMutation.isPending}
-          disabled={deleteMutation.isPending}
-          style={styles.button}
-        >
-          Delete
-        </Button>
+        <View style={styles.buttonWrapper}>
+          <SecondaryButton 
+            title="Delete" 
+            onPress={handleDelete}
+          />
+        </View>
+        <View style={styles.buttonWrapper}>
+          <PrimaryButton 
+            title="Edit Skill" 
+            onPress={() => navigation.navigate('EditSkill', { id })}
+          />
+        </View>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  loader: { flex: 1 },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: lightTheme.colors.background,
+  },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 24,
   },
   header: {
-    padding: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  title: {
-    fontWeight: 'bold',
-    flex: 1,
-  },
-  primaryChip: {
-    marginLeft: 8,
-  },
-  section: {
-    padding: 16,
-  },
-  sectionTitle: {
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  divider: {
-    height: 1,
-  },
-  actionButtons: {
-    padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 24,
   },
-  button: {
+  title: {
     flex: 1,
-    marginHorizontal: 8,
+  },
+  certBadge: {
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  certText: {
+    color: '#2E7D32',
+    fontFamily: lightTheme.typography.fontFamily.bold,
+  },
+  sectionCard: {
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    marginBottom: 16,
+    color: lightTheme.colors.primary,
+  },
+  detailRow: {
+    marginBottom: 16,
+  },
+  detailLabel: {
+    color: lightTheme.colors.textSecondary,
+    marginBottom: 4,
+  },
+  detailValue: {
+    fontFamily: lightTheme.typography.fontFamily.medium,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    padding: 16,
+    backgroundColor: lightTheme.colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: lightTheme.colors.divider,
+    gap: 16,
+  },
+  buttonWrapper: {
+    flex: 1,
   },
 });

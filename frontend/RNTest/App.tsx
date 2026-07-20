@@ -5,6 +5,8 @@ import { store } from './src/store';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { SnackbarProvider } from './src/components/providers/SnackbarProvider';
 
 const queryClient = new QueryClient();
 
@@ -14,7 +16,11 @@ function App(): React.JSX.Element {
       <QueryClientProvider client={queryClient}>
         <PaperProvider>
           <SafeAreaProvider>
-            <AppNavigator />
+            <ErrorBoundary>
+              <SnackbarProvider>
+                <AppNavigator />
+              </SnackbarProvider>
+            </ErrorBoundary>
           </SafeAreaProvider>
         </PaperProvider>
       </QueryClientProvider>
