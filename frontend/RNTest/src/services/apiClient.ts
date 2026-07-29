@@ -21,7 +21,7 @@ apiClient.interceptors.request.use(
     const token = state.auth.accessToken;
 
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.set('Authorization', `Bearer ${token}`);
     }
     return config;
   },
@@ -55,7 +55,7 @@ apiClient.interceptors.response.use(
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
+            originalRequest.headers.set('Authorization', `Bearer ${token}`);
             return apiClient(originalRequest);
           })
           .catch((err) => Promise.reject(err));
@@ -87,7 +87,7 @@ apiClient.interceptors.response.use(
         await AsyncStorage.setItem('authState', JSON.stringify({ accessToken: newAccessToken, refreshToken: newRefreshToken, user: refreshedUser }));
 
         processQueue(null, newAccessToken);
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        originalRequest.headers.set('Authorization', `Bearer ${newAccessToken}`);
 
         return apiClient(originalRequest);
       } catch (refreshError) {

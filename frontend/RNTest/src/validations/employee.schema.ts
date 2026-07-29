@@ -18,8 +18,10 @@ export const employeeSchema = yup
       .nullable()
       .transform((v, o) => (o === '' ? null : v)),
     reportingManagerId: yup.string().nullable(),
+    roleId: yup.string().required('Role is required'),
   })
   .required();
 
-// Password not editable via the generic update form — see UpdateEmployeeInput.
-export const employeeEditSchema = employeeSchema.omit(['password']);
+// Password not editable via the generic update form, and role changes go through the
+// dedicated assign-role action (EditEmployeeScreen's handleAssignRole) — see UpdateEmployeeInput.
+export const employeeEditSchema = employeeSchema.omit(['password', 'roleId']);

@@ -1,3 +1,5 @@
+import { EmployeeListItem } from './employees';
+
 export interface SkillCategory {
   id: string;
   categoryName: string;
@@ -30,10 +32,13 @@ export interface EmployeeSkill {
   yearsOfExperience?: number;
   isCertified?: boolean;
   approvalStatus?: 'pending' | 'approved' | 'rejected';
+  previousStatus?: string | null;
   lastUsedDate?: string;
+  submittedAt?: string | null;
   createdAt: string;
   updatedAt: string;
   skill?: Skill;
+  employee?: EmployeeListItem;
 }
 
 // Legacy envelope shape (`{success,message,data:{data,total},errors}`). Kept only

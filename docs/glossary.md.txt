@@ -1,0 +1,552 @@
+# Glossary
+
+> Version: 1.0
+> Project: Workforce Management System (WFMS)
+
+---
+
+# Purpose
+
+This glossary defines the terminology used throughout the WFMS project.
+
+It provides a common vocabulary for developers, architects, QA engineers, DevOps engineers, product owners, and AI coding agents.
+
+Unless explicitly stated otherwise, these definitions should be used consistently across all documentation and source code.
+
+---
+
+# A
+
+## ADR (Architecture Decision Record)
+
+A permanent document describing an important architectural decision, including the context, alternatives considered, decision made, and consequences.
+
+Example:
+
+```
+ADR-0002: Adopt REST API
+```
+
+---
+
+## API (Application Programming Interface)
+
+The contract through which the frontend communicates with the backend.
+
+WFMS uses REST APIs.
+
+---
+
+## Authentication
+
+The process of verifying **who a user is**.
+
+WFMS uses JWT-based authentication.
+
+---
+
+## Authorization
+
+The process of determining **what an authenticated user is allowed to do**.
+
+Authorization is enforced in the backend using roles and business rules.
+
+---
+
+## Audit Log
+
+A permanent record of important system events.
+
+Examples:
+
+- Login
+- Logout
+- Employee Creation
+- Skill Approval
+- Role Assignment
+
+---
+
+# B
+
+## Backend
+
+The server-side application responsible for business logic, authentication, authorization, APIs, and data access.
+
+Technology:
+
+NestJS
+
+---
+
+## Business Rule
+
+A rule that governs how the organization operates.
+
+Examples:
+
+- Employees cannot approve their own skills.
+- Managers may only approve assigned employees.
+
+Business rules belong in backend services.
+
+---
+
+# C
+
+## CI/CD
+
+Continuous Integration and Continuous Deployment (or Delivery).
+
+An automated process for building, testing, and deploying software.
+
+---
+
+## Component
+
+A reusable user interface element.
+
+Examples:
+
+- Button
+- Dialog
+- Card
+- Input Field
+
+Components should focus on presentation rather than business logic.
+
+---
+
+## Controller
+
+A NestJS class responsible for receiving HTTP requests and delegating work to services.
+
+Controllers should remain thin.
+
+---
+
+# D
+
+## Database Migration
+
+A version-controlled change to the database schema.
+
+All schema changes should be implemented through migrations.
+
+---
+
+## Dependency Injection (DI)
+
+A design pattern where dependencies are provided by a framework rather than created manually.
+
+NestJS uses dependency injection extensively.
+
+---
+
+## DTO (Data Transfer Object)
+
+An object used to validate and transfer data between the client and the backend.
+
+DTOs should not contain business logic.
+
+---
+
+# E
+
+## Entity
+
+A TypeORM class representing a database table.
+
+Entities define structure and relationships.
+
+Business logic should not reside in entities.
+
+---
+
+## Environment
+
+A deployment context with its own configuration.
+
+Examples:
+
+- Development
+- Testing
+- Staging
+- Production
+
+---
+
+# F
+
+## Feature
+
+A self-contained business capability.
+
+Examples:
+
+- Authentication
+- Employee Management
+- Skill Management
+- Analytics
+
+Features own their own screens, services, types, validation, and related code.
+
+---
+
+## Foreign Key
+
+A database constraint that links one table to another.
+
+Foreign keys enforce referential integrity.
+
+---
+
+# G
+
+## Git
+
+The version control system used by WFMS.
+
+---
+
+## GraphQL
+
+An API query language considered during architectural evaluation but not adopted.
+
+See:
+
+ADR-0002
+
+---
+
+# H
+
+## Hook
+
+A reusable React function that encapsulates behavior.
+
+Examples:
+
+- useEmployees()
+- usePagination()
+- useDebounce()
+
+---
+
+## HTTP
+
+Hypertext Transfer Protocol.
+
+Used for communication between the mobile application and backend.
+
+---
+
+# I
+
+## Index
+
+A database structure that improves query performance.
+
+Indexes should be added based on query patterns.
+
+---
+
+## Integration Test
+
+A test verifying interaction between multiple system components.
+
+---
+
+# J
+
+## JWT (JSON Web Token)
+
+A stateless authentication token used to verify user identity.
+
+JWTs are included in the Authorization header of protected requests.
+
+---
+
+# L
+
+## Logging
+
+The process of recording application events.
+
+Logs should support debugging, monitoring, and auditing without exposing sensitive information.
+
+---
+
+# M
+
+## Migration
+
+See:
+
+Database Migration
+
+---
+
+## Module
+
+A logical grouping of related functionality.
+
+In NestJS, a module contains controllers, services, providers, and related configuration.
+
+---
+
+# O
+
+## ORM (Object-Relational Mapping)
+
+A framework that maps application objects to database tables.
+
+WFMS uses TypeORM.
+
+---
+
+# P
+
+## Pagination
+
+The process of retrieving data in smaller subsets rather than loading all records at once.
+
+Large datasets should always support pagination.
+
+---
+
+## Pattern
+
+A documented, approved implementation approach used consistently throughout the project.
+
+Examples:
+
+- API Service Pattern
+- Repository Pattern
+- Navigation Pattern
+
+---
+
+## Pull Request (PR)
+
+A proposed code change submitted for review before merging into a shared branch.
+
+---
+
+# R
+
+## React Query
+
+A library used to manage server state.
+
+Responsibilities include:
+
+- Fetching
+- Caching
+- Synchronization
+- Pagination
+- Background updates
+
+---
+
+## Repository
+
+A class responsible for reading and writing data.
+
+Repositories should not contain business rules.
+
+---
+
+## REST
+
+Representational State Transfer.
+
+The architectural style adopted for backend APIs.
+
+See:
+
+ADR-0002
+
+---
+
+## Role
+
+A collection of permissions assigned to a user.
+
+Current roles include:
+
+- Administrator
+- Manager
+- Employee
+
+---
+
+# S
+
+## Screen
+
+A top-level user interface representing a page or workflow within the application.
+
+Screens coordinate components, hooks, and services.
+
+---
+
+## Service
+
+A class responsible for business logic.
+
+Services coordinate validation, repositories, and workflows.
+
+---
+
+## Soft Delete
+
+A deletion strategy where records are marked as deleted rather than permanently removed.
+
+Soft deletes preserve historical information.
+
+---
+
+## State
+
+The current data used by the application.
+
+Types include:
+
+- Local UI State
+- Global Application State
+- Server State
+
+---
+
+# T
+
+## Test
+
+A verification that confirms software behaves as expected.
+
+Types include:
+
+- Unit Test
+- Integration Test
+- End-to-End Test
+
+---
+
+## Theme
+
+The centralized collection of colors, typography, spacing, and design tokens used by the UI.
+
+---
+
+## TypeORM
+
+The ORM used by WFMS for interacting with PostgreSQL.
+
+---
+
+# U
+
+## Unit Test
+
+A test verifying a single unit of functionality in isolation.
+
+---
+
+## UTC
+
+Coordinated Universal Time.
+
+All timestamps should be stored in UTC.
+
+---
+
+# V
+
+## Validation
+
+The process of ensuring data meets defined rules before processing.
+
+Validation occurs in both the frontend (user experience) and backend (business enforcement).
+
+---
+
+# Versioning
+
+The practice of assigning version numbers to software releases.
+
+WFMS follows Semantic Versioning.
+
+---
+
+# W
+
+## Workflow
+
+A defined sequence of business or engineering activities.
+
+Examples:
+
+- Approval Workflow
+- Git Workflow
+- Deployment Workflow
+
+---
+
+# AI-Specific Terms
+
+## AI Agent
+
+An automated coding assistant capable of reading project documentation, understanding architecture, and generating code.
+
+Examples include:
+
+- ChatGPT
+- Claude Code
+- Codex
+- Cursor
+- Roo Code
+- Gemini CLI
+- OpenHands
+
+---
+
+## Pattern Library
+
+A collection of approved implementation patterns used to maintain consistency across the project.
+
+---
+
+## Decision Tree
+
+A documented decision-making guide used by developers and AI agents to choose the correct implementation approach.
+
+---
+
+## Playbook
+
+A step-by-step guide for performing a specific engineering activity.
+
+Examples:
+
+- Creating a New Feature
+- Implementing Authentication
+- Releasing a New Version
+
+---
+
+# Related Documents
+
+- architecture.md
+- coding-standards.md
+- business-rules.md
+- api-conventions.md
+- security-guidelines.md
+
+---
+
+# Guiding Principle
+
+Shared terminology reduces misunderstanding.
+
+When everyone uses the same words to mean the same things, communication becomes faster, code reviews become clearer, documentation becomes easier to maintain, and AI agents can reason more accurately about the project.

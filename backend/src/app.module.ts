@@ -24,17 +24,12 @@ import { Permission } from './roles/entities/permission.entity';
 import { RolePermission } from './roles/entities/role-permission.entity';
 import { EmployeeRole } from './roles/entities/employee-role.entity';
 import { AuditLog } from './audit-logs/entities/audit-log.entity';
-import { RolesModule } from './roles/roles.module';
-import { AuditLogModule } from './audit-logs/audit-log.module';
-import { NotificationsModule } from './notifications/notifications.module';
 @Module({
   imports: [
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 100,
-      },
-    ]),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100,
+    }]),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -61,9 +56,8 @@ import { NotificationsModule } from './notifications/notifications.module';
             EmployeeRole,
             AuditLog,
           ],
-          synchronize: false,
-          migrationsRun:
-            configService.get<string>('MIGRATIONS_RUN', 'true') === 'true',
+          synchronize: true,
+          migrationsRun: configService.get<string>('MIGRATIONS_RUN', 'true') === 'true',
         };
 
         return config;
@@ -76,9 +70,6 @@ import { NotificationsModule } from './notifications/notifications.module';
     SkillsModule,
     EmployeeSkillsModule,
     SearchModule,
-    RolesModule,
-    AuditLogModule,
-    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -89,4 +80,4 @@ import { NotificationsModule } from './notifications/notifications.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

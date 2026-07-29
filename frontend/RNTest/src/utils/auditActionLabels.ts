@@ -1,0 +1,25 @@
+export const AUDIT_ACTION_LABELS: Record<string, string> = {
+  CREATE: 'Employee record created',
+  UPDATE: 'Employee details updated',
+  DELETE: 'Employee deactivated (soft delete)',
+  RESTORE: 'Employee restored',
+  ACTIVATE: 'Employee activated',
+  DEACTIVATE: 'Employee deactivated',
+  ROLE_ASSIGNED: 'Role assigned',
+  ROLE_REVOKED: 'Role revoked',
+  PERMISSIONS_UPDATED: 'Permissions updated',
+  BULK_ACTIVATE: 'Bulk activated',
+  BULK_DEACTIVATE: 'Bulk deactivated',
+  BULK_DELETE: 'Bulk deleted',
+  EXPORT: 'Data exported',
+  NOTIFICATION_SENT: 'Notification sent',
+  LOGIN: 'Logged in',
+  LOGIN_FAILED: 'Failed login attempt',
+  LOGOUT: 'Logged out',
+  PASSWORD_RESET: 'Password reset',
+  SKILL_APPROVED: 'Skill approved',
+  SKILL_REJECTED: 'Skill rejected',
+  CHANGES_REQUESTED: 'Changes requested',
+};
+
+export const getAuditActionLabel = (action: string): string => AUDIT_ACTION_LABELS[action] || action;

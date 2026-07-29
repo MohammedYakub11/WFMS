@@ -1,0 +1,386 @@
+# Business Rules
+
+> Applies to: Entire System
+
+---
+
+# Purpose
+
+This document defines the business rules governing the Workforce Management System (WFMS).
+
+Business rules describe **how the organization operates**, not how the software is implemented.
+
+Business rules always take precedence over implementation convenience.
+
+---
+
+# Core Principles
+
+- Every action must respect user permissions.
+- Business validation belongs in the backend.
+- The frontend improves user experience but is not a security boundary.
+- Data integrity is more important than convenience.
+- Preserve auditability for critical actions.
+
+---
+
+# User Roles
+
+Current system roles:
+
+| Role | Responsibilities |
+|------|------------------|
+| Administrator | Full system administration |
+| Manager | Manage assigned employees |
+| Employee | Maintain own profile and skills |
+
+Future roles may be introduced without affecting existing behavior.
+
+Never hardcode role IDs.
+
+Always use role definitions.
+
+---
+
+# Authentication Rules
+
+- Every user must authenticate before accessing protected resources.
+- Authentication is handled using JWT.
+- Expired tokens must be rejected.
+- Invalid tokens must be rejected.
+
+---
+
+# Authorization Rules
+
+Permissions are role-based.
+
+Examples:
+
+Administrator
+
+- Full access.
+
+Manager
+
+- Access only employees under their responsibility.
+
+Employee
+
+- Access only their own information.
+
+Never trust permissions supplied by the client.
+
+---
+
+# Employee Rules
+
+Employees may:
+
+- View their own profile.
+- Update permitted profile information.
+- Add skills.
+- Update skill proficiency before approval.
+- View approval status.
+
+Employees may NOT:
+
+- Approve skills.
+- Change roles.
+- Manage other employees.
+- Modify protected system settings.
+
+---
+
+# Manager Rules
+
+Managers may:
+
+- View assigned employees.
+- Approve employee skills.
+- Reject employee skills.
+- Review workforce data within their scope.
+
+Managers may NOT:
+
+- Access employees outside their assigned scope.
+- Modify administrator settings.
+- Assign administrative roles.
+
+---
+
+# Administrator Rules
+
+Administrators may:
+
+- Create employees.
+- Edit employees.
+- Assign roles.
+- Configure organizations.
+- Manage system settings.
+- View analytics.
+- Manage master data.
+
+Administrators should avoid bypassing audit mechanisms.
+
+---
+
+# Skill Rules
+
+Employees may declare skills.
+
+Every skill has a proficiency level.
+
+New or modified skills require manager approval before becoming officially recognized.
+
+Possible states:
+
+- Draft
+- Pending Approval
+- Approved
+- Rejected
+
+The backend is responsible for enforcing state transitions.
+
+---
+
+# Approval Rules
+
+Approval decisions must:
+
+- Record the approving manager.
+- Record the approval timestamp.
+- Preserve audit history.
+
+Approval should never silently overwrite historical information.
+
+---
+
+# Employee Status Rules
+
+Example statuses:
+
+- Active
+- Inactive
+- Suspended
+
+Inactive users:
+
+- Cannot authenticate.
+- Cannot access protected resources.
+
+Avoid deleting employee records unless required by business policy.
+
+---
+
+# Search Rules
+
+Search operations should:
+
+- Respect user permissions.
+- Return only authorized data.
+- Support pagination.
+- Support filtering.
+- Support sorting.
+
+Search results must never expose unauthorized information.
+
+---
+
+# Analytics Rules
+
+Analytics must:
+
+- Respect role permissions.
+- Use approved data sources.
+- Exclude unauthorized records.
+
+Managers should not see organization-wide analytics unless authorized.
+
+---
+
+# Audit Rules
+
+The following actions should be auditable:
+
+- Login
+- Logout
+- Employee creation
+- Employee updates
+- Role assignment
+- Skill approval
+- Skill rejection
+- Administrative changes
+
+Audit records should include:
+
+- User
+- Timestamp
+- Action
+- Entity affected
+
+Audit history should not be silently removed.
+
+---
+
+# Data Integrity Rules
+
+Always preserve:
+
+- Referential integrity
+- Approval history
+- Employee ownership
+- Role consistency
+
+Avoid orphaned records.
+
+---
+
+# Soft Delete Policy
+
+Prefer deactivation or soft delete over permanent deletion when historical records are important.
+
+Permanent deletion should be rare and intentional.
+
+---
+
+# Validation Rules
+
+Validate:
+
+- Required fields
+- Duplicate entries
+- Invalid state transitions
+- Permission checks
+- Business constraints
+
+Validation belongs in the backend.
+
+---
+
+# State Transition Rules
+
+Example:
+
+Draft
+
+↓
+
+Pending Approval
+
+↓
+
+Approved
+
+or
+
+↓
+
+Rejected
+
+Do not allow invalid transitions.
+
+Example:
+
+Approved
+
+↓
+
+Draft
+
+This transition should not occur unless explicitly supported by business policy.
+
+---
+
+# Security Rules
+
+Never rely on frontend validation.
+
+Always validate:
+
+- Permissions
+- Ownership
+- Roles
+- Entity existence
+
+Every protected operation must be verified by the backend.
+
+---
+
+# Future Expansion
+
+The business model should support future capabilities such as:
+
+- Certifications
+- Learning plans
+- AI recommendations
+- Workforce forecasting
+- Multi-organization support
+- Advanced reporting
+
+Avoid implementations that make future expansion difficult.
+
+---
+
+# AI Agent Checklist
+
+Before implementing a feature:
+
+- [ ] Which user roles are affected?
+- [ ] Are permission checks required?
+- [ ] Does approval logic apply?
+- [ ] Is audit logging required?
+- [ ] Should history be preserved?
+- [ ] Is backend validation required?
+- [ ] Does this change affect existing workflows?
+
+---
+
+# Do
+
+✅ Enforce permissions in the backend.
+
+✅ Preserve business history.
+
+✅ Validate ownership.
+
+✅ Record important actions.
+
+✅ Follow documented workflows.
+
+---
+
+# Don't
+
+❌ Trust frontend validation.
+
+❌ Hardcode role IDs.
+
+❌ Bypass approval workflows.
+
+❌ Delete historical records without approval.
+
+❌ Skip audit logging for critical actions.
+
+---
+
+# Decision Table
+
+| Situation | Action |
+|-----------|--------|
+| User edits profile | Verify ownership |
+| Manager approves skill | Record approver and timestamp |
+| Employee changes role | Reject |
+| Unauthorized access | Return Forbidden |
+| Skill updated | Apply approval workflow if required |
+| User inactive | Deny authentication |
+
+---
+
+# Guiding Principle
+
+Business rules define **what the system is allowed to do**.
+
+Implementation details may change over time.
+
+Business rules should remain stable, explicit, and centrally documented.

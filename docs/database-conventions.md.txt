@@ -1,0 +1,548 @@
+# Database Conventions
+
+> Version: 1.0
+> Project: Workforce Management System (WFMS)
+> Database: PostgreSQL
+> ORM: TypeORM
+
+---
+
+# Purpose
+
+This document defines the database design standards and conventions for the Workforce Management System (WFMS).
+
+Its purpose is to ensure:
+
+- Consistency
+- Data integrity
+- Performance
+- Scalability
+- Maintainability
+
+Every database change should follow these conventions unless an Architecture Decision Record (ADR) explicitly states otherwise.
+
+---
+
+# Scope
+
+Applies to:
+
+- PostgreSQL
+- TypeORM Entities
+- Migrations
+- Relationships
+- Indexes
+- Constraints
+- Database Naming
+- Audit Fields
+
+---
+
+# Guiding Principles
+
+The database should be:
+
+- Consistent
+- Predictable
+- Normalized where practical
+- Easy to query
+- Easy to maintain
+- Optimized for business correctness first
+
+Performance optimizations should never compromise data integrity.
+
+---
+
+# Database Design Principles
+
+Prefer:
+
+- Explicit relationships
+- Referential integrity
+- Meaningful names
+- Strong constraints
+- Indexed foreign keys
+
+Avoid:
+
+- Duplicate data
+- Hidden relationships
+- Magic values
+- Business logic inside the database
+
+---
+
+# Naming Conventions
+
+## Tables
+
+Use:
+
+- lowercase
+- snake_case
+- plural nouns
+
+Good
+
+```
+employees
+employee_skills
+organizations
+roles
+departments
+```
+
+Avoid
+
+```
+Employee
+EmployeeTable
+tbl_employee
+Employee_Master
+```
+
+---
+
+## Columns
+
+Use:
+
+snake_case
+
+Good
+
+```
+employee_name
+department_id
+created_at
+updated_at
+```
+
+Avoid
+
+```
+EmployeeName
+DepartmentID
+empName
+```
+
+---
+
+## Primary Keys
+
+Every table should have a single primary key.
+
+Preferred:
+
+```
+id
+```
+
+Avoid:
+
+```
+employee_id
+employee_pk
+empid
+```
+
+---
+
+# ID Strategy
+
+Current Standard
+
+Auto-increment integer IDs.
+
+Example
+
+```
+id SERIAL PRIMARY KEY
+```
+
+Future migration to UUIDs should be documented through an ADR if required.
+
+---
+
+# Foreign Keys
+
+Foreign keys should clearly indicate the referenced entity.
+
+Example
+
+```
+employee_id
+manager_id
+organization_id
+role_id
+```
+
+Every foreign key should enforce referential integrity.
+
+---
+
+# Junction Tables
+
+Many-to-many relationships should use descriptive names.
+
+Example
+
+```
+employee_skills
+employee_roles
+user_permissions
+```
+
+Avoid abbreviations.
+
+---
+
+# Constraints
+
+Use database constraints wherever possible.
+
+Examples:
+
+- PRIMARY KEY
+- FOREIGN KEY
+- UNIQUE
+- CHECK
+- NOT NULL
+
+Do not rely solely on application validation.
+
+---
+
+# Unique Constraints
+
+Use unique constraints for business identifiers.
+
+Examples:
+
+- email
+- employee_code
+- username
+
+Avoid enforcing uniqueness only in application code.
+
+---
+
+# Nullability
+
+Fields should only allow NULL when there is a valid business reason.
+
+Prefer NOT NULL by default.
+
+---
+
+# Default Values
+
+Use explicit default values where appropriate.
+
+Example
+
+```
+is_active DEFAULT true
+```
+
+Avoid relying on application code for defaults.
+
+---
+
+# Audit Fields
+
+Every business entity should include:
+
+```
+created_at
+
+created_by
+
+updated_at
+
+updated_by
+```
+
+If soft delete is enabled:
+
+```
+deleted_at
+
+deleted_by
+```
+
+Audit fields support traceability and accountability.
+
+---
+
+# Soft Deletes
+
+Prefer soft deletes for business entities.
+
+Example
+
+```
+deleted_at
+```
+
+Avoid permanently deleting records that may be required for:
+
+- Auditing
+- Reporting
+- Compliance
+
+---
+
+# Timestamps
+
+Store timestamps in UTC.
+
+Use PostgreSQL timestamp with time zone where appropriate.
+
+Never store local times in the database.
+
+---
+
+# Relationships
+
+Use explicit relationships.
+
+Examples:
+
+One-to-One
+
+One-to-Many
+
+Many-to-One
+
+Many-to-Many
+
+Avoid implicit relationships maintained only in application logic.
+
+---
+
+# Cascading Rules
+
+Use cascading deletes cautiously.
+
+Prefer explicit deletion through business logic.
+
+Avoid accidental data loss.
+
+---
+
+# Indexing
+
+Create indexes for:
+
+- Primary keys
+- Foreign keys
+- Frequently searched columns
+- Frequently filtered columns
+- Frequently sorted columns
+
+Examples
+
+```
+employee_code
+
+email
+
+department_id
+
+manager_id
+
+organization_id
+```
+
+---
+
+# Composite Indexes
+
+Use composite indexes only when query patterns justify them.
+
+Example
+
+```
+organization_id
+
+department_id
+```
+
+Measure performance before adding indexes.
+
+---
+
+# Large Tables
+
+For tables expected to grow significantly:
+
+- Use pagination
+- Optimize indexes
+- Review query plans periodically
+
+Avoid loading entire tables into memory.
+
+---
+
+# Entity Conventions (TypeORM)
+
+Entities should:
+
+- Represent database structure
+- Define relationships
+- Avoid business logic
+
+Business logic belongs in services.
+
+---
+
+# Migration Rules
+
+Every schema change must be implemented through migrations.
+
+Never manually modify production schemas.
+
+Migration files should be:
+
+- Small
+- Atomic
+- Reversible where practical
+
+---
+
+# Transactions
+
+Use transactions when:
+
+- Multiple updates must succeed together
+- Financial-like consistency is required
+- Approval workflows modify multiple records
+
+Avoid partial writes.
+
+---
+
+# Query Design
+
+Prefer:
+
+- Parameterized queries
+- Repository methods
+- ORM features
+
+Avoid:
+
+- String concatenation
+- Dynamic SQL without validation
+- Duplicate queries
+
+---
+
+# Security
+
+Never store:
+
+- Plain-text passwords
+- Secrets
+- API keys
+- Tokens
+
+Passwords must be securely hashed.
+
+Sensitive information should be encrypted where appropriate.
+
+---
+
+# Performance
+
+Avoid:
+
+- N+1 queries
+- Unnecessary joins
+- SELECT *
+- Repeated queries inside loops
+
+Profile slow queries before optimizing.
+
+---
+
+# AI Agent Guidance
+
+Before modifying the database:
+
+- Search existing entities.
+- Reuse existing relationships.
+- Follow naming conventions.
+- Preserve referential integrity.
+- Create migrations.
+- Add indexes only when justified.
+- Maintain audit fields.
+
+Never bypass migrations.
+
+---
+
+# Anti-Patterns
+
+Avoid:
+
+❌ Table prefixes
+
+❌ Business logic in entities
+
+❌ Duplicate columns
+
+❌ Nullable fields without reason
+
+❌ Missing foreign keys
+
+❌ Missing indexes
+
+❌ Hardcoded IDs
+
+❌ Manual schema changes
+
+❌ Circular relationships
+
+---
+
+# Database Review Checklist
+
+Before approving a schema change:
+
+- [ ] Naming conventions followed
+- [ ] Migration created
+- [ ] Foreign keys defined
+- [ ] Constraints applied
+- [ ] Audit fields included
+- [ ] Soft delete considered
+- [ ] Indexes reviewed
+- [ ] Query performance considered
+- [ ] Entity updated
+- [ ] Documentation updated
+
+---
+
+# Related Documents
+
+- architecture.md
+- tech-stack.md
+- coding-standards.md
+- api-conventions.md
+
+---
+
+# Related ADRs
+
+- ADR-0005: Adopt TypeORM
+
+---
+
+# Guiding Principle
+
+The database is the source of truth.
+
+Application code may change frequently.
+
+A well-designed database should remain stable, consistent, and trustworthy throughout the lifetime of the system.

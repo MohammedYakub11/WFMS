@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Modal, Pressable, Dimensions } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Modal, Pressable, Dimensions, ScrollView } from 'react-native';
 import { lightTheme as theme } from '../theme/theme';
 import { AppText } from '../components/AppText';
 import { BottomTabNavigator } from './BottomTabNavigator';
@@ -65,6 +65,27 @@ const menuItems: MenuItem[] = [
     route: 'AdminOverview',
     roles: ['Administrator'],
   },
+  {
+    key: 'AuditLogs',
+    label: 'Audit Logs',
+    icon: '📜',
+    route: 'AuditLogs',
+    roles: ['Administrator'],
+  },
+  {
+    key: 'Reports',
+    label: 'Reports',
+    icon: '📈',
+    route: 'ReportsDashboard',
+    roles: ['Administrator', 'Workforce Manager', 'Resource Manager'],
+  },
+  {
+    key: 'OrgSettings',
+    label: 'Organization Settings',
+    icon: '🏢',
+    route: 'OrgSettingsDashboard',
+    roles: ['Administrator'],
+  },
 ];
 
 export const DrawerNavigator = () => {
@@ -114,7 +135,11 @@ export const DrawerNavigator = () => {
             </View>
 
             {/* Menu Items */}
-            <View style={styles.menuList}>
+            <ScrollView
+              style={styles.menuList}
+              contentContainerStyle={styles.menuListContent}
+              showsVerticalScrollIndicator={false}
+            >
               {menuItems
                 .filter((item) => !item.roles || (!!user?.role && item.roles.includes(user.role)))
                 .map((item) => (
@@ -127,7 +152,7 @@ export const DrawerNavigator = () => {
                   <AppText style={styles.menuLabel}>{item.label}</AppText>
                 </TouchableOpacity>
               ))}
-            </View>
+            </ScrollView>
 
             {/* Footer */}
             <View style={styles.footer}>
@@ -178,7 +203,10 @@ const styles = StyleSheet.create({
   },
   menuList: {
     flex: 1,
+  },
+  menuListContent: {
     paddingTop: 8,
+    paddingBottom: 8,
   },
   menuItem: {
     flexDirection: 'row',

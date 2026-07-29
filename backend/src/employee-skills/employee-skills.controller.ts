@@ -43,10 +43,24 @@ export class EmployeeSkillsController {
   async findPending(
     @Query('page') page: string,
     @Query('limit') limit: string,
+    @Query('search') search: string,
+    @Query('department') department: string,
+    @Query('categoryId') categoryId: string,
+    @Query('status') status: string,
+    @Query('sortBy') sortBy: string,
+    @Query('sortOrder') sortOrder: string,
   ) {
     const data = await this.employeeSkillsService.findPending(
       +page || 1,
       +limit || 10,
+      {
+        search,
+        department,
+        categoryId,
+        status: status as 'new' | 'resubmitted',
+        sortBy: sortBy as 'submittedAt' | 'employeeName',
+        sortOrder: sortOrder as 'ASC' | 'DESC',
+      },
     );
     return {
       success: true,
@@ -62,11 +76,21 @@ export class EmployeeSkillsController {
     @Query('limit') limit: string,
     @Query('employeeId') employeeId: string,
     @Query('skillId') skillId: string,
+    @Request() req: { user?: { sub?: string; permissions?: string[] } },
   ) {
+    let targetEmployeeId = employeeId;
+    
+    // RBAC: If the user lacks the global 'EMPLOYEE_SKILL_VIEW' permission,
+    // enforce that they can only view their own skills.
+    const hasGlobalView = req.user?.permissions?.includes(PermissionCode.EMPLOYEE_SKILL_VIEW);
+    if (!hasGlobalView) {
+      targetEmployeeId = req.user?.sub as string;
+    }
+
     const data = await this.employeeSkillsService.findAll(
       +page || 1,
       +limit || 10,
-      employeeId,
+      targetEmployeeId,
       skillId,
     );
     return {

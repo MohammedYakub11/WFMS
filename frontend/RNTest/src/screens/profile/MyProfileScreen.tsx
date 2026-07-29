@@ -25,7 +25,7 @@ export const MyProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <AppHeader title="My Profile" showDrawer showNotification />
+      <AppHeader title="My Profile" showDrawer showNotification showAvatar={false} />
       
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>

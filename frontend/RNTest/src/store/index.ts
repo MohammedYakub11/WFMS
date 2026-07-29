@@ -7,6 +7,8 @@ import uiReducer from './uiSlice';
 import employeeDirectoryReducer from './employeeDirectorySlice';
 import skillAdminDirectoryReducer from './skillAdminDirectorySlice';
 import notificationsUiReducer from './notificationsUiSlice';
+import auditLogFiltersReducer from './auditLogFiltersSlice';
+import reportFiltersReducer from './reportFiltersSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +20,8 @@ export const store = configureStore({
     employeeDirectory: employeeDirectoryReducer,
     skillAdminDirectory: skillAdminDirectoryReducer,
     notificationsUi: notificationsUiReducer,
+    auditLogFilters: auditLogFiltersReducer,
+    reportFilters: reportFiltersReducer,
   },
 });
 

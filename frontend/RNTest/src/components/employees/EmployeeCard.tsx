@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { Card } from '../Cards';
 import { AppText } from '../AppText';
 import { Avatar } from '../Avatar';
+import { renderAppIcon } from '../AppIcon';
 import { RootState } from '../../store';
 import { lightTheme, darkTheme } from '../../theme/theme';
 import { EmployeeListItem } from '../../types/employees';
@@ -35,7 +36,7 @@ const EmployeeCardComponent: React.FC<EmployeeCardProps> = ({ employee, onPress,
           </AppText>
         </View>
         {onEdit && (
-          <IconButton icon="pencil" size={20} iconColor={theme.colors.textSecondary} onPress={() => onEdit(employee)} />
+          <IconButton icon={renderAppIcon("pencil")} size={20} iconColor={theme.colors.textSecondary} onPress={() => onEdit(employee)} />
         )}
       </View>
 

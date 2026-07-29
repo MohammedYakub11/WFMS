@@ -1,0 +1,497 @@
+# ADR-0002: Adopt REST API Architecture
+
+- **Status:** Accepted
+- **Decision ID:** ADR-0002
+- **Date:** 2026-07-24
+- **Owners:** WFMS Engineering Team
+- **Supersedes:** None
+- **Superseded By:** None
+
+---
+
+# Summary
+
+The Workforce Management System (WFMS) adopts a **RESTful API architecture** as the standard communication protocol between the React Native mobile application and the NestJS backend.
+
+All client-server communication must follow REST principles unless a future Architecture Decision Record explicitly approves an alternative.
+
+---
+
+# Context
+
+WFMS is an enterprise workforce management platform.
+
+The application contains multiple business domains including:
+
+- Authentication
+- Employee Management
+- Skill Management
+- Organization Management
+- Workforce Planning
+- Analytics
+- Reporting
+- Administration
+
+The backend must expose APIs that are:
+
+- Predictable
+- Maintainable
+- Secure
+- Easy to debug
+- Easy to version
+- Well supported by enterprise tooling
+
+The client is primarily a React Native mobile application communicating over HTTPS.
+
+---
+
+# Problem Statement
+
+The engineering team must choose a communication architecture that balances:
+
+- Simplicity
+- Performance
+- Scalability
+- Developer productivity
+- Long-term maintenance
+- AI-assisted development
+
+---
+
+# Requirements
+
+The chosen architecture must:
+
+- Support CRUD operations
+- Support pagination
+- Support filtering
+- Support authentication
+- Support authorization
+- Support caching
+- Support mobile networks
+- Be easy to document
+- Be widely understood
+- Integrate well with NestJS
+
+---
+
+# Options Considered
+
+## Option A
+
+REST API
+
+### Advantages
+
+- Industry standard
+- Excellent NestJS support
+- Easy to debug
+- Human readable
+- Simple request lifecycle
+- Excellent HTTP tooling
+- Mature caching support
+- Easy onboarding
+- Works naturally with React Query
+
+### Disadvantages
+
+- Multiple requests may be required
+- Fixed response structure
+- Over-fetching is possible
+
+---
+
+## Option B
+
+GraphQL
+
+### Advantages
+
+- Flexible querying
+- Reduced over-fetching
+- Strong schema tooling
+
+### Disadvantages
+
+- Increased complexity
+- Higher learning curve
+- More difficult authorization
+- More difficult caching
+- Additional infrastructure
+- Harder debugging
+- Less predictable queries
+- Increased operational overhead
+
+---
+
+## Option C
+
+gRPC
+
+### Advantages
+
+- High performance
+- Strong contracts
+- Binary protocol
+
+### Disadvantages
+
+- Poor fit for mobile-first workflows
+- Harder debugging
+- Less developer-friendly
+- Requires additional tooling
+- Limited browser compatibility
+
+---
+
+# Decision
+
+The project adopts **REST API** as the official communication architecture.
+
+All APIs should follow RESTful conventions.
+
+---
+
+# Decision Drivers
+
+The following factors influenced this decision:
+
+✔ Simplicity
+
+✔ Team familiarity
+
+✔ Mobile-first architecture
+
+✔ Strong NestJS integration
+
+✔ React Query compatibility
+
+✔ Mature ecosystem
+
+✔ Excellent documentation
+
+✔ Easy testing
+
+✔ Predictable request lifecycle
+
+✔ Lower operational complexity
+
+---
+
+# API Principles
+
+Endpoints represent resources.
+
+Example
+
+```
+/employees
+
+/skills
+
+/organizations
+
+/users
+```
+
+Endpoints should avoid verbs.
+
+Good
+
+```
+GET /employees
+
+POST /employees
+
+PATCH /employees/15
+
+DELETE /employees/15
+```
+
+Avoid
+
+```
+POST /createEmployee
+
+GET /getEmployees
+
+POST /deleteEmployee
+```
+
+---
+
+# Request Lifecycle
+
+```
+React Native
+
+↓
+
+React Query
+
+↓
+
+Service Layer
+
+↓
+
+REST API
+
+↓
+
+Controller
+
+↓
+
+Service
+
+↓
+
+Repository
+
+↓
+
+PostgreSQL
+```
+
+Every request follows this lifecycle.
+
+No shortcuts.
+
+---
+
+# Versioning Strategy
+
+All APIs are versioned.
+
+Example
+
+```
+/api/v1
+```
+
+Breaking changes require:
+
+- New API version
+
+or
+
+- Backward compatibility
+
+Existing consumers should never break unexpectedly.
+
+---
+
+# Authentication
+
+REST endpoints use JWT authentication.
+
+Authentication is stateless.
+
+Protected endpoints require:
+
+```
+Authorization: Bearer <token>
+```
+
+---
+
+# Pagination
+
+Large datasets must support pagination.
+
+Preferred parameters
+
+```
+?page=1
+
+&limit=20
+```
+
+---
+
+# Filtering
+
+Filtering should use query parameters.
+
+Example
+
+```
+/employees?department=IT
+
+/employees?status=ACTIVE
+```
+
+---
+
+# Sorting
+
+Sorting should use query parameters.
+
+Example
+
+```
+?sort=name
+
+&order=asc
+```
+
+---
+
+# Search
+
+Searching should be server-side.
+
+Example
+
+```
+?search=john
+```
+
+Avoid loading large datasets into the client solely for searching.
+
+---
+
+# Error Responses
+
+REST responses must use standard HTTP status codes.
+
+Example
+
+```
+200 OK
+
+201 Created
+
+204 No Content
+
+400 Bad Request
+
+401 Unauthorized
+
+403 Forbidden
+
+404 Not Found
+
+409 Conflict
+
+500 Internal Server Error
+```
+
+Never return HTTP 200 for failed business operations.
+
+---
+
+# Why REST Fits WFMS
+
+WFMS primarily performs:
+
+- CRUD operations
+- Searching
+- Filtering
+- Pagination
+- Authentication
+- Reporting
+
+REST maps naturally to these operations.
+
+GraphQL's flexibility provides limited additional value for the current architecture while increasing operational complexity.
+
+---
+
+# Consequences
+
+Positive
+
+- Easier onboarding
+- Predictable APIs
+- Better tooling
+- Easier testing
+- Easier debugging
+- Better AI code generation
+- Lower maintenance cost
+
+Negative
+
+- Some endpoints may over-fetch data.
+- Some screens may require multiple API calls.
+
+These trade-offs are acceptable.
+
+---
+
+# Alternatives Rejected
+
+## GraphQL
+
+Rejected because:
+
+- Increased complexity
+- More difficult authorization
+- Additional infrastructure
+- Lower team familiarity
+
+The additional flexibility does not justify the operational overhead for WFMS.
+
+---
+
+## gRPC
+
+Rejected because:
+
+- Less suitable for mobile-first REST workflows
+- Harder debugging
+- Higher operational complexity
+
+---
+
+# Future Reconsideration
+
+This ADR should be revisited if:
+
+- Real-time streaming becomes a primary requirement.
+- The application evolves into a public API platform.
+- Multiple heterogeneous clients require fine-grained querying.
+- Performance profiling demonstrates REST as a bottleneck.
+
+Until then, REST remains the standard.
+
+---
+
+# AI Guidance
+
+When implementing backend functionality:
+
+Always:
+
+- Reuse existing REST endpoints.
+- Follow REST naming conventions.
+- Use proper HTTP methods.
+- Use DTOs.
+- Preserve API versioning.
+
+Never:
+
+- Introduce GraphQL.
+- Introduce gRPC.
+- Create verb-based endpoints.
+- Return inconsistent response structures.
+- Bypass the service layer.
+
+---
+
+# References
+
+- docs/api-conventions.md
+- docs/architecture.md
+- docs/tech-stack.md
+- docs/coding-standards.md
+
+---
+
+# Related ADRs
+
+- ADR-0001: Adopt React Native for Mobile Application
+- ADR-0003: Adopt JWT Authentication (Pending)
+- ADR-0004: Adopt Feature-Based Architecture (Pending)
+- ADR-0005: Adopt TypeORM (Pending)

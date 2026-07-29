@@ -99,26 +99,46 @@ export class EmployeesService {
     }
 
     const { reportingManagerId, roleId, ...rest } = dto;
-    const employee = this.employeeRepository.create({
-      ...rest,
-      reportingManagerId: reportingManagerId ?? null,
-    });
-    const saved = await this.employeeRepository.save(employee);
+    const resolvedRoleId = roleId ?? (await this.getDefaultRoleId());
 
-    await this.rolesService.assignRole(
-      saved.id,
-      roleId ?? (await this.getDefaultRoleId()),
-      actorId,
+    // Employee insert + role assignment share one transaction: an invalid/unassignable
+    // role rolls back the employee insert too, instead of leaving an employee with no role.
+    const saved = await this.employeeRepository.manager.transaction(
+      async (manager) => {
+        const employee = manager.getRepository(Employee).create({
+          ...rest,
+          reportingManagerId: reportingManagerId ?? null,
+        });
+        const savedEmployee = await manager.save(employee);
+
+        await this.rolesService.assignRole(
+          savedEmployee.id,
+          resolvedRoleId,
+          actorId,
+          manager,
+        );
+
+        return savedEmployee;
+      },
     );
 
-    await this.auditLogService.record({
-      userId: actorId,
-      module: 'EMPLOYEES',
-      entity: 'Employee',
-      entityId: saved.id,
-      action: 'CREATE',
-      newValue: { employee_code: saved.employee_code, email: saved.email },
-    });
+    // Best-effort audit + notification — a failure here must not turn an already-committed
+    // employee creation into an HTTP 500 (the employee/role rows are already committed above).
+    try {
+      await this.auditLogService.record({
+        userId: actorId,
+        module: 'EMPLOYEES',
+        entity: 'Employee',
+        entityId: saved.id,
+        action: 'CREATE',
+        newValue: { employee_code: saved.employee_code, email: saved.email },
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to write audit log for employee ${saved.id} creation`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
 
     try {
       await this.notificationsService.create({
@@ -251,7 +271,10 @@ export class EmployeesService {
     dto: UpdateEmployeeDto,
     actorId?: string,
   ): Promise<Employee> {
-    const employee = await this.employeeRepository.findOne({ where: { id } });
+    const employee = await this.employeeRepository.findOne({ 
+      where: { id },
+      relations: ['profile_metadata'],
+    });
     if (!employee) {
       throw new NotFoundException('Employee not found');
     }
@@ -278,6 +301,13 @@ export class EmployeesService {
       designation: employee.designation,
       status: employee.status,
     };
+
+    if (dto.profile_metadata) {
+      if (employee.profile_metadata) {
+        Object.assign(employee.profile_metadata, dto.profile_metadata);
+        delete dto.profile_metadata;
+      }
+    }
 
     Object.assign(employee, dto);
     const saved = await this.employeeRepository.save(employee);

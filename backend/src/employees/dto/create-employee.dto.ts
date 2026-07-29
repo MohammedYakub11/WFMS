@@ -65,7 +65,7 @@ export class CreateEmployeeDto {
   @IsUUID()
   reportingManagerId?: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsUUID()
-  roleId?: string;
+  roleId: string;
 }

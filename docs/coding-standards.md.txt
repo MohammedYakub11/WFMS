@@ -1,0 +1,560 @@
+# Coding Standards
+
+## Project
+
+Workforce Management System (WFMS)
+
+---
+
+# Purpose
+
+This document defines the coding standards for the WFMS project.
+
+Every contributor and AI agent must follow these standards to ensure consistency, readability, maintainability, and long-term scalability.
+
+Code should look like it was written by one engineering team, not multiple individuals with different styles.
+
+---
+
+# Core Principles
+
+Every piece of code should strive to be:
+
+- Readable
+- Predictable
+- Maintainable
+- Testable
+- Reusable
+- Simple
+
+When in doubt, prefer readability over cleverness.
+
+---
+
+# General Rules
+
+Always:
+
+- Write self-explanatory code.
+- Prefer clarity over brevity.
+- Follow existing project patterns.
+- Reuse existing code before creating new implementations.
+- Keep implementations as small as practical.
+
+Avoid:
+
+- Premature optimization
+- Unnecessary abstraction
+- Deep nesting
+- Large classes
+- Duplicate logic
+- Dead code
+
+---
+
+# TypeScript Standards
+
+Use TypeScript strictly.
+
+Prefer:
+
+- explicit interfaces
+- explicit return types for exported functions
+- readonly where appropriate
+- enums only when they provide real value
+
+Avoid:
+
+- any
+- unknown without narrowing
+- excessive type assertions
+- disabled compiler checks
+
+Good
+
+```ts
+interface Employee {
+    id: number;
+    name: string;
+}
+```
+
+Avoid
+
+```ts
+const employee: any = {};
+```
+
+---
+
+# Naming Conventions
+
+Classes
+
+PascalCase
+
+```
+EmployeeService
+```
+
+Components
+
+PascalCase
+
+```
+EmployeeCard
+```
+
+Interfaces
+
+PascalCase
+
+```
+Employee
+```
+
+Functions
+
+camelCase
+
+```
+calculateScore()
+```
+
+Variables
+
+camelCase
+
+```
+employeeList
+```
+
+Constants
+
+UPPER_SNAKE_CASE only for true constants.
+
+Example
+
+```
+MAX_LOGIN_ATTEMPTS
+```
+
+Avoid unnecessary abbreviations.
+
+---
+
+# Function Design
+
+Functions should:
+
+- Do one thing.
+- Have one clear responsibility.
+- Be easy to understand.
+- Be easy to test.
+
+Prefer:
+
+```
+validateEmployee()
+
+calculateExperience()
+
+generateSkillSummary()
+```
+
+Avoid
+
+```
+processEverything()
+```
+
+---
+
+# Function Length
+
+Aim for:
+
+10–30 lines.
+
+If a function exceeds roughly 50 lines, evaluate whether it should be split into smaller functions.
+
+---
+
+# Parameters
+
+Prefer
+
+```
+function updateEmployee(employee)
+```
+
+instead of
+
+```
+function updateEmployee(
+    id,
+    name,
+    department,
+    manager,
+    role,
+    ...
+)
+```
+
+Use objects when parameter lists become large.
+
+---
+
+# Component Design
+
+React components should:
+
+- Focus on presentation.
+- Remain small.
+- Be reusable.
+- Avoid business logic.
+
+Components should primarily:
+
+- render UI
+- receive props
+- emit events
+
+Business logic belongs elsewhere.
+
+---
+
+# Screen Design
+
+Screens coordinate.
+
+Screens should:
+
+- call hooks
+- compose components
+- initiate API requests
+- handle navigation
+
+Screens should not contain complex business rules.
+
+---
+
+# Hooks
+
+Use hooks for reusable behavior.
+
+Examples
+
+```
+useEmployees()
+
+usePagination()
+
+useDebounce()
+```
+
+Avoid placing rendering logic inside hooks.
+
+---
+
+# Business Logic
+
+Business rules belong in:
+
+NestJS Services
+
+NOT
+
+React components
+
+NOT
+
+Controllers
+
+NOT
+
+Entities
+
+---
+
+# Controllers
+
+Controllers should:
+
+- Receive requests
+- Validate input
+- Call services
+- Return responses
+
+Controllers should remain thin.
+
+---
+
+# Services
+
+Services contain:
+
+- business logic
+- calculations
+- validations
+- workflows
+
+Most application intelligence belongs here.
+
+---
+
+# Repository Layer
+
+Repositories should only:
+
+- query data
+- insert data
+- update data
+- delete data
+
+Repositories should not contain business rules.
+
+---
+
+# Error Handling
+
+Always handle expected failures.
+
+Frontend
+
+- Show meaningful messages.
+- Avoid application crashes.
+
+Backend
+
+- Throw appropriate exceptions.
+- Return meaningful HTTP status codes.
+
+Avoid swallowing errors silently.
+
+---
+
+# Null Handling
+
+Never assume values exist.
+
+Prefer
+
+```ts
+if (!employee) {
+    return;
+}
+```
+
+instead of
+
+```ts
+employee.name
+```
+
+without checking.
+
+---
+
+# Async Code
+
+Always use:
+
+async / await
+
+Avoid deeply nested Promise chains.
+
+Example
+
+```ts
+const employee = await employeeService.findOne(id);
+```
+
+---
+
+# Comments
+
+Write comments only when they explain intent.
+
+Avoid comments that merely repeat the code.
+
+Good
+
+```ts
+// Manager approval is required before activation.
+```
+
+Bad
+
+```ts
+// Increment i
+i++;
+```
+
+Code should explain itself whenever possible.
+
+---
+
+# Logging
+
+Use logging for:
+
+- unexpected failures
+- important business events
+- debugging during development
+
+Remove temporary debugging statements before merging.
+
+Avoid excessive logging.
+
+---
+
+# Magic Values
+
+Avoid hardcoded values.
+
+Instead of
+
+```ts
+if (role == 3)
+```
+
+Prefer
+
+```ts
+if (role === UserRole.Manager)
+```
+
+---
+
+# Reusability
+
+Before creating:
+
+- Component
+- Hook
+- Utility
+- Service
+
+Search the project.
+
+Reuse existing implementations whenever possible.
+
+---
+
+# Code Duplication
+
+Duplicate logic should be extracted.
+
+Prefer
+
+One implementation
+
+Many consumers
+
+Avoid
+
+Many similar implementations
+
+---
+
+# Performance
+
+Avoid:
+
+- unnecessary renders
+- unnecessary API calls
+- repeated calculations
+
+Use memoization only where it provides measurable value.
+
+Do not optimize prematurely.
+
+---
+
+# Imports
+
+Remove:
+
+- unused imports
+- duplicate imports
+
+Group imports logically.
+
+---
+
+# File Size
+
+Large files become difficult to maintain.
+
+As a guideline:
+
+Components
+
+~300 lines maximum
+
+Services
+
+~400 lines maximum
+
+Split files when responsibilities become mixed.
+
+These are guidelines, not hard limits.
+
+---
+
+# Testing Mindset
+
+Every implementation should be written assuming it will eventually be tested.
+
+Write deterministic code.
+
+Avoid hidden side effects.
+
+---
+
+# AI Development Rules
+
+Before generating code:
+
+1. Search for existing implementations.
+2. Follow existing naming conventions.
+3. Preserve architecture.
+4. Reuse components.
+5. Reuse services.
+6. Avoid introducing new patterns unless required.
+7. Make the smallest correct change.
+
+Never generate code that ignores existing project conventions.
+
+---
+
+# Refactoring
+
+Refactor only when:
+
+- it improves maintainability
+- it reduces duplication
+- it simplifies the design
+
+Do not refactor unrelated code while implementing a feature unless explicitly requested.
+
+---
+
+# Definition of Done
+
+A task is complete only when:
+
+- Code compiles.
+- Existing functionality is preserved.
+- New functionality works.
+- No duplicate code has been introduced.
+- Naming is consistent.
+- Architecture is respected.
+- No unnecessary complexity exists.
+
+---
+
+# Guiding Principle
+
+Write code that another engineer can understand six months later without additional explanation.

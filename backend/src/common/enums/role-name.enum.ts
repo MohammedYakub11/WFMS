@@ -20,6 +20,7 @@ export const ROLE_PERMISSION_MATRIX: Record<RoleName, PermissionCode[]> = {
     PermissionCode.EMPLOYEE_SKILL_VIEW,
     PermissionCode.EMPLOYEE_SKILL_UPDATE,
     PermissionCode.EMPLOYEE_SKILL_DELETE,
+    PermissionCode.VIEW_DASHBOARD,
   ],
   [RoleName.WORKFORCE_MANAGER]: [
     PermissionCode.LOGIN,
@@ -38,6 +39,7 @@ export const ROLE_PERMISSION_MATRIX: Record<RoleName, PermissionCode[]> = {
     PermissionCode.VIEW_DASHBOARD,
     PermissionCode.VIEW_ANALYTICS,
     PermissionCode.EXPORT_REPORTS,
+    PermissionCode.REPORT_VIEW,
   ],
   [RoleName.RESOURCE_MANAGER]: [
     PermissionCode.LOGIN,
@@ -56,6 +58,7 @@ export const ROLE_PERMISSION_MATRIX: Record<RoleName, PermissionCode[]> = {
     PermissionCode.VIEW_DASHBOARD,
     PermissionCode.VIEW_ANALYTICS,
     PermissionCode.EXPORT_REPORTS,
+    PermissionCode.REPORT_VIEW,
   ],
   [RoleName.ADMINISTRATOR]: Object.values(PermissionCode),
 };

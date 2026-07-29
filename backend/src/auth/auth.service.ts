@@ -1,32 +1,78 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { EmployeesService } from '../employees/employees.service';
 import { RolesService } from '../roles/roles.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ConfigService } from '@nestjs/config';
+import { AuditLogService } from '../audit-logs/audit-log.service';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly employeesService: EmployeesService,
     private readonly rolesService: RolesService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   async login(loginDto: LoginDto) {
     const employee = await this.employeesService.findByEmail(loginDto.email);
     if (!employee) {
+      await this.recordAuditSafe({
+        userId: null,
+        module: 'AUTH',
+        entity: 'Employee',
+        entityId: null,
+        action: 'LOGIN_FAILED',
+        newValue: { email: loginDto.email },
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const isPasswordValid = await employee.validatePassword(loginDto.password);
     if (!isPasswordValid) {
+      await this.recordAuditSafe({
+        userId: null,
+        module: 'AUTH',
+        entity: 'Employee',
+        entityId: null,
+        action: 'LOGIN_FAILED',
+        newValue: { email: loginDto.email },
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    await this.recordAuditSafe({
+      userId: employee.id,
+      module: 'AUTH',
+      entity: 'Employee',
+      entityId: employee.id,
+      action: 'LOGIN',
+      newValue: { email: employee.email },
+    });
+
     return this.generateTokens(employee.id, employee.email);
+  }
+
+  async logout(userId?: string) {
+    await this.recordAuditSafe({
+      userId: userId ?? null,
+      module: 'AUTH',
+      entity: 'Employee',
+      entityId: userId ?? null,
+      action: 'LOGOUT',
+    });
+
+    return {
+      success: true,
+      message: 'Logged out successfully',
+      data: {},
+      errors: null,
+    };
   }
 
   async refreshToken(refreshTokenDto: RefreshTokenDto) {
@@ -58,15 +104,52 @@ export class AuthService {
       };
     }
     // TODO: Implement actual email sending logic and token generation
+    await this.recordAuditSafe({
+      userId: employee.id,
+      module: 'AUTH',
+      entity: 'Employee',
+      entityId: employee.id,
+      action: 'PASSWORD_RESET',
+      newValue: { email: employee.email, stage: 'requested' },
+    });
     return {
       message: 'If an account exists, a password reset link has been sent.',
     };
   }
 
-  async resetPassword(_token: string, _newPassword: string) {
+  async resetPassword(token: string, newPassword: string) {
     // TODO: Implement actual token verification and password update
     await new Promise((resolve) => setTimeout(resolve, 10)); // Dummy await to fix ESLint
+    await this.recordAuditSafe({
+      userId: null,
+      module: 'AUTH',
+      entity: 'Employee',
+      entityId: null,
+      action: 'PASSWORD_RESET',
+      newValue: {
+        stage: 'completed',
+        tokenProvided: Boolean(token),
+        newPasswordProvided: Boolean(newPassword),
+      },
+    });
     return { message: 'Password has been successfully reset.' };
+  }
+
+  /**
+   * Best-effort audit write. Never throws — a failure here must not
+   * affect the outcome of the auth flow it's attached to.
+   */
+  private async recordAuditSafe(
+    input: Parameters<AuditLogService['record']>[0],
+  ): Promise<void> {
+    try {
+      await this.auditLogService.record(input);
+    } catch (err) {
+      this.logger.error(
+        `Failed to write audit log for action ${input.action}`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
   }
 
   private async generateTokens(userId: string, email: string) {

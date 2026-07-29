@@ -1,0 +1,496 @@
+# UI Guidelines
+
+> Version: 1.0
+> Project: Workforce Management System (WFMS)
+> Applies To: React Native Frontend
+
+---
+
+# Purpose
+
+This document defines the visual and interaction standards for the Workforce Management System (WFMS).
+
+The goal is to create a consistent, accessible, maintainable, and enterprise-grade user experience across the application.
+
+Every screen should appear as though it was designed by the same team and implemented by the same developer.
+
+---
+
+# Scope
+
+These guidelines apply to:
+
+- Screens
+- Components
+- Forms
+- Dialogs
+- Navigation
+- Tables
+- Lists
+- Charts
+- Cards
+- Bottom Sheets
+- Empty States
+- Error States
+- Loading States
+
+---
+
+# Design Principles
+
+The UI should prioritize:
+
+- Consistency
+- Simplicity
+- Readability
+- Accessibility
+- Predictability
+- Responsiveness
+- Performance
+
+Never sacrifice usability for visual effects.
+
+---
+
+# Design Philosophy
+
+The application follows an enterprise design philosophy.
+
+Every screen should answer:
+
+- Where am I?
+- What can I do?
+- What should I do next?
+
+Users should never need to guess.
+
+---
+
+# Theme
+
+The application supports:
+
+- Light Theme
+- Dark Theme
+
+Never hardcode colors.
+
+Always use theme tokens.
+
+Example
+
+Correct
+
+```
+theme.colors.primary
+```
+
+Incorrect
+
+```
+#2563EB
+```
+
+---
+
+# Color Usage
+
+Primary
+
+Primary actions.
+
+Secondary
+
+Secondary actions.
+
+Success
+
+Completed operations.
+
+Warning
+
+Potential issues.
+
+Error
+
+Failures.
+
+Information
+
+Neutral information.
+
+Avoid using color as the only way to communicate meaning.
+
+---
+
+# Typography
+
+Use the project's typography system.
+
+Maintain consistent:
+
+- Font family
+- Font weight
+- Font size
+- Line height
+
+Avoid arbitrary font sizes.
+
+---
+
+# Spacing
+
+Use a consistent spacing scale.
+
+Recommended spacing:
+
+```
+4
+8
+12
+16
+20
+24
+32
+40
+48
+64
+```
+
+Avoid random spacing values.
+
+---
+
+# Border Radius
+
+Use consistent border radius values.
+
+Recommended:
+
+```
+4
+8
+12
+16
+24
+```
+
+Avoid inconsistent corner rounding.
+
+---
+
+# Elevation
+
+Use elevation sparingly.
+
+Prefer hierarchy through:
+
+- Spacing
+- Typography
+- Color
+
+rather than excessive shadows.
+
+---
+
+# Icons
+
+Icons should:
+
+- Be meaningful
+- Be consistent
+- Match existing icon sets
+
+Do not mix multiple icon libraries.
+
+---
+
+# Buttons
+
+Buttons should have clear hierarchy.
+
+Primary
+
+Most important action.
+
+Secondary
+
+Alternative action.
+
+Text Button
+
+Low-priority action.
+
+Danger
+
+Destructive action.
+
+Avoid multiple primary buttons within the same context.
+
+---
+
+# Forms
+
+Forms should:
+
+- Show labels
+- Show validation
+- Show required indicators
+- Preserve entered values where appropriate
+
+Validation should occur as early as practical without disrupting the user.
+
+---
+
+# Input Fields
+
+Inputs should have:
+
+- Label
+- Placeholder (when useful)
+- Helper text (if needed)
+- Validation message
+
+Do not rely solely on placeholders.
+
+---
+
+# Dialogs
+
+Dialogs should:
+
+- Focus on one task
+- Have a clear title
+- Explain the action
+- Present obvious actions
+
+Primary action should be visually emphasized.
+
+Avoid placing unrelated content inside dialogs.
+
+---
+
+# Navigation
+
+Navigation should be predictable.
+
+Users should always know:
+
+- Current location
+- Previous location
+- Available destinations
+
+Avoid deep navigation hierarchies.
+
+---
+
+# Lists
+
+Lists should:
+
+- Scroll smoothly
+- Support loading states
+- Support empty states
+- Support error states
+
+Avoid blank screens.
+
+---
+
+# Tables
+
+Tables should:
+
+- Support sorting
+- Support pagination
+- Support filtering
+- Align numeric values consistently
+
+Large datasets should never be rendered entirely.
+
+---
+
+# Cards
+
+Cards should group related information.
+
+Avoid placing unrelated content inside the same card.
+
+---
+
+# Loading States
+
+Always provide feedback.
+
+Examples:
+
+- Skeleton loading
+- Progress indicators
+- Activity indicators
+
+Avoid frozen interfaces.
+
+---
+
+# Empty States
+
+Every empty state should explain:
+
+- Why the screen is empty
+- What the user can do next
+
+Good example:
+
+"No employees found."
+
+Action:
+
+"Create Employee"
+
+---
+
+# Error States
+
+Errors should:
+
+- Explain the problem
+- Suggest a solution
+- Avoid technical language
+
+Bad
+
+```
+500 Error
+```
+
+Good
+
+```
+Unable to load employee data.
+
+Please try again.
+```
+
+---
+
+# Accessibility
+
+The application should support:
+
+- Screen readers
+- Dynamic text scaling
+- High contrast
+- Keyboard navigation (where applicable)
+
+Touch targets should be at least 44 × 44 points.
+
+---
+
+# Responsive Design
+
+Support:
+
+- Phones
+- Tablets
+- Different screen sizes
+- Orientation changes where appropriate
+
+Avoid hardcoded widths.
+
+---
+
+# Animations
+
+Animations should:
+
+- Be subtle
+- Reinforce interactions
+- Never delay critical workflows
+
+Avoid decorative animations.
+
+---
+
+# Component Reuse
+
+Before creating a new component:
+
+1. Search the project.
+2. Check shared components.
+3. Reuse existing implementations.
+
+Avoid duplicate UI components.
+
+---
+
+# AI Agent Guidance
+
+Before creating UI:
+
+- Follow existing design patterns.
+- Reuse existing components.
+- Use theme values.
+- Maintain spacing consistency.
+- Preserve accessibility.
+- Keep layouts responsive.
+
+Never introduce a new visual style without approval.
+
+---
+
+# Anti-Patterns
+
+Avoid:
+
+❌ Hardcoded colors
+
+❌ Hardcoded spacing
+
+❌ Inconsistent typography
+
+❌ Duplicate components
+
+❌ Mixed icon styles
+
+❌ Missing loading states
+
+❌ Missing empty states
+
+❌ Missing error states
+
+❌ Tiny touch targets
+
+❌ Inconsistent dialogs
+
+---
+
+# UI Review Checklist
+
+Before submitting UI changes:
+
+- [ ] Uses theme colors
+- [ ] Uses design system spacing
+- [ ] Responsive layout
+- [ ] Accessible controls
+- [ ] Loading state implemented
+- [ ] Empty state implemented
+- [ ] Error state implemented
+- [ ] Existing components reused
+- [ ] Consistent typography
+- [ ] No hardcoded values
+
+---
+
+# Related Documents
+
+- architecture.md
+- coding-standards.md
+- business-rules.md
+
+---
+
+# Guiding Principle
+
+Every new screen should feel like it has always been part of the application.
+
+Users should recognize patterns, not relearn interfaces.

@@ -1,6 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Card, Text, Avatar, Chip, useTheme } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Chip } from 'react-native-paper';
+import { useSelector } from 'react-redux';
+import { Card } from '../Cards';
+import { AppText } from '../AppText';
+import { Avatar } from '../Avatar';
+import { RootState } from '../../store';
+import { lightTheme, darkTheme } from '../../theme/theme';
 
 interface SearchResultCardProps {
   employee: any;
@@ -8,99 +14,89 @@ interface SearchResultCardProps {
 }
 
 export const SearchResultCard: React.FC<SearchResultCardProps> = ({ employee, onPress }) => {
-  const theme = useTheme();
+  const isDarkMode = useSelector((state: RootState) => state.theme.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+  const fullName = `${employee.first_name || ''} ${employee.last_name || ''}`.trim() || 'Unknown Employee';
+  const extraSkillsCount = (employee.totalSkills || 0) - (employee.primarySkills?.length || 0);
 
   return (
-    <TouchableOpacity onPress={() => onPress(employee)}>
-      <Card style={styles.card}>
-        <Card.Content>
-          <View style={styles.header}>
-            {employee.profile_image ? (
-              <Avatar.Image size={50} source={{ uri: employee.profile_image }} />
-            ) : (
-              <Avatar.Text 
-                size={50} 
-                label={`${employee.first_name?.[0] || ''}${employee.last_name?.[0] || ''}`} 
-              />
-            )}
-            <View style={styles.headerText}>
-              <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
-                {employee.first_name} {employee.last_name}
-              </Text>
-              <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                {employee.designation || 'No Designation'} • {employee.department || 'No Department'}
-              </Text>
-            </View>
-          </View>
+    <Card style={styles.card} onPress={() => onPress(employee)}>
+      <View style={styles.header}>
+        <Avatar name={fullName} uri={employee.profile_image} size={48} />
+        <View style={styles.titleContainer}>
+          <AppText variant="h2" numberOfLines={1}>{fullName}</AppText>
+          <AppText variant="caption" color={theme.colors.textSecondary} numberOfLines={1}>
+            {employee.designation || 'No designation'} · {employee.department || 'No department'}
+          </AppText>
+        </View>
+      </View>
 
-          <View style={styles.statsContainer}>
-            <View style={styles.statBox}>
-              <Text variant="titleSmall">{employee.totalSkills}</Text>
-              <Text variant="bodySmall" style={{ color: theme.colors.outline }}>Skills</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text variant="titleSmall">{employee.averageProficiency}</Text>
-              <Text variant="bodySmall" style={{ color: theme.colors.outline }}>Avg Prof.</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text variant="titleSmall">{employee.certificationsCount}</Text>
-              <Text variant="bodySmall" style={{ color: theme.colors.outline }}>Certs</Text>
-            </View>
-          </View>
+      <View style={[styles.statsRow, { backgroundColor: theme.colors.border }]}>
+        <View style={styles.statBox}>
+          <AppText variant="h3">{employee.totalSkills ?? 0}</AppText>
+          <AppText variant="caption" color={theme.colors.textSecondary}>Skills</AppText>
+        </View>
+        <View style={styles.statBox}>
+          <AppText variant="h3">{employee.averageProficiency ?? 0}</AppText>
+          <AppText variant="caption" color={theme.colors.textSecondary}>Avg. Prof.</AppText>
+        </View>
+        <View style={styles.statBox}>
+          <AppText variant="h3">{employee.certificationsCount ?? 0}</AppText>
+          <AppText variant="caption" color={theme.colors.textSecondary}>Certs</AppText>
+        </View>
+      </View>
 
-          {employee.primarySkills && employee.primarySkills.length > 0 && (
-            <View style={styles.skillsContainer}>
-              {employee.primarySkills.map((skillName: string, index: number) => (
-                <Chip key={index} style={styles.chip} textStyle={{ fontSize: 10, minHeight: 12, lineHeight: 12 }}>
-                  {skillName}
-                </Chip>
-              ))}
-              {employee.totalSkills > 3 && (
-                <Chip style={styles.chip} textStyle={{ fontSize: 10, minHeight: 12, lineHeight: 12 }}>
-                  +{employee.totalSkills - 3} more
-                </Chip>
-              )}
-            </View>
+      {employee.primarySkills?.length > 0 && (
+        <View style={styles.skillsRow}>
+          {employee.primarySkills.map((skillName: string, index: number) => (
+            <Chip key={index} style={[styles.chip, { backgroundColor: theme.colors.border }]} textStyle={styles.chipText} compact>
+              {skillName}
+            </Chip>
+          ))}
+          {extraSkillsCount > 0 && (
+            <Chip style={[styles.chip, { backgroundColor: theme.colors.border }]} textStyle={styles.chipText} compact>
+              +{extraSkillsCount} more
+            </Chip>
           )}
-        </Card.Content>
-      </Card>
-    </TouchableOpacity>
+        </View>
+      )}
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 12,
-    elevation: 2,
+    marginHorizontal: 16,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
   },
-  headerText: {
-    marginLeft: 16,
+  titleContainer: {
     flex: 1,
+    marginLeft: 12,
   },
-  statsContainer: {
+  statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 16,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(0,0,0,0.03)',
+    paddingVertical: 12,
     borderRadius: 8,
+    marginBottom: 12,
   },
   statBox: {
     alignItems: 'center',
   },
-  skillsContainer: {
+  skillsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
+    gap: 8,
   },
   chip: {
-    height: 24,
+    height: 28,
     justifyContent: 'center',
-    alignItems: 'center',
+  },
+  chipText: {
+    fontSize: 12,
   },
 });

@@ -8,6 +8,15 @@ export interface TrendInfo {
   positive: boolean;
 }
 
+export interface MySkillsSummary {
+  total: number;
+  approved: number;
+  pending: number;
+  rejected: number;
+  changesRequested: number;
+  completionPercentage: number;
+}
+
 export interface DashboardSummary {
   totalEmployees: number;
   totalSkills: number;
@@ -18,6 +27,7 @@ export interface DashboardSummary {
   notificationCount: number;
   employeeTrend: TrendInfo;
   skillTrend: TrendInfo;
+  mySkills: MySkillsSummary;
 }
 
 export interface CategoryBreakdownItem {
@@ -48,4 +58,68 @@ export interface DashboardAnalytics {
   approvalStatusBreakdown: ApprovalBreakdownItem[];
   proficiencyDistribution: ProficiencyBreakdownItem[];
   recentActivity: DashboardActivityItem[];
+}
+
+export interface DepartmentKpi {
+  department: string;
+  headcount: number;
+  avgExperience: number;
+  approvedSkillCount: number;
+  avgProficiency: number;
+}
+
+export interface SkillGapItem {
+  categoryName: string;
+  belowProficiencyPct: number;
+  certificationGapCount: number;
+}
+
+export interface IssuingOrganizationCount {
+  name: string;
+  count: number;
+}
+
+export interface CertificationAnalytics {
+  certifiedCount: number;
+  notCertifiedCount: number;
+  topIssuingOrganizations: IssuingOrganizationCount[];
+  expiringSoonCount: number;
+}
+
+export interface TopReviewer {
+  employeeId: string;
+  name: string;
+  count: number;
+}
+
+export interface ApprovalsAnalytics {
+  statusBreakdown: ApprovalBreakdownItem[];
+  avgReviewHours: number;
+  topReviewers: TopReviewer[];
+}
+
+export interface DepartmentDesignationCount {
+  department: string;
+  designation: string;
+  count: number;
+}
+
+export interface LocationCount {
+  location: string;
+  count: number;
+}
+
+export interface WorkforceDistribution {
+  byDepartmentDesignation: DepartmentDesignationCount[];
+  byLocation: LocationCount[];
+}
+
+export interface MonthlyCount {
+  month: string;
+  count: number;
+}
+
+export interface Trends {
+  employeeGrowth: MonthlyCount[];
+  skillSubmissions: MonthlyCount[];
 }

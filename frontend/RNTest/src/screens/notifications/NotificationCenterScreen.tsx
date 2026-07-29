@@ -13,6 +13,7 @@ import {
 } from '../../hooks/useNotifications';
 import { usePermissions } from '../../hooks/usePermissions';
 import { AppHeader } from '../../components/AppHeader';
+import { renderAppIcon } from '../../components/AppIcon';
 import { AppText } from '../../components/AppText';
 import { EmptyState } from '../../components/EmptyState';
 import { NotificationListItem } from '../../components/notifications/NotificationListItem';
@@ -118,17 +119,12 @@ export const NotificationCenterScreen = () => {
         title="Notifications"
         showBack
         rightAction={
-          <View style={styles.headerActions}>
-            <TouchableOpacity onPress={() => markAllReadMutation.mutate()}>
-              <AppText color={theme.colors.primary}>Mark all read</AppText>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('NotificationPreferences')}
-              accessibilityLabel="Notification preferences"
-            >
-              <AppText style={styles.gearIcon}>⚙</AppText>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('NotificationPreferences')}
+            accessibilityLabel="Notification preferences"
+          >
+            <AppText style={styles.gearIcon}>⚙</AppText>
+          </TouchableOpacity>
         }
       />
 
@@ -157,6 +153,16 @@ export const NotificationCenterScreen = () => {
           );
         })}
       </View>
+
+      {notifications.length > 0 && (
+        <View style={styles.markAllReadRow}>
+          <TouchableOpacity onPress={() => markAllReadMutation.mutate()} accessibilityLabel="Mark all notifications as read">
+            <AppText variant="caption" color={theme.colors.primary} weight="semiBold">
+              Mark all read
+            </AppText>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {isLoading && page === 1 ? (
         <FlatList
@@ -187,7 +193,7 @@ export const NotificationCenterScreen = () => {
 
       {hasPermission('NOTIFICATION_SEND') && (
         <FAB
-          icon="bullhorn-outline"
+          icon={renderAppIcon("bullhorn-outline")}
           style={styles.fab}
           onPress={() => navigation.navigate('SendNotification')}
           color="#FFF"
@@ -217,10 +223,10 @@ const createStyles = (theme: typeof lightTheme) =>
     listContent: {
       paddingBottom: 24,
     },
-    headerActions: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 16,
+    markAllReadRow: {
+      alignItems: 'flex-end',
+      paddingHorizontal: 16,
+      paddingBottom: 12,
     },
     gearIcon: {
       fontSize: 20,

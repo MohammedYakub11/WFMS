@@ -19,12 +19,51 @@ export class DashboardController {
   async getSummary(@Req() req: Request & { user: AuthenticatedUser }) {
     // dashboard.service.ts's signature (user?: Employee) is untouched — only reads user?.id,
     // so the lean auth-chain user shape is safe to pass here via a type-only cast.
-    return this.dashboardService.getSummary(req.user as unknown as Employee);
+    return this.dashboardService.getSummary(
+      req.user as unknown as Employee,
+      req.user.permissions,
+    );
   }
 
   @RequirePermissions(PermissionCode.VIEW_ANALYTICS)
   @Get('analytics')
   async getAnalytics() {
     return this.dashboardService.getAnalytics();
+  }
+
+  @RequirePermissions(PermissionCode.VIEW_ANALYTICS)
+  @Get('department-kpis')
+  async getDepartmentKpis() {
+    return this.dashboardService.getDepartmentKpis();
+  }
+
+  @RequirePermissions(PermissionCode.VIEW_ANALYTICS)
+  @Get('skill-gap')
+  async getSkillGap() {
+    return this.dashboardService.getSkillGap();
+  }
+
+  @RequirePermissions(PermissionCode.VIEW_ANALYTICS)
+  @Get('certifications')
+  async getCertificationAnalytics() {
+    return this.dashboardService.getCertificationAnalytics();
+  }
+
+  @RequirePermissions(PermissionCode.VIEW_ANALYTICS)
+  @Get('approvals-analytics')
+  async getApprovalsAnalytics() {
+    return this.dashboardService.getApprovalsAnalytics();
+  }
+
+  @RequirePermissions(PermissionCode.VIEW_ANALYTICS)
+  @Get('workforce-distribution')
+  async getWorkforceDistribution() {
+    return this.dashboardService.getWorkforceDistribution();
+  }
+
+  @RequirePermissions(PermissionCode.VIEW_ANALYTICS)
+  @Get('trends')
+  async getTrends() {
+    return this.dashboardService.getTrends();
   }
 }

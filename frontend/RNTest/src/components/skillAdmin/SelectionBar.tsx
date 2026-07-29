@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Checkbox, IconButton, ActivityIndicator } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { AppText } from '../AppText';
+import { renderAppIcon } from '../AppIcon';
 import { RootState } from '../../store';
 import { lightTheme, darkTheme } from '../../theme/theme';
 
@@ -59,14 +60,14 @@ export const SelectionBar: React.FC<SelectionBarProps> = ({
         {isLoading ? (
           <ActivityIndicator size="small" color={theme.colors.primary} style={styles.loader} />
         ) : (
-          <IconButton icon="close" size={20} onPress={onCancel} accessibilityLabel="Cancel selection" />
+          <IconButton icon={renderAppIcon("close")} size={20} onPress={onCancel} accessibilityLabel="Cancel selection" />
         )}
       </View>
 
       <View style={[styles.actionsRow, { borderTopColor: theme.colors.divider }]}>
         {onActivate && (
           <IconButton
-            icon="check-circle-outline"
+            icon={renderAppIcon("check-circle-outline")}
             size={22}
             onPress={onActivate}
             disabled={isLoading || selectedCount === 0}
@@ -75,7 +76,7 @@ export const SelectionBar: React.FC<SelectionBarProps> = ({
         )}
         {onDeactivate && (
           <IconButton
-            icon="close-circle-outline"
+            icon={renderAppIcon("close-circle-outline")}
             size={22}
             onPress={onDeactivate}
             disabled={isLoading || selectedCount === 0}
@@ -84,7 +85,7 @@ export const SelectionBar: React.FC<SelectionBarProps> = ({
         )}
         {onExportSelected && (
           <IconButton
-            icon="export-variant"
+            icon={renderAppIcon("export-variant")}
             size={22}
             onPress={onExportSelected}
             disabled={isLoading || selectedCount === 0}
@@ -93,7 +94,7 @@ export const SelectionBar: React.FC<SelectionBarProps> = ({
         )}
         {onDelete && (
           <IconButton
-            icon="delete-outline"
+            icon={renderAppIcon("delete-outline")}
             size={22}
             iconColor={theme.colors.error}
             onPress={onDelete}

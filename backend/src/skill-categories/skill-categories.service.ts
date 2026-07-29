@@ -13,6 +13,17 @@ import { BulkSkillActionDto } from '../skills/dto/bulk-skill-action.dto';
 import { BulkDeleteDto } from '../skills/dto/bulk-delete.dto';
 import { AuditLogService } from '../audit-logs/audit-log.service';
 
+interface DatabaseError {
+  code?: string;
+  driverError?: { code?: string };
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const dbError = error as Error & DatabaseError;
+  return dbError.code === '23505' || dbError.driverError?.code === '23505';
+}
+
 @Injectable()
 export class SkillCategoriesService {
   constructor(
@@ -26,7 +37,16 @@ export class SkillCategoriesService {
     actorId?: string,
   ): Promise<SkillCategory> {
     const category = this.categoryRepository.create(createDto);
-    const saved = await this.categoryRepository.save(category);
+
+    let saved: SkillCategory;
+    try {
+      saved = await this.categoryRepository.save(category);
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        throw new ConflictException('Category name already in use');
+      }
+      throw error;
+    }
 
     await this.auditLogService.record({
       userId: actorId,

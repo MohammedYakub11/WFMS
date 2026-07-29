@@ -3,11 +3,12 @@ import Share from 'react-native-share';
 import { store } from '../store';
 import { getBaseUrl } from './network';
 
-export type ExportFormat = 'csv' | 'xlsx';
+export type ExportFormat = 'csv' | 'xlsx' | 'pdf';
 
 const MIME_TYPES: Record<ExportFormat, string> = {
   csv: 'text/csv',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  pdf: 'application/pdf',
 };
 
 /**

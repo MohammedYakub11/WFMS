@@ -1,0 +1,480 @@
+# API Conventions
+
+> Applies to: Backend (NestJS), Frontend (React Native), AI Agents
+
+---
+
+# Purpose
+
+This document defines how APIs are designed, implemented, consumed, and maintained within the Workforce Management System (WFMS).
+
+All new APIs and API integrations must follow these conventions.
+
+---
+
+# Guiding Principles
+
+- Consistency over creativity.
+- Backward compatibility whenever possible.
+- Predictable request and response formats.
+- Thin controllers.
+- Business logic belongs in services.
+- Never expose internal implementation details.
+
+---
+
+# Standard Request Flow
+
+```
+Client
+   │
+   ▼
+Controller
+   │
+   ▼
+Service
+   │
+   ▼
+Repository
+   │
+   ▼
+Database
+```
+
+Never bypass the service layer.
+
+---
+
+# Endpoint Naming
+
+## Good
+
+```
+GET    /employees
+GET    /employees/:id
+POST   /employees
+PATCH  /employees/:id
+DELETE /employees/:id
+```
+
+## Avoid
+
+```
+GET /getEmployees
+POST /createEmployee
+POST /deleteEmployee
+```
+
+Use RESTful resource names.
+
+---
+
+# HTTP Methods
+
+| Method | Purpose |
+|---------|----------|
+| GET | Read |
+| POST | Create |
+| PATCH | Partial Update |
+| PUT | Full Replacement (rare) |
+| DELETE | Remove |
+
+Never use POST for updates unless there is a compelling business reason.
+
+---
+
+# URL Structure
+
+Use nouns.
+
+Example
+
+```
+/employees
+```
+
+Avoid verbs.
+
+```
+/createEmployee
+```
+
+Nested resources should be meaningful.
+
+Example
+
+```
+/employees/:id/skills
+```
+
+---
+
+# Versioning
+
+Current version
+
+```
+/api/v1/
+```
+
+Breaking API changes require a new version.
+
+Never silently change response contracts.
+
+---
+
+# Controllers
+
+Controllers should only:
+
+- Receive requests
+- Validate DTOs
+- Call services
+- Return responses
+
+Controllers should NOT:
+
+- Query databases
+- Perform calculations
+- Contain business rules
+- Coordinate workflows
+
+Target size:
+
+< 150 lines
+
+---
+
+# Services
+
+Services are responsible for:
+
+- Business rules
+- Validation
+- Calculations
+- Workflows
+- Coordination
+
+Most application intelligence belongs here.
+
+---
+
+# Repositories
+
+Repositories should only:
+
+- Query
+- Insert
+- Update
+- Delete
+
+Repositories should never contain business rules.
+
+---
+
+# DTO Rules
+
+Every request must use DTOs.
+
+Example
+
+```
+CreateEmployeeDto
+
+UpdateEmployeeDto
+
+EmployeeResponseDto
+```
+
+Avoid using entities directly in controllers.
+
+---
+
+# Validation
+
+Always validate:
+
+- Required fields
+- Length
+- Range
+- Format
+- Enum values
+
+Use validation decorators instead of manual validation whenever possible.
+
+---
+
+# Response Structure
+
+Success responses should be predictable.
+
+Example
+
+```json
+{
+  "success": true,
+  "data": {},
+  "message": "Employee created successfully"
+}
+```
+
+Error responses should also follow a consistent format.
+
+```json
+{
+  "success": false,
+  "message": "Employee not found",
+  "errorCode": "EMPLOYEE_NOT_FOUND"
+}
+```
+
+---
+
+# Pagination
+
+Large collections must support pagination.
+
+Preferred parameters
+
+```
+?page=1
+&limit=20
+```
+
+Response example
+
+```json
+{
+  "items": [],
+  "total": 320,
+  "page": 1,
+  "limit": 20
+}
+```
+
+Avoid returning large datasets without pagination.
+
+---
+
+# Filtering
+
+Use query parameters.
+
+Example
+
+```
+GET /employees?department=IT
+```
+
+Support multiple filters when appropriate.
+
+---
+
+# Sorting
+
+Use query parameters.
+
+Example
+
+```
+?sort=name
+&order=asc
+```
+
+Avoid creating separate endpoints for sorting.
+
+---
+
+# Searching
+
+Search should be server-side whenever practical.
+
+Example
+
+```
+GET /employees?search=John
+```
+
+Avoid client-side searching for large datasets.
+
+---
+
+# Authentication
+
+Protected endpoints require JWT authentication.
+
+Public endpoints must be explicitly documented.
+
+Never rely on frontend authentication alone.
+
+---
+
+# Authorization
+
+Role checks belong in the backend.
+
+Never trust role information supplied by the client.
+
+---
+
+# Error Handling
+
+Return appropriate HTTP status codes.
+
+| Code | Meaning |
+|-------|----------|
+| 200 | Success |
+| 201 | Created |
+| 204 | No Content |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 409 | Conflict |
+| 500 | Internal Error |
+
+Do not return HTTP 200 for failures.
+
+---
+
+# Database Access
+
+Allowed
+
+```
+Controller
+    ↓
+Service
+    ↓
+Repository
+```
+
+Not Allowed
+
+```
+Controller
+      ↓
+Database
+```
+
+---
+
+# Transactions
+
+Use transactions when:
+
+- Multiple writes must succeed together.
+- Partial updates would corrupt data.
+- Business consistency is required.
+
+---
+
+# Logging
+
+Log:
+
+- Authentication failures
+- Unexpected exceptions
+- Critical business events
+
+Do not log:
+
+- Passwords
+- Tokens
+- Sensitive personal data
+
+---
+
+# Frontend API Consumption
+
+Screens should never make HTTP requests directly.
+
+Correct flow
+
+```
+Screen
+   │
+Hook
+   │
+Service
+   │
+API
+```
+
+or
+
+```
+Screen
+   │
+React Query
+   │
+Service
+   │
+API
+```
+
+---
+
+# AI Agent Checklist
+
+Before creating or modifying an API:
+
+- [ ] Search for an existing endpoint.
+- [ ] Reuse existing DTOs if appropriate.
+- [ ] Preserve response format.
+- [ ] Preserve API version.
+- [ ] Keep controller thin.
+- [ ] Place business logic in services.
+- [ ] Validate all inputs.
+- [ ] Return appropriate HTTP status codes.
+- [ ] Maintain backward compatibility.
+
+---
+
+# Do
+
+✅ Use DTOs.
+
+✅ Use RESTful endpoints.
+
+✅ Validate inputs.
+
+✅ Return consistent responses.
+
+✅ Reuse existing services.
+
+---
+
+# Don't
+
+❌ Put business logic in controllers.
+
+❌ Return inconsistent response structures.
+
+❌ Bypass repositories.
+
+❌ Change API contracts without versioning.
+
+❌ Create duplicate endpoints.
+
+---
+
+# Decision Table
+
+| Situation | Action |
+|-----------|--------|
+| Need new endpoint | Search existing APIs first |
+| Need validation | Use DTO decorators |
+| Need database access | Go through service and repository |
+| Need business logic | Add to service |
+| Need pagination | Use page and limit |
+| Need filtering | Use query parameters |
+| Need role checks | Backend authorization |
+
+---
+
+# Guiding Principle
+
+Every API should be predictable, discoverable, secure, and maintainable.
+
+A developer or AI agent should be able to understand an endpoint without reading its implementation.

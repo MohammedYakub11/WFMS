@@ -4,6 +4,7 @@ import { FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { AppHeader } from '../../components/AppHeader';
+import { renderAppIcon } from '../../components/AppIcon';
 import { AppText } from '../../components/AppText';
 import { EmptyState } from '../../components/EmptyState';
 import { ConfirmationDialog } from '../../components/ConfirmationDialog';
@@ -85,7 +86,7 @@ export const RoleManagementScreen = () => {
         />
       )}
 
-      <FAB icon="plus" style={styles.fab} onPress={() => navigation.navigate('RoleForm', {})} color="#FFF" />
+      <FAB icon={renderAppIcon("plus")} style={styles.fab} onPress={() => navigation.navigate('RoleForm', {})} color="#FFF" />
 
       <ConfirmationDialog
         visible={!!roleToDelete}

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AuditLog, AuditAction } from './entities/audit-log.entity';
 import { AuditLogQueryDto } from './dto/audit-log-query.dto';
 
@@ -38,6 +38,34 @@ export class AuditLogService {
     const page = query.page || 1;
     const limit = query.limit || 10;
 
+    const [items, total] = await this.buildFindQuery(query)
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async findOne(id: string): Promise<AuditLog | null> {
+    return this.auditLogRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+  }
+
+  async exportRows(query: AuditLogQueryDto): Promise<AuditLog[]> {
+    return this.buildFindQuery(query).take(50000).getMany();
+  }
+
+  private buildFindQuery(
+    query: AuditLogQueryDto,
+  ): SelectQueryBuilder<AuditLog> {
     const queryBuilder = this.auditLogRepository
       .createQueryBuilder('log')
       .leftJoinAndSelect('log.user', 'user');
@@ -70,26 +98,8 @@ export class AuditLogService {
       });
     }
 
-    queryBuilder
-      .orderBy('log.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit);
+    queryBuilder.orderBy('log.createdAt', 'DESC');
 
-    const [items, total] = await queryBuilder.getManyAndCount();
-
-    return {
-      items,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
-  }
-
-  async findOne(id: string): Promise<AuditLog | null> {
-    return this.auditLogRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
+    return queryBuilder;
   }
 }

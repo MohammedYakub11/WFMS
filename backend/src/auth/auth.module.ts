@@ -7,11 +7,13 @@ import { EmployeesModule } from '../employees/employees.module';
 import { RolesModule } from '../roles/roles.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuditLogModule } from '../audit-logs/audit-log.module';
 
 @Module({
   imports: [
     EmployeesModule,
     RolesModule,
+    AuditLogModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

@@ -1,0 +1,162 @@
+# AGENTS.md
+
+## Project
+
+Workforce Management System (WFMS)
+
+WFMS is an enterprise Workforce Management System used for workforce planning, employee skill management, approvals, analytics, and organizational administration.
+
+This repository contains both the frontend (React Native) and backend (NestJS) applications.
+
+---
+
+# Primary Objective
+
+When making any code changes:
+
+- Maintain code quality.
+- Preserve existing functionality.
+- Prefer extending existing implementations over introducing new patterns.
+- Keep solutions simple, maintainable, and scalable.
+- Follow enterprise software engineering practices.
+
+---
+
+# Development Philosophy
+
+Always prioritize:
+
+1. Correctness
+2. Readability
+3. Maintainability
+4. Reusability
+5. Performance
+
+Never sacrifice maintainability for short-term convenience.
+
+---
+
+# General Rules
+
+Always:
+
+- Understand the existing implementation before making changes.
+- Search for reusable components before creating new ones.
+- Keep business logic separated from UI.
+- Follow the existing architecture.
+- Prefer composition over duplication.
+- Keep files focused on a single responsibility.
+
+Avoid:
+
+- Large refactors unless explicitly requested.
+- Breaking existing APIs.
+- Changing database contracts.
+- Introducing unnecessary dependencies.
+- Creating duplicate components.
+
+---
+
+# Project Documentation
+
+Consult the following documents before implementing changes when relevant:
+
+- docs/architecture.md
+- docs/tech-stack.md
+- docs/folder-structure.md
+- docs/coding-standards.md
+- docs/business-rules.md
+- docs/ui-guidelines.md
+- docs/api-conventions.md
+- docs/database-conventions.md
+- docs/testing-guidelines.md
+- docs/security-guidelines.md
+
+Do not assume project conventions. Prefer documented standards.
+
+---
+
+# Code Quality Expectations
+
+Generated code should:
+
+- Compile successfully.
+- Follow TypeScript best practices.
+- Avoid code duplication.
+- Handle errors gracefully.
+- Be production-ready.
+- Include appropriate comments only where they add value.
+- Prefer readable code over clever code.
+
+---
+
+# UI Expectations
+
+Unless explicitly instructed otherwise:
+
+- Reuse existing UI components.
+- Follow the project's design system.
+- Maintain visual consistency.
+- Support responsive layouts where applicable.
+- Preserve accessibility considerations.
+
+---
+
+# Backend Expectations
+
+Unless requested:
+
+- Do not modify API contracts.
+- Do not change DTOs unnecessarily.
+- Do not rename database entities.
+- Preserve backward compatibility.
+- Keep controllers thin.
+- Keep business logic inside services.
+
+---
+
+# Frontend Expectations
+
+Unless requested:
+
+- Reuse existing components.
+- Reuse existing hooks.
+- Reuse existing utilities.
+- Reuse existing navigation patterns.
+- Preserve state management architecture.
+
+---
+
+# Pull Request Mindset
+
+Every implementation should be considered production code.
+
+Before considering a task complete, verify that:
+
+- Existing behavior is preserved.
+- New functionality works as intended.
+- No unnecessary complexity has been introduced.
+- Naming is consistent.
+- The implementation follows project conventions.
+
+---
+
+# Communication
+
+When explaining changes:
+
+- Explain what changed.
+- Explain why.
+- Mention any assumptions.
+- Identify potential risks if applicable.
+- Suggest improvements only when they provide clear value.
+
+Avoid unnecessary verbosity.
+
+Focus on actionable information.
+
+---
+
+# Guiding Principle
+
+Make the smallest change that correctly solves the problem while improving the overall quality of the codebase.

@@ -1,0 +1,491 @@
+---
+id: ADR-0004
+title: Adopt Feature-Based Architecture
+status: Accepted
+date: 2026-07-24
+category: Architecture
+owners:
+  - WFMS Engineering Team
+tags:
+  - architecture
+  - frontend
+  - backend
+  - scalability
+---
+
+# ADR-0004: Adopt Feature-Based Architecture
+
+## Executive Summary
+
+WFMS adopts a **Feature-Based Architecture** for both the React Native frontend and the NestJS backend.
+
+The system is organized around **business capabilities**, not technical layers.
+
+Business capabilities own their UI, APIs, models, validation, tests, and implementation.
+
+This architecture maximizes scalability, maintainability, developer productivity, and AI-assisted development.
+
+---
+
+# Status
+
+✅ Accepted
+
+---
+
+# Decision
+
+The project shall organize source code primarily by **business feature**.
+
+Examples:
+
+- Authentication
+- Employees
+- Skills
+- Analytics
+- Organizations
+- Dashboard
+- Reports
+- Settings
+
+Each feature owns everything required for its implementation.
+
+---
+
+# Context
+
+WFMS is expected to evolve for years.
+
+Planned growth includes:
+
+- Additional employee modules
+- Organization management
+- Learning plans
+- Certifications
+- Notifications
+- AI recommendations
+- Workforce forecasting
+- Reporting
+- Integrations
+
+A scalable architecture is required.
+
+---
+
+# Problem Statement
+
+Traditional layer-based architectures become increasingly difficult to maintain as applications grow.
+
+Typical problems include:
+
+- Massive services
+- Massive component folders
+- Shared utilities becoming dumping grounds
+- Circular dependencies
+- Difficult ownership
+- Difficult onboarding
+
+The architecture should minimize these problems.
+
+---
+
+# Goals
+
+The architecture should:
+
+- Scale to hundreds of screens
+- Scale to dozens of developers
+- Support AI-assisted development
+- Encourage modularity
+- Reduce coupling
+- Improve discoverability
+- Improve code ownership
+
+---
+
+# Options Considered
+
+## Option A — Layer-Based Architecture
+
+Example
+
+```
+components/
+
+screens/
+
+services/
+
+models/
+
+utils/
+```
+
+### Advantages
+
+- Easy for small applications
+- Familiar structure
+
+### Disadvantages
+
+- Poor scalability
+- Difficult ownership
+- Large shared folders
+- High coupling
+
+---
+
+## Option B — Feature-Based Architecture
+
+Example
+
+```
+features/
+
+employee/
+
+skills/
+
+analytics/
+```
+
+### Advantages
+
+- High cohesion
+- Better ownership
+- Easier navigation
+- Easier testing
+- Excellent scalability
+- AI-friendly
+
+### Disadvantages
+
+- Slightly more planning required
+
+---
+
+## Option C — Clean Architecture
+
+Advantages
+
+- Excellent separation
+
+Disadvantages
+
+- Additional complexity
+- More boilerplate
+- Higher learning curve
+- Slower development
+
+The additional complexity is not justified for the current project.
+
+---
+
+# Decision Matrix
+
+| Criteria | Layer | Feature | Clean |
+|----------|-------|---------|-------|
+| Scalability | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Simplicity | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
+| AI-Friendly | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Maintainability | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Developer Productivity | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+
+Feature-Based Architecture provides the best balance.
+
+---
+
+# Standard Structure
+
+Frontend
+
+```
+features/
+
+employee/
+
+components/
+
+hooks/
+
+screens/
+
+services/
+
+types/
+
+validation/
+
+utils/
+```
+
+Backend
+
+```
+employee/
+
+employee.module.ts
+
+employee.controller.ts
+
+employee.service.ts
+
+dto/
+
+entities/
+
+guards/
+
+validators/
+```
+
+Every feature should remain as self-contained as practical.
+
+---
+
+# Feature Ownership
+
+Each feature owns:
+
+- UI
+- Services
+- Types
+- Validation
+- Tests
+- Business logic
+- Feature-specific utilities
+
+Ownership should be clear.
+
+---
+
+# Shared Code
+
+Only truly reusable code belongs in shared directories.
+
+Examples:
+
+```
+components/
+
+theme/
+
+hooks/
+
+utils/
+```
+
+A utility used by only one feature should remain inside that feature.
+
+---
+
+# Feature Communication
+
+Preferred
+
+```
+Employee Feature
+
+↓
+
+Shared Service
+
+↓
+
+Analytics Feature
+```
+
+Avoid direct feature-to-feature dependencies where possible.
+
+Prefer communication through shared abstractions or backend APIs.
+
+---
+
+# Dependency Rules
+
+Allowed
+
+```
+Feature
+
+↓
+
+Shared Component
+```
+
+Allowed
+
+```
+Feature
+
+↓
+
+Shared Utility
+```
+
+Avoid
+
+```
+Employee
+
+↓
+
+Dashboard
+
+↓
+
+Analytics
+
+↓
+
+Employee
+```
+
+Circular dependencies are prohibited.
+
+---
+
+# Import Rules
+
+Prefer
+
+```
+Feature
+
+↓
+
+Shared
+```
+
+Avoid
+
+```
+Feature A
+
+↓
+
+Feature B
+
+↓
+
+Feature A
+```
+
+---
+
+# Creating a New Feature
+
+Checklist
+
+- Define business capability.
+- Create feature directory.
+- Add screens.
+- Add components.
+- Add hooks.
+- Add services.
+- Add validation.
+- Add tests.
+- Register navigation.
+- Register backend module if required.
+
+---
+
+# Promotion Rule
+
+Do **not** immediately move code into shared folders.
+
+Promote code only when:
+
+- Used by three or more features.
+- Stable.
+- Generic.
+- Independent of business rules.
+
+Premature sharing increases coupling.
+
+---
+
+# Anti-Patterns
+
+Avoid:
+
+❌ Huge shared folders
+
+❌ Generic helper files
+
+❌ Circular dependencies
+
+❌ Business logic in components
+
+❌ Feature-to-feature imports without justification
+
+❌ Cross-feature state mutation
+
+---
+
+# AI Agent Guidance
+
+Before creating a new file:
+
+1. Determine the owning feature.
+2. Search for existing implementation.
+3. Keep feature boundaries intact.
+4. Avoid introducing new shared utilities unless justified.
+5. Follow the feature structure exactly.
+
+Never create files outside the owning feature without a clear architectural reason.
+
+---
+
+# Consequences
+
+Positive
+
+- Better ownership
+- Easier onboarding
+- Faster feature development
+- Better AI code generation
+- Reduced coupling
+- Improved scalability
+
+Negative
+
+- More directories
+- Slightly more initial planning
+
+These trade-offs are acceptable.
+
+---
+
+# Future Reconsideration
+
+This decision should be revisited only if:
+
+- The project adopts micro-frontends.
+- The project adopts microservices requiring different boundaries.
+- Organizational architecture changes significantly.
+
+---
+
+# Related ADRs
+
+- ADR-0001 — React Native
+- ADR-0002 — REST API
+- ADR-0003 — JWT Authentication
+- ADR-0005 — TypeORM
+
+---
+
+# Related Patterns
+
+- screen-pattern.md
+- navigation-pattern.md
+- repository-pattern.md
+
+---
+
+# Guiding Principle
+
+> Organize code by **business capability**, not by technical implementation.
+
+A developer—or an AI agent—should be able to locate every file related to a feature within that feature's directory.

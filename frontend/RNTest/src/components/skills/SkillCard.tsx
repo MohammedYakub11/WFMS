@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Chip, IconButton } from 'react-native-paper';
 import { Card } from '../Cards';
 import { AppText } from '../AppText';
+import { renderAppIcon } from '../AppIcon';
 import { EmployeeSkill } from '../../types/skills';
 import { lightTheme as theme } from '../../theme/theme';
 
@@ -43,8 +44,8 @@ const SkillCardComponent: React.FC<SkillCardProps> = ({ employeeSkill, onEdit, o
           )}
         </View>
         <View style={styles.actions}>
-          {onEdit && <IconButton icon="pencil" size={20} iconColor={theme.colors.textSecondary} onPress={() => onEdit(employeeSkill)} />}
-          {onDelete && <IconButton icon="delete" size={20} iconColor={theme.colors.error} onPress={() => onDelete(employeeSkill)} />}
+          {onEdit && <IconButton icon={renderAppIcon("pencil")} size={20} iconColor={theme.colors.textSecondary} onPress={() => onEdit(employeeSkill)} />}
+          {onDelete && <IconButton icon={renderAppIcon("delete")} size={20} iconColor={theme.colors.error} onPress={() => onDelete(employeeSkill)} />}
         </View>
       </View>
 
@@ -65,11 +66,12 @@ const SkillCardComponent: React.FC<SkillCardProps> = ({ employeeSkill, onEdit, o
         )}
       </View>
 
+      <View style={styles.proficiencyRow}>
+        <AppText variant="caption" style={styles.detailLabel}>Proficiency</AppText>
+        <SkillProficiencyRating rating={employeeSkill.proficiencyRating} readonly size={16} />
+      </View>
+
       <View style={styles.detailsRow}>
-        <View style={styles.detailItem}>
-          <AppText variant="caption" style={styles.detailLabel}>Proficiency</AppText>
-          <SkillProficiencyRating rating={employeeSkill.proficiencyRating} readonly size={16} />
-        </View>
         <View style={styles.detailItem}>
           <AppText variant="caption" style={styles.detailLabel}>Experience</AppText>
           <AppText style={styles.detailValue}>{employeeSkill.yearsOfExperience || 0} years</AppText>
@@ -137,6 +139,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontFamily: theme.typography.fontFamily.bold,
     fontSize: 10,
+  },
+  proficiencyRow: {
+    marginBottom: 12,
   },
   detailsRow: {
     flexDirection: 'row',

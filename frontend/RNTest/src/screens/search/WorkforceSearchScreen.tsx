@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, ActivityIndicator, ScrollView } from 'react-native';
-import { Searchbar, useTheme, IconButton, Text } from 'react-native-paper';
+import { View, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { Chip, IconButton } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../../store';
-import { setKeyword, toggleFilterDrawer, setDepartment, setLocation, setSkills } from '../../store/searchSlice';
+import { setKeyword, toggleFilterDrawer, setFilters } from '../../store/searchSlice';
 import { useWorkforceSearch } from '../../hooks/useSearch';
 import { SearchResultCard } from '../../components/search/SearchResultCard';
 import { FilterDrawer } from '../../components/search/FilterDrawer';
-import { Chip } from 'react-native-paper';
+import { AppHeader } from '../../components/AppHeader';
+import { AppTextField } from '../../components/AppTextField';
+import { EmptyState } from '../../components/EmptyState';
+import { Loader } from '../../components/Loader';
+import { renderAppIcon } from '../../components/AppIcon';
+import { lightTheme, darkTheme } from '../../theme/theme';
 
 export const WorkforceSearchScreen = () => {
-  const theme = useTheme();
+  const isDarkMode = useSelector((state: RootState) => state.theme.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
   const dispatch = useDispatch();
   const navigation = useNavigation<any>();
   const searchState = useSelector((state: RootState) => state.search);
@@ -27,7 +33,12 @@ export const WorkforceSearchScreen = () => {
     return () => clearTimeout(timer);
   }, [localKeyword, dispatch]);
 
-  const { data, isLoading, isError } = useWorkforceSearch(searchState);
+  // `isFilterDrawerOpen` is UI-only local state, not a backend search field — the
+  // API's ValidationPipe rejects unknown query params, so it must not be forwarded.
+  const { isFilterDrawerOpen, ...searchQueryParams } = searchState;
+  const { data, isLoading, isError, refetch } = useWorkforceSearch(searchQueryParams);
+
+  const hasActiveFilters = !!(searchState.department || searchState.location || searchState.skill);
 
   const handleEmployeePress = (employee: any) => {
     navigation.navigate('EmployeePreview', { employeeId: employee.id, employeeData: employee });
@@ -36,71 +47,86 @@ export const WorkforceSearchScreen = () => {
   const renderEmpty = () => {
     if (isLoading) return null;
     return (
-      <View style={styles.emptyContainer}>
-        <Text variant="titleMedium">No employees found.</Text>
-        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 8 }}>
-          Try adjusting your search filters.
-        </Text>
-      </View>
+      <EmptyState
+        title="No employees found"
+        description="Try adjusting your search or filters to find what you're looking for."
+      />
     );
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.searchHeader}>
-        <Searchbar
-          placeholder="Search employees, skills..."
-          onChangeText={setLocalKeyword}
-          value={localKeyword}
-          style={styles.searchBar}
-          elevation={1}
-        />
-        <IconButton 
-          icon="filter-variant" 
-          mode="contained-tonal"
-          size={24}
-          onPress={() => dispatch(toggleFilterDrawer())}
-        />
+  const renderHeader = () => (
+    <>
+      <View style={styles.headerContent}>
+        <View style={styles.searchContainer}>
+          <AppTextField
+            label=""
+            placeholder="Search employees, skills..."
+            value={localKeyword}
+            onChangeText={setLocalKeyword}
+            style={styles.searchField}
+            rightIcon={
+              <IconButton
+                icon={renderAppIcon('filter-variant')}
+                size={20}
+                iconColor={hasActiveFilters ? theme.colors.primary : theme.colors.textSecondary}
+                style={styles.filterIconButton}
+                onPress={() => dispatch(toggleFilterDrawer())}
+                accessibilityLabel="Filter employees"
+              />
+            }
+          />
+        </View>
       </View>
 
-      {/* Active Filter Chips */}
-      {(searchState.department || searchState.location || searchState.skills.length > 0) && (
-        <View style={styles.activeFiltersContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeFiltersContent}>
-            {searchState.department && (
-              <Chip icon="close" onPress={() => dispatch(setDepartment(''))} style={styles.filterChip}>
-                {searchState.department}
-              </Chip>
-            )}
-            {searchState.location && (
-              <Chip icon="close" onPress={() => dispatch(setLocation(''))} style={styles.filterChip}>
-                {searchState.location}
-              </Chip>
-            )}
-            {searchState.skills.map(skill => (
-              <Chip key={skill} icon="close" onPress={() => dispatch(setSkills(searchState.skills.filter(s => s !== skill)))} style={styles.filterChip}>
-                {skill}
-              </Chip>
-            ))}
-          </ScrollView>
-        </View>
+      {hasActiveFilters && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.activeFiltersRow}
+          contentContainerStyle={styles.activeFiltersContent}
+        >
+          {searchState.department && (
+            <Chip icon={renderAppIcon('close')} onPress={() => dispatch(setFilters({ department: null }))} style={styles.filterChip}>
+              {searchState.department}
+            </Chip>
+          )}
+          {searchState.location && (
+            <Chip icon={renderAppIcon('close')} onPress={() => dispatch(setFilters({ location: null }))} style={styles.filterChip}>
+              {searchState.location}
+            </Chip>
+          )}
+          {searchState.skill && (
+            <Chip icon={renderAppIcon('close')} onPress={() => dispatch(setFilters({ skill: null }))} style={styles.filterChip}>
+              {searchState.skill}
+            </Chip>
+          )}
+        </ScrollView>
       )}
+    </>
+  );
+
+  return (
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <AppHeader title="Employee Search" showDrawer showNotification />
 
       {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
+        <View style={styles.container}>
+          {renderHeader()}
+          <Loader fullScreen />
         </View>
       ) : isError ? (
-        <View style={styles.emptyContainer}>
-          <Text style={{ color: theme.colors.error }}>Error loading search results.</Text>
-        </View>
+        <EmptyState
+          title="Failed to load search results"
+          description="An error occurred while searching employees. Please try again."
+          actionTitle="Retry"
+          onAction={() => refetch()}
+        />
       ) : (
         <FlatList
           data={data?.items || []}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <SearchResultCard employee={item} onPress={handleEmployeePress} />
-          )}
+          renderItem={({ item }) => <SearchResultCard employee={item} onPress={handleEmployeePress} />}
+          ListHeaderComponent={renderHeader}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={renderEmpty}
         />
@@ -114,47 +140,31 @@ export const WorkforceSearchScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
-  searchHeader: {
-    flexDirection: 'row',
+  headerContent: {
     padding: 16,
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#fff',
-    elevation: 2,
-    zIndex: 1,
+    paddingBottom: 0,
   },
-  searchBar: {
+  searchContainer: {
+    marginBottom: 8,
+  },
+  searchField: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
   },
-  activeFiltersContainer: {
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingBottom: 8,
+  filterIconButton: {
+    margin: 0,
+  },
+  activeFiltersRow: {
+    marginTop: 8,
   },
   activeFiltersContent: {
     paddingHorizontal: 16,
     gap: 8,
   },
   filterChip: {
-    backgroundColor: '#e3f2fd',
+    marginRight: 0,
   },
   listContent: {
-    padding: 16,
     paddingBottom: 40,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 60,
   },
 });

@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { EntityManager, IsNull, Repository } from 'typeorm';
 import { Role } from './entities/role.entity';
 import { Permission } from './entities/permission.entity';
 import { RolePermission } from './entities/role-permission.entity';
@@ -16,6 +16,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { AuditLogService } from '../audit-logs/audit-log.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/entities/notification.entity';
+import { RoleName } from '../common/enums/role-name.enum';
 
 export interface EffectivePermissions {
   roleName: string;
@@ -48,17 +49,27 @@ export class RolesService {
       relations: ['role'],
     });
 
-    if (!activeAssignment) {
-      return { roleName: '', permissionCodes: [] };
+    // An employee with no active role assignment (never assigned, or the
+    // assignment was revoked/soft-deleted) still gets valid tokens — default
+    // them to the baseline Employee role rather than leaving role/permissions
+    // empty, which broke frontend role checks (`user.role === ''` reads as
+    // "no role" everywhere instead of "least-privileged role").
+    const roleId = activeAssignment
+      ? activeAssignment.roleId
+      : (await this.roleRepository.findOne({ where: { name: RoleName.EMPLOYEE } }))?.id;
+    const roleName = activeAssignment ? activeAssignment.role.name : RoleName.EMPLOYEE;
+
+    if (!roleId) {
+      return { roleName, permissionCodes: [] };
     }
 
     const rolePermissions = await this.rolePermissionRepository.find({
-      where: { roleId: activeAssignment.roleId },
+      where: { roleId },
       relations: ['permission'],
     });
 
     return {
-      roleName: activeAssignment.role.name,
+      roleName,
       permissionCodes: rolePermissions.map((rp) => rp.permission.code),
     };
   }
@@ -265,44 +276,67 @@ export class RolesService {
     };
   }
 
+  // `manager` lets a caller (e.g. EmployeesService.createEmployee) fold this assignment
+  // into its own transaction — the insert then shares the caller's DB transaction instead
+  // of committing separately, so a bad roleId rolls back the caller's insert too.
   async assignRole(
     employeeId: string,
     roleId: string,
     assignedBy?: string,
+    manager?: EntityManager,
   ): Promise<EmployeeRole> {
-    const role = await this.roleRepository.findOne({ where: { id: roleId } });
+    const roleRepo = manager
+      ? manager.getRepository(Role)
+      : this.roleRepository;
+    const employeeRoleRepo = manager
+      ? manager.getRepository(EmployeeRole)
+      : this.employeeRoleRepository;
+
+    const role = await roleRepo.findOne({ where: { id: roleId } });
     if (!role) {
       throw new NotFoundException('Role not found');
     }
 
-    const current = await this.employeeRoleRepository.findOne({
+    const current = await employeeRoleRepo.findOne({
       where: { employeeId, deletedAt: IsNull() },
       relations: ['role'],
     });
 
-    const created = await this.employeeRoleRepository.manager.transaction(
-      async (manager) => {
-        if (current) {
-          await manager.softRemove(current);
-        }
-        const newAssignment = manager.create(EmployeeRole, {
-          employeeId,
-          roleId,
-          assignedBy: assignedBy ?? null,
-        });
-        return manager.save(newAssignment);
-      },
-    );
+    const doAssign = async (txManager: EntityManager) => {
+      const txRepo = txManager.getRepository(EmployeeRole);
+      if (current) {
+        await txRepo.softRemove(current);
+      }
+      const newAssignment = txRepo.create({
+        employeeId,
+        roleId,
+        assignedBy: assignedBy ?? null,
+      });
+      return txRepo.save(newAssignment);
+    };
 
-    await this.auditLogService.record({
-      userId: assignedBy,
-      module: 'EMPLOYEE_ROLES',
-      entity: 'EmployeeRole',
-      entityId: employeeId,
-      action: 'ROLE_ASSIGNED',
-      oldValue: current ? { roleName: current.role.name } : null,
-      newValue: { roleName: role.name },
-    });
+    const created = manager
+      ? await doAssign(manager)
+      : await this.employeeRoleRepository.manager.transaction(doAssign);
+
+    // Best-effort audit + notification — never let a logging/notification failure
+    // undo or fail an assignment that already committed successfully.
+    try {
+      await this.auditLogService.record({
+        userId: assignedBy,
+        module: 'EMPLOYEE_ROLES',
+        entity: 'EmployeeRole',
+        entityId: employeeId,
+        action: 'ROLE_ASSIGNED',
+        oldValue: current ? { roleName: current.role.name } : null,
+        newValue: { roleName: role.name },
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to write audit log for role assignment (employee ${employeeId})`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
 
     try {
       await this.notificationsService.create({

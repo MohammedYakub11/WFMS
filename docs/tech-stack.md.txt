@@ -1,0 +1,472 @@
+# Technology Stack
+
+## Project
+
+Workforce Management System (WFMS)
+
+---
+
+# Purpose
+
+This document defines the approved technology stack for the Workforce Management System.
+
+All contributors and AI agents should use the technologies described here unless explicitly instructed otherwise.
+
+Introducing alternative frameworks or libraries requires approval.
+
+---
+
+# High-Level Stack
+
+| Layer | Technology |
+|---------|------------|
+| Mobile | React Native |
+| Language | TypeScript |
+| Backend | NestJS |
+| Database | PostgreSQL |
+| ORM | TypeORM |
+| API | REST |
+| Authentication | JWT |
+| Version Control | Git |
+
+---
+
+# Frontend
+
+## Framework
+
+React Native
+
+Reason:
+
+- Cross-platform development
+- Strong community support
+- Excellent TypeScript support
+- Mature ecosystem
+- Enterprise scalability
+
+Do not introduce Flutter, Ionic, Expo-specific APIs (unless already adopted), or other UI frameworks.
+
+---
+
+## Programming Language
+
+TypeScript
+
+Reason:
+
+- Static typing
+- Better refactoring
+- Better IntelliSense
+- Reduced runtime errors
+
+Avoid:
+
+- JavaScript files
+- use of `any`
+- disabling TypeScript checks
+
+Prefer strict typing.
+
+---
+
+## Navigation
+
+React Navigation
+
+Responsibilities:
+
+- Screen navigation
+- Authentication flow
+- Stack navigation
+- Bottom tabs
+- Drawer navigation (if required)
+
+Do not introduce additional navigation libraries.
+
+---
+
+## API Communication
+
+Use the existing API service layer.
+
+Responsibilities:
+
+- HTTP requests
+- Authentication headers
+- Error handling
+- Request configuration
+
+Do not make direct HTTP calls from screens or components.
+
+---
+
+## Server State
+
+React Query
+
+Use React Query for:
+
+- API data
+- Pagination
+- Search
+- Lists
+- Caching
+- Background refresh
+
+Avoid copying server data into local component state unless necessary.
+
+---
+
+## Local State
+
+Use React hooks for local UI state.
+
+Examples:
+
+- Dialog visibility
+- Input fields
+- Selected tabs
+- Temporary filters
+
+Keep local state minimal.
+
+---
+
+## Forms
+
+Use the project's existing form solution.
+
+Responsibilities:
+
+- Validation
+- Submission
+- Error display
+
+Avoid implementing custom validation logic repeatedly.
+
+---
+
+## UI Components
+
+Prefer existing reusable components.
+
+Before creating a component:
+
+1. Search the project.
+2. Check shared components.
+3. Reuse existing implementations.
+
+Only create new components when no suitable alternative exists.
+
+---
+
+## Icons
+
+Use the project's approved icon library.
+
+Do not introduce additional icon packages.
+
+---
+
+## Styling
+
+Follow the project design system.
+
+Maintain consistency in:
+
+- spacing
+- typography
+- colors
+- elevation
+- border radius
+
+Avoid inline styles unless trivial.
+
+---
+
+# Backend
+
+## Framework
+
+NestJS
+
+Reason:
+
+- Modular architecture
+- Dependency Injection
+- TypeScript support
+- Enterprise scalability
+- Excellent testing capabilities
+
+Do not introduce Express-only patterns into business modules.
+
+Use NestJS conventions.
+
+---
+
+## Language
+
+TypeScript
+
+Follow strict typing.
+
+Avoid:
+
+- any
+- unnecessary type assertions
+- disabled compiler checks
+
+---
+
+## ORM
+
+TypeORM
+
+Responsibilities:
+
+- Entity mapping
+- Repositories
+- Relations
+- Transactions
+
+Avoid writing raw SQL unless absolutely necessary.
+
+Prefer TypeORM features.
+
+---
+
+## Database
+
+PostgreSQL
+
+Responsibilities:
+
+- Persistent storage
+- Constraints
+- Relationships
+- Indexes
+- Transactions
+
+Database schema changes should be intentional and documented.
+
+---
+
+## Authentication
+
+JWT
+
+Authentication should remain stateless.
+
+Never store sensitive information inside JWT payloads.
+
+Always validate tokens on protected routes.
+
+---
+
+## Validation
+
+Use DTO validation.
+
+Avoid manual validation inside controllers whenever possible.
+
+Validation belongs close to request models.
+
+---
+
+## Dependency Injection
+
+Always use NestJS dependency injection.
+
+Avoid manually instantiating services.
+
+---
+
+# API
+
+Architecture:
+
+REST
+
+Guidelines:
+
+- Resource-oriented endpoints
+- Proper HTTP methods
+- Consistent status codes
+- Predictable response structures
+
+Avoid introducing GraphQL or gRPC unless the project explicitly adopts them.
+
+---
+
+# Database
+
+Approved database:
+
+PostgreSQL
+
+Reasons:
+
+- ACID compliance
+- Excellent indexing
+- Mature ecosystem
+- Strong TypeORM integration
+
+Avoid introducing additional databases without architectural approval.
+
+---
+
+# Security
+
+Authentication:
+
+JWT
+
+Authorization:
+
+Role-based access control
+
+Never trust frontend validation.
+
+Security decisions belong in the backend.
+
+---
+
+# Version Control
+
+Git
+
+Guidelines:
+
+- Small commits
+- Descriptive commit messages
+- Feature branches
+- Pull requests
+- Code review
+
+Avoid committing generated files or secrets.
+
+---
+
+# Logging
+
+Backend:
+
+Use NestJS logging mechanisms.
+
+Frontend:
+
+Use the project's logging utilities.
+
+Remove temporary debugging statements before merging.
+
+---
+
+# Configuration
+
+Environment-specific values must be stored in environment configuration.
+
+Never hardcode:
+
+- API URLs
+- Passwords
+- Tokens
+- Secrets
+- Database credentials
+
+---
+
+# Testing
+
+Testing should include:
+
+- Unit tests
+- Integration tests
+- Manual validation
+
+Critical business logic should not rely solely on manual testing.
+
+---
+
+# Performance
+
+Prefer:
+
+- Pagination
+- Lazy loading
+- Cached requests
+- Memoization where appropriate
+
+Avoid:
+
+- Unnecessary re-renders
+- Duplicate API calls
+- Large in-memory collections
+
+---
+
+# Accessibility
+
+UI components should:
+
+- Support screen readers
+- Use meaningful labels
+- Maintain touch target sizes
+- Preserve color contrast
+
+Accessibility should be considered during implementation, not added later.
+
+---
+
+# Approved Technologies
+
+Frontend
+
+- React Native
+- TypeScript
+- React Navigation
+- React Query
+
+Backend
+
+- NestJS
+- TypeORM
+
+Database
+
+- PostgreSQL
+
+Authentication
+
+- JWT
+
+Version Control
+
+- Git
+
+---
+
+# Technologies That Should Not Be Introduced
+
+Unless explicitly approved, do not introduce:
+
+- Redux
+- MobX
+- Flutter
+- GraphQL
+- Firebase Authentication
+- MongoDB
+- Sequelize
+- Axios wrappers that bypass the existing service layer
+- Additional UI frameworks
+- Duplicate component libraries
+
+Maintain consistency across the project.
+
+---
+
+# Guiding Principle
+
+Prefer consistency over novelty.
+
+A technology should be introduced because it solves a genuine architectural need—not because it is newer or more popular.

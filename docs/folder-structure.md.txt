@@ -1,0 +1,643 @@
+# Folder Structure
+
+## Project
+
+Workforce Management System (WFMS)
+
+---
+
+# Purpose
+
+This document defines the directory structure, ownership, and organization of the project.
+
+Every developer and AI agent should follow these conventions to keep the codebase consistent and maintainable.
+
+---
+
+# Repository Structure
+
+```
+WFMS/
+
+frontend/
+
+backend/
+
+docs/
+
+README.md
+
+AGENTS.md
+```
+
+Each top-level directory has a specific responsibility.
+
+---
+
+# Frontend Structure
+
+```
+frontend/
+
+src/
+
+assets/
+
+components/
+
+constants/
+
+features/
+
+hooks/
+
+navigation/
+
+screens/
+
+services/
+
+store/
+
+theme/
+
+types/
+
+utils/
+```
+
+---
+
+# src/
+
+Contains all application source code.
+
+Everything inside the application should originate from this directory.
+
+---
+
+# assets/
+
+Contains static resources.
+
+Examples:
+
+- Images
+- Icons
+- Fonts
+- Animations
+- SVGs
+
+Do not place business logic here.
+
+---
+
+# components/
+
+Contains reusable UI components.
+
+Examples:
+
+- Buttons
+- Cards
+- Dialogs
+- Inputs
+- Loaders
+- Badges
+- Chips
+
+Rules:
+
+Components should be reusable.
+
+Do not place feature-specific business logic inside reusable components.
+
+---
+
+# constants/
+
+Contains application constants.
+
+Examples:
+
+- Routes
+- Colors
+- API constants
+- Permission constants
+- Error messages
+- App configuration
+
+Avoid hardcoded values throughout the application.
+
+---
+
+# features/
+
+Contains business features.
+
+Each feature owns its own implementation.
+
+Example:
+
+```
+features/
+
+employee/
+
+authentication/
+
+skills/
+
+dashboard/
+
+analytics/
+```
+
+Each feature may contain:
+
+```
+components/
+
+hooks/
+
+services/
+
+types/
+
+validation/
+
+utils/
+
+screens/
+```
+
+A feature should remain as independent as possible.
+
+---
+
+# hooks/
+
+Contains reusable custom React hooks.
+
+Examples:
+
+- useDebounce
+- usePagination
+- usePermissions
+
+Rules:
+
+Hooks should be generic.
+
+Avoid feature-specific hooks unless they belong inside that feature.
+
+---
+
+# navigation/
+
+Contains navigation configuration.
+
+Examples:
+
+- Root navigator
+- Authentication navigator
+- Main navigator
+- Navigation types
+
+Navigation logic should remain centralized.
+
+---
+
+# screens/
+
+Contains screen-level components.
+
+Examples:
+
+- Login Screen
+- Dashboard Screen
+- Employee Screen
+
+Rules:
+
+Screens should:
+
+- compose UI
+- call hooks
+- coordinate data
+
+Screens should not contain large business logic.
+
+---
+
+# services/
+
+Contains communication with backend APIs.
+
+Responsibilities:
+
+- HTTP requests
+- Authentication headers
+- API wrappers
+- Response handling
+
+Rules:
+
+Never call APIs directly from screens.
+
+Always use services.
+
+---
+
+# store/
+
+Contains application-wide state.
+
+Only global state belongs here.
+
+Avoid storing server state if React Query already manages it.
+
+---
+
+# theme/
+
+Contains design system configuration.
+
+Examples:
+
+- Colors
+- Typography
+- Shadows
+- Border Radius
+- Spacing
+
+UI components should reference theme values rather than hardcoded styles.
+
+---
+
+# types/
+
+Contains shared TypeScript types.
+
+Examples:
+
+- Interfaces
+- Enums
+- Type aliases
+
+Feature-specific types should remain inside their feature.
+
+---
+
+# utils/
+
+Contains reusable utility functions.
+
+Examples:
+
+- Date formatting
+- String utilities
+- Number formatting
+- Common helpers
+
+Utilities should remain pure functions.
+
+Avoid dependencies on UI.
+
+---
+
+# Backend Structure
+
+```
+backend/
+
+src/
+```
+
+Inside src:
+
+```
+auth/
+
+employee/
+
+skills/
+
+analytics/
+
+common/
+
+config/
+
+database/
+```
+
+Each module owns its own implementation.
+
+---
+
+# Module Structure
+
+Every NestJS module should follow:
+
+```
+module.ts
+
+controller.ts
+
+service.ts
+
+entity.ts
+
+dto/
+
+guards/
+
+decorators/
+
+interceptors/
+
+validators/
+```
+
+Not every module requires every directory.
+
+Create folders only when needed.
+
+---
+
+# Controllers
+
+Responsibilities:
+
+- Receive requests
+- Validate input
+- Call services
+- Return responses
+
+Controllers should remain thin.
+
+---
+
+# Services
+
+Responsibilities:
+
+- Business logic
+- Validation
+- Processing
+- Coordination
+
+Business logic belongs here.
+
+---
+
+# DTOs
+
+Responsibilities:
+
+- Request validation
+- Response typing
+
+Never bypass DTO validation.
+
+---
+
+# Entities
+
+Represent database tables.
+
+Responsibilities:
+
+- Mapping
+- Relationships
+
+Avoid placing business logic inside entities.
+
+---
+
+# Repositories
+
+Responsibilities:
+
+- Database operations
+
+Repositories should not contain business rules.
+
+---
+
+# Common/
+
+Contains shared backend functionality.
+
+Examples:
+
+- Filters
+- Guards
+- Interceptors
+- Pipes
+- Utilities
+
+Only place code here if it is reusable across multiple modules.
+
+---
+
+# Config/
+
+Contains configuration.
+
+Examples:
+
+- Environment
+- Database configuration
+- Authentication configuration
+
+Avoid reading environment variables throughout the application.
+
+Centralize configuration.
+
+---
+
+# Database/
+
+Contains database-related configuration.
+
+Examples:
+
+- Migrations
+- Seeds
+- Data source configuration
+
+Database implementation should remain isolated.
+
+---
+
+# Naming Conventions
+
+Folders
+
+Use lowercase.
+
+Example:
+
+```
+employee
+
+dashboard
+
+authentication
+```
+
+Avoid:
+
+```
+EmployeeModule
+
+DashboardFeature
+```
+
+---
+
+# File Names
+
+Use descriptive names.
+
+Examples:
+
+```
+employee.service.ts
+
+employee.controller.ts
+
+employee.entity.ts
+
+login.screen.tsx
+```
+
+Avoid vague names such as:
+
+```
+helper.ts
+
+common.ts
+
+test.ts
+
+new.ts
+```
+
+---
+
+# Component Naming
+
+React Components:
+
+PascalCase
+
+Example:
+
+```
+EmployeeCard
+
+SkillSelector
+
+DashboardHeader
+```
+
+---
+
+# Hook Naming
+
+Always begin with:
+
+```
+use
+```
+
+Examples:
+
+```
+useEmployees
+
+usePermissions
+
+usePagination
+```
+
+---
+
+# Utility Naming
+
+Utility names should describe their purpose.
+
+Examples:
+
+```
+formatDate()
+
+calculateExperience()
+
+generateAvatar()
+```
+
+Avoid generic names.
+
+---
+
+# Import Rules
+
+Prefer absolute imports if supported.
+
+Group imports:
+
+1. React
+2. External libraries
+3. Internal shared modules
+4. Feature modules
+5. Relative imports
+
+Remove unused imports.
+
+Avoid circular dependencies.
+
+---
+
+# Creating New Features
+
+Before creating anything:
+
+Search the repository.
+
+Questions to ask:
+
+- Does something similar already exist?
+- Can an existing component be reused?
+- Can an existing hook be extended?
+- Can an existing service be updated?
+
+Reuse before creating.
+
+---
+
+# Anti-Patterns
+
+Avoid:
+
+- Large utility files
+- God components
+- Massive services
+- Duplicate helpers
+- Circular imports
+- Hardcoded values
+- Business logic inside UI
+- API calls inside components
+- Deep nesting
+- Copy-paste implementations
+
+---
+
+# Guiding Principle
+
+Every file should have a clear owner, a clear purpose, and a predictable location.
+
+If another developer or AI agent cannot guess where a file belongs, the project structure needs improvement.

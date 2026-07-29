@@ -1,3 +1,7 @@
+declare module '@env' {
+  export const API_URL: string | undefined;
+}
+
 declare module '@tanstack/react-query' {
   export const QueryClient: any;
   export const QueryClientProvider: any;

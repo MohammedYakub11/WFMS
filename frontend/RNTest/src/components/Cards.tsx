@@ -29,10 +29,11 @@ interface StatCardProps {
   trend?: string;
   trendPositive?: boolean;
   icon?: React.ReactNode;
+  footerAction?: React.ReactNode;
   onPress?: () => void;
 }
 
-export const StatCard: React.FC<StatCardProps> = ({ title, value, trend, trendPositive, icon, onPress }) => {
+export const StatCard: React.FC<StatCardProps> = ({ title, value, trend, trendPositive, icon, footerAction, onPress }) => {
   return (
     <Card onPress={onPress} style={styles.statCard}>
       <View style={styles.statHeader}>
@@ -47,7 +48,12 @@ export const StatCard: React.FC<StatCardProps> = ({ title, value, trend, trendPo
           <AppText style={[styles.trendText, { color: trendPositive ? theme.colors.success : theme.colors.error }]}>
             {trendPositive ? '↑' : '↓'} {trend}
           </AppText>
-          <AppText variant="caption" style={styles.trendSubtitle}> from last month</AppText>
+          <AppText variant="caption" style={styles.trendSubtitle}>from last month</AppText>
+        </View>
+      )}
+      {footerAction && (
+        <View style={styles.footerActionContainer}>
+          {footerAction}
         </View>
       )}
     </Card>
@@ -77,16 +83,22 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: '#16A34A', // Green tint
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: '#DCFCE7', // Soft green background
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 16,
+    shadowColor: '#16A34A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   statInfo: {
     flex: 1,
+    justifyContent: 'center',
   },
   statTitle: {
     color: '#6B7280',
@@ -94,17 +106,25 @@ const styles = StyleSheet.create({
   },
   statValue: {
     color: '#111827',
+    fontSize: 28,
+    lineHeight: 32,
   },
   trendContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    marginTop: 4,
   },
   trendText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
+    marginBottom: 2,
   },
   trendSubtitle: {
     color: '#6B7280',
-    marginLeft: 4,
+    fontSize: 12,
+  },
+  footerActionContainer: {
+    marginTop: 8,
+    alignItems: 'flex-start',
   },
 });

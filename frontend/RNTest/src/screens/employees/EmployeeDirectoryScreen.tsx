@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl, Keyboard } from 'react-native';
-import { FAB, useTheme } from 'react-native-paper';
+import { FAB, IconButton, useTheme } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../../store';
@@ -13,6 +13,7 @@ import { EmployeeCardSkeleton } from '../../components/employees/EmployeeCardSke
 import { EmployeeFiltersModal } from '../../components/employees/EmployeeFiltersModal';
 import { PaginationControls } from '../../components/PaginationControls';
 import { AppHeader } from '../../components/AppHeader';
+import { renderAppIcon } from '../../components/AppIcon';
 import { AppTextField } from '../../components/AppTextField';
 import { StatCard } from '../../components/Cards';
 import { EmptyState } from '../../components/EmptyState';
@@ -124,14 +125,13 @@ export const EmployeeDirectoryScreen = () => {
           onChangeText={setLocalSearch}
           style={styles.searchField}
           rightIcon={
-            <FAB
-              icon="filter-variant"
-              size="small"
-              style={[
-                styles.filterFab,
-                (department || designation || status || location) ? { backgroundColor: theme.colors.primaryContainer } : null,
-              ]}
+            <IconButton
+              icon={renderAppIcon("filter-variant")}
+              size={20}
+              iconColor={(department || designation || status || location) ? theme.colors.primary : theme.colors.onSurfaceVariant}
+              style={styles.filterIconButton}
               onPress={() => setIsFilterVisible(true)}
+              accessibilityLabel="Filter employees"
             />
           }
         />
@@ -187,7 +187,7 @@ export const EmployeeDirectoryScreen = () => {
 
       {hasPermission('EMPLOYEE_CREATE') && (
         <FAB
-          icon="plus"
+          icon={renderAppIcon("plus")}
           style={styles.fab}
           onPress={() => navigation.navigate('AddEmployee')}
           color="#FFF"
@@ -219,10 +219,8 @@ const styles = StyleSheet.create({
   searchField: {
     flex: 1,
   },
-  filterFab: {
-    elevation: 0,
-    backgroundColor: 'transparent',
-    marginRight: 4,
+  filterIconButton: {
+    margin: 0,
   },
   listContent: {
     paddingBottom: 80,

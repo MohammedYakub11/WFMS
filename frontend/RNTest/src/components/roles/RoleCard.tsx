@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { Card } from '../Cards';
+import { renderAppIcon } from '../AppIcon';
 import { AppText } from '../AppText';
 import { RootState } from '../../store';
 import { lightTheme, darkTheme } from '../../theme/theme';
@@ -31,9 +32,9 @@ export const RoleCard: React.FC<RoleCardProps> = ({ role, onPress, onEdit, onDel
           )}
         </View>
         <View style={styles.actions}>
-          {onEdit && <IconButton icon="pencil" size={20} iconColor={theme.colors.textSecondary} onPress={() => onEdit(role)} />}
+          {onEdit && <IconButton icon={renderAppIcon("pencil")} size={20} iconColor={theme.colors.textSecondary} onPress={() => onEdit(role)} />}
           {onDelete && !role.isSystem && (
-            <IconButton icon="delete" size={20} iconColor={theme.colors.error} onPress={() => onDelete(role)} />
+            <IconButton icon={renderAppIcon("delete")} size={20} iconColor={theme.colors.error} onPress={() => onDelete(role)} />
           )}
         </View>
       </View>

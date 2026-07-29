@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { Switch } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,11 +9,13 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { useCreateEmployeeSkill } from '../../hooks/useSkills';
 import { SkillProficiencyRating } from '../../components/skills/SkillProficiencyRating';
+import { SkillPickerModal } from '../../components/skills/SkillPickerModal';
 import { AppHeader } from '../../components/AppHeader';
 import { AppTextField } from '../../components/AppTextField';
 import { AppText } from '../../components/AppText';
 import { PrimaryButton } from '../../components/PrimaryButton';
 import { Card } from '../../components/Cards';
+import { Skill } from '../../types/skills';
 import { lightTheme as theme } from '../../theme/theme';
 
 const schema = yup.object({
@@ -30,8 +32,10 @@ export const AddEmployeeSkillScreen = () => {
   const navigation = useNavigation();
   const createMutation = useCreateEmployeeSkill();
   const user = useSelector((state: RootState) => state.auth.user);
+  const [isSkillPickerVisible, setIsSkillPickerVisible] = useState(false);
+  const [selectedSkillName, setSelectedSkillName] = useState('');
 
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       categoryId: '',
@@ -46,11 +50,23 @@ export const AddEmployeeSkillScreen = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      await createMutation.mutateAsync({
-        ...data,
+      const payload: any = {
         employeeId: user?.id,
-        status: 'PENDING_APPROVAL',
-      });
+        skillId: data.skillId,
+        proficiencyRating: data.proficiencyRating,
+      };
+
+      if (data.yearsOfExperience !== null && data.yearsOfExperience !== undefined) {
+        payload.yearsOfExperience = data.yearsOfExperience;
+      }
+      if (data.lastUsedDate) {
+        payload.lastUsedDate = data.lastUsedDate;
+      }
+      if (data.notes) {
+        payload.remarks = data.notes;
+      }
+
+      await createMutation.mutateAsync(payload);
       navigation.goBack();
     } catch (error) {
       console.error('Failed to create skill:', error);
@@ -79,19 +95,22 @@ export const AddEmployeeSkillScreen = () => {
               )}
             />
 
-            <Controller
-              control={control}
-              name="skillId"
-              render={({ field: { onChange, value } }) => (
-                <AppTextField
-                  label="Skill ID"
-                  placeholder="Enter skill ID"
-                  value={value}
-                  onChangeText={onChange}
-                  error={errors.skillId?.message}
-                />
+            <View style={styles.pickerField}>
+              <AppText variant="inputLabel" color={theme.colors.textSecondary} style={styles.pickerLabel}>
+                Skill
+              </AppText>
+              <TouchableOpacity
+                style={[styles.pickerButton, { borderColor: theme.colors.border }]}
+                onPress={() => setIsSkillPickerVisible(true)}
+              >
+                <AppText>{selectedSkillName || 'Select a skill'}</AppText>
+              </TouchableOpacity>
+              {errors.skillId && (
+                <AppText variant="caption" color={theme.colors.error} style={styles.errorText}>
+                  {errors.skillId.message}
+                </AppText>
               )}
-            />
+            </View>
           </Card>
 
           <Card style={styles.sectionCard}>
@@ -175,6 +194,15 @@ export const AddEmployeeSkillScreen = () => {
           />
         </View>
       </KeyboardAvoidingView>
+
+      <SkillPickerModal
+        visible={isSkillPickerVisible}
+        onDismiss={() => setIsSkillPickerVisible(false)}
+        onSelect={(skill: Skill) => {
+          setValue('skillId', skill.id);
+          setSelectedSkillName(skill.skillName);
+        }}
+      />
     </View>
   );
 };
@@ -207,6 +235,18 @@ const styles = StyleSheet.create({
   },
   errorText: {
     marginTop: 4,
+  },
+  pickerField: {
+    marginTop: 4,
+  },
+  pickerLabel: {
+    marginBottom: 8,
+  },
+  pickerButton: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
   },
   switchContainer: {
     flexDirection: 'row',

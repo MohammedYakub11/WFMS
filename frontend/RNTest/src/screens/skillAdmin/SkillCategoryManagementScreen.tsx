@@ -8,6 +8,7 @@ import { useCategoriesAdmin } from '../../hooks/useCategoriesAdmin';
 import { usePermissions } from '../../hooks/usePermissions';
 import { CategoryCard } from '../../components/skillAdmin/CategoryCard';
 import { AppHeader } from '../../components/AppHeader';
+import { renderAppIcon } from '../../components/AppIcon';
 import { AppTextField } from '../../components/AppTextField';
 import { AppText } from '../../components/AppText';
 import { EmptyState } from '../../components/EmptyState';
@@ -162,7 +163,7 @@ export const SkillCategoryManagementScreen = () => {
 
       {hasPermission('CATEGORY_CREATE') && (
         <FAB
-          icon="plus"
+          icon={renderAppIcon("plus")}
           style={styles.fab}
           onPress={() => navigation.navigate('CategoryForm')}
           color="#FFF"

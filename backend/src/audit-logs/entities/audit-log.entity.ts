@@ -23,7 +23,14 @@ export type AuditAction =
   | 'BULK_DEACTIVATE'
   | 'BULK_DELETE'
   | 'EXPORT'
-  | 'NOTIFICATION_SENT';
+  | 'NOTIFICATION_SENT'
+  | 'LOGIN'
+  | 'LOGIN_FAILED'
+  | 'LOGOUT'
+  | 'PASSWORD_RESET'
+  | 'SKILL_APPROVED'
+  | 'SKILL_REJECTED'
+  | 'CHANGES_REQUESTED';
 
 // Immutable, write-once audit trail (PRD's exact documented schema).
 // No updatedAt/deletedAt — rows are never modified or removed.

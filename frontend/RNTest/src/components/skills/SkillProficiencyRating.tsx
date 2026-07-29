@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { AppText } from '../AppText';
+import { renderAppIcon } from '../AppIcon';
 import { lightTheme as theme } from '../../theme/theme';
 import { ProficiencyColors } from '../../theme/colors';
 
@@ -46,7 +47,7 @@ export const SkillProficiencyRating = ({ rating, maxRating = 5, readonly = true,
               activeOpacity={0.7}
             >
               <IconButton
-                icon={isFilled ? 'star' : 'star-outline'}
+                icon={renderAppIcon(isFilled ? 'star' : 'star-outline')}
                 size={size}
                 iconColor={isFilled ? currentInfo.color : theme.colors.border}
                 style={styles.star}

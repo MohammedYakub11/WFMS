@@ -1,0 +1,425 @@
+# ADR-0003: Adopt JWT Authentication
+
+- **Status:** Accepted
+- **Decision ID:** ADR-0003
+- **Date:** 2026-07-24
+- **Owners:** WFMS Engineering Team
+- **Category:** Security Architecture
+
+---
+
+# Executive Summary
+
+WFMS adopts **JSON Web Tokens (JWT)** as the primary authentication mechanism for all protected API endpoints.
+
+Authentication is stateless.
+
+Authorization is role-based.
+
+JWT provides an excellent balance between scalability, security, simplicity, and compatibility with React Native and NestJS.
+
+---
+
+# Context
+
+WFMS is an enterprise workforce management platform accessed primarily through mobile devices.
+
+The system includes protected resources such as:
+
+- Employee Profiles
+- Skills
+- Analytics
+- Organization Settings
+- Administration
+- Reports
+- Approvals
+
+The backend must verify every protected request without relying on server-side sessions.
+
+---
+
+# Problem Statement
+
+The authentication mechanism must:
+
+- Scale horizontally
+- Work well with mobile applications
+- Minimize server memory usage
+- Support secure API communication
+- Integrate with NestJS
+- Be compatible with React Native
+- Support future enterprise growth
+
+---
+
+# Functional Requirements
+
+Authentication must:
+
+- Identify users securely
+- Protect private APIs
+- Support role-based authorization
+- Support token expiration
+- Support secure logout
+- Prevent unauthorized access
+- Integrate with REST APIs
+
+---
+
+# Non-Functional Requirements
+
+The authentication solution should provide:
+
+- High scalability
+- Low operational complexity
+- Stateless architecture
+- Easy horizontal scaling
+- Strong ecosystem support
+- Mature security practices
+
+---
+
+# Options Considered
+
+## Option A
+
+JWT
+
+### Advantages
+
+- Stateless
+- Excellent mobile support
+- Excellent NestJS integration
+- Easy scaling
+- Industry standard
+- No server-side session storage
+- Works naturally with REST
+
+### Disadvantages
+
+- Token revocation is more complex
+- Requires expiration management
+
+---
+
+## Option B
+
+Server Sessions
+
+### Advantages
+
+- Simple revocation
+- Familiar implementation
+
+### Disadvantages
+
+- Server memory usage
+- Sticky sessions
+- Poor horizontal scalability
+- More infrastructure complexity
+
+---
+
+## Option C
+
+Firebase Authentication
+
+### Advantages
+
+- Managed authentication
+- Rapid development
+
+### Disadvantages
+
+- Vendor lock-in
+- Less flexibility
+- Additional external dependency
+- Higher long-term operational cost
+
+---
+
+# Decision Matrix
+
+| Criteria | JWT | Sessions | Firebase |
+|-----------|-----|----------|----------|
+| Mobile Support | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Horizontal Scaling | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ |
+| NestJS Integration | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+| Operational Simplicity | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Vendor Independence | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐ |
+| Long-term Flexibility | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+
+JWT provides the best overall balance for WFMS.
+
+---
+
+# Decision
+
+WFMS officially adopts **JWT Authentication**.
+
+Authentication will remain stateless.
+
+Every protected request must include:
+
+```
+Authorization: Bearer <access_token>
+```
+
+---
+
+# Authentication Flow
+
+```
+User
+
+↓
+
+Login Screen
+
+↓
+
+Authentication API
+
+↓
+
+Credential Validation
+
+↓
+
+JWT Issued
+
+↓
+
+Secure Storage
+
+↓
+
+Protected API Requests
+
+↓
+
+JWT Verification
+
+↓
+
+Authorized Resource
+```
+
+---
+
+# Authorization
+
+Authentication answers:
+
+> Who are you?
+
+Authorization answers:
+
+> What are you allowed to do?
+
+Authorization is enforced using:
+
+- Roles
+- Permissions
+- Ownership
+- Business Rules
+
+Authorization is always performed by the backend.
+
+---
+
+# Token Lifecycle
+
+```
+Login
+
+↓
+
+Access Token Issued
+
+↓
+
+Protected Requests
+
+↓
+
+Token Expiration
+
+↓
+
+Re-authentication (or Refresh Token strategy, if implemented)
+```
+
+Tokens should have reasonable expiration periods.
+
+Long-lived access tokens are discouraged.
+
+---
+
+# Security Principles
+
+Always:
+
+- Validate every JWT
+- Validate expiration
+- Validate signature
+- Use HTTPS
+- Store secrets securely
+
+Never:
+
+- Trust unsigned tokens
+- Accept expired tokens
+- Store passwords in tokens
+- Expose secrets to clients
+
+---
+
+# Secure Storage
+
+Mobile applications should store tokens using the project's approved secure storage mechanism.
+
+Avoid storing tokens in insecure storage.
+
+---
+
+# Backend Responsibilities
+
+The backend is responsible for:
+
+- Token validation
+- User verification
+- Permission checks
+- Role validation
+- Ownership validation
+
+Authentication decisions must never depend on frontend logic.
+
+---
+
+# Frontend Responsibilities
+
+The frontend is responsible for:
+
+- Login flow
+- Secure token storage
+- Including tokens in requests
+- Handling unauthorized responses
+- Redirecting users to login when required
+
+The frontend must never determine authorization independently.
+
+---
+
+# Risks
+
+## Token Theft
+
+Risk
+
+Compromised access tokens may allow unauthorized API access.
+
+Mitigation
+
+- HTTPS
+- Short-lived access tokens
+- Secure storage
+- Server-side authorization checks
+
+---
+
+## Expired Tokens
+
+Risk
+
+Users lose authenticated access unexpectedly.
+
+Mitigation
+
+- Clear authentication flow
+- Optional refresh token strategy
+- Graceful logout
+
+---
+
+## Secret Exposure
+
+Risk
+
+Compromised signing keys invalidate system security.
+
+Mitigation
+
+- Environment variables
+- Secret rotation
+- Restricted infrastructure access
+
+---
+
+# Consequences
+
+Positive
+
+- Stateless authentication
+- Easier horizontal scaling
+- Lower server memory usage
+- Excellent mobile compatibility
+- Strong ecosystem support
+
+Negative
+
+- Revocation requires additional strategy
+- Expiration management required
+
+These trade-offs are acceptable.
+
+---
+
+# AI Guidance
+
+When implementing authentication:
+
+Always:
+
+- Use JWT Guards
+- Validate tokens
+- Protect sensitive routes
+- Reuse authentication services
+- Respect role-based authorization
+
+Never:
+
+- Hardcode secrets
+- Skip authentication guards
+- Trust frontend permissions
+- Store passwords inside JWT payloads
+- Disable authentication for convenience
+
+---
+
+# Future Considerations
+
+This ADR should be revisited if:
+
+- Single Sign-On (SSO) becomes mandatory.
+- Enterprise Identity Providers (Azure AD, Okta, Keycloak) are adopted.
+- OAuth2/OpenID Connect become organizational requirements.
+- Regulatory requirements demand a different authentication model.
+
+---
+
+# References
+
+- docs/security-guidelines.md
+- docs/api-conventions.md
+- docs/business-rules.md
+- docs/architecture.md
+
+---
+
+# Related ADRs
+
+- ADR-0001: Adopt React Native
+- ADR-0002: Adopt REST API
+- ADR-0004: Adopt Feature-Based Architecture (Pending)
+- ADR-0005: Adopt TypeORM (Pending)

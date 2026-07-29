@@ -21,6 +21,7 @@ import { SkillAdminFiltersModal } from '../../components/skillAdmin/SkillAdminFi
 import { SelectionBar } from '../../components/skillAdmin/SelectionBar';
 import { PaginationControls } from '../../components/PaginationControls';
 import { AppHeader } from '../../components/AppHeader';
+import { renderAppIcon } from '../../components/AppIcon';
 import { AppTextField } from '../../components/AppTextField';
 import { StatCard } from '../../components/Cards';
 import { EmptyState } from '../../components/EmptyState';
@@ -278,14 +279,13 @@ export const SkillAdminDirectoryScreen = () => {
               onChangeText={setLocalSearch}
               style={styles.searchField}
               rightIcon={
-                <FAB
-                  icon="filter-variant"
-                  size="small"
-                  style={[
-                    styles.filterFab,
-                    (categoryId || status) ? { backgroundColor: theme.colors.primaryContainer } : null,
-                  ]}
+                <IconButton
+                  icon={renderAppIcon("filter-variant")}
+                  size={20}
+                  iconColor={(categoryId || status) ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                  style={styles.filterIconButton}
                   onPress={() => setIsFilterVisible(true)}
+                  accessibilityLabel="Filter skills"
                 />
               }
             />
@@ -307,7 +307,7 @@ export const SkillAdminDirectoryScreen = () => {
               onDismiss={() => setMenuVisible(false)}
               anchor={
                 <IconButton
-                  icon="dots-vertical"
+                  icon={renderAppIcon("dots-vertical")}
                   onPress={() => setMenuVisible(true)}
                   accessibilityLabel="More options"
                 />
@@ -315,7 +315,7 @@ export const SkillAdminDirectoryScreen = () => {
             >
               {canSelectMultiple && (
                 <Menu.Item
-                  leadingIcon="checkbox-multiple-marked-outline"
+                  leadingIcon={renderAppIcon("checkbox-multiple-marked-outline")}
                   title="Select multiple"
                   onPress={() => {
                     setMenuVisible(false);
@@ -326,7 +326,7 @@ export const SkillAdminDirectoryScreen = () => {
               )}
               {canExport && (
                 <Menu.Item
-                  leadingIcon="file-delimited-outline"
+                  leadingIcon={renderAppIcon("file-delimited-outline")}
                   title={exportingFormat === 'csv' ? 'Exporting CSV…' : 'Export CSV'}
                   disabled={exportMutation.isPending}
                   onPress={() => handleExport('csv')}
@@ -334,7 +334,7 @@ export const SkillAdminDirectoryScreen = () => {
               )}
               {canExport && (
                 <Menu.Item
-                  leadingIcon="file-excel-outline"
+                  leadingIcon={renderAppIcon("file-excel-outline")}
                   title={exportingFormat === 'xlsx' ? 'Exporting Excel…' : 'Export Excel'}
                   disabled={exportMutation.isPending}
                   onPress={() => handleExport('xlsx')}
@@ -400,7 +400,7 @@ export const SkillAdminDirectoryScreen = () => {
 
       {hasPermission('SKILL_CREATE') && !selectionMode && (
         <FAB
-          icon="plus"
+          icon={renderAppIcon("plus")}
           style={styles.fab}
           onPress={() => navigation.navigate('SkillForm')}
           color="#FFF"
@@ -432,10 +432,8 @@ const styles = StyleSheet.create({
   searchField: {
     flex: 1,
   },
-  filterFab: {
-    elevation: 0,
-    backgroundColor: 'transparent',
-    marginRight: 4,
+  filterIconButton: {
+    margin: 0,
   },
   listContent: {
     paddingBottom: 80,

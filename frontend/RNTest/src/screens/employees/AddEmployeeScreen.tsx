@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { Menu } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigation } from '@react-navigation/native';
@@ -9,14 +10,17 @@ import { AppTextField } from '../../components/AppTextField';
 import { PasswordField } from '../../components/PasswordField';
 import { AppText } from '../../components/AppText';
 import { PrimaryButton } from '../../components/PrimaryButton';
+import { SecondaryButton } from '../../components/SecondaryButton';
 import { Card } from '../../components/Cards';
 import { EmployeePickerModal } from '../../components/employees/EmployeePickerModal';
 import { useCreateEmployee } from '../../hooks/useEmployee';
+import { useRoles } from '../../hooks/useRoles';
 import { useSnackbar } from '../../components/providers/SnackbarProvider';
 import { employeeSchema } from '../../validations/employee.schema';
 import { RootState } from '../../store';
 import { lightTheme, darkTheme } from '../../theme/theme';
 import { EmployeeListItem } from '../../types/employees';
+import { Role } from '../../types/roles';
 
 export const AddEmployeeScreen = () => {
   const navigation = useNavigation<any>();
@@ -27,11 +31,16 @@ export const AddEmployeeScreen = () => {
 
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [reportingManagerName, setReportingManagerName] = useState<string | null>(null);
+  const [isRoleMenuVisible, setIsRoleMenuVisible] = useState(false);
+
+  const { data: rolesData, isLoading: isLoadingRoles } = useRoles();
+  const roles = rolesData ?? [];
 
   const {
     control,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(employeeSchema),
@@ -47,8 +56,12 @@ export const AddEmployeeScreen = () => {
       location: '',
       experience: null as number | null,
       reportingManagerId: null as string | null,
+      roleId: '',
     },
   });
+
+  const selectedRoleId = watch('roleId');
+  const selectedRole = roles.find((r: Role) => r.id === selectedRoleId);
 
   const onSubmit = async (data: any) => {
     try {
@@ -159,6 +172,47 @@ export const AddEmployeeScreen = () => {
               </TouchableOpacity>
             </View>
           </Card>
+
+          <Card style={styles.sectionCard}>
+            <AppText variant="h3" style={styles.sectionTitle}>Role &amp; Access</AppText>
+            <AppText variant="inputLabel" color={theme.colors.textSecondary} style={styles.pickerLabel}>
+              Role *
+            </AppText>
+            <Controller
+              control={control}
+              name="roleId"
+              render={() => (
+                <Menu
+                  visible={isRoleMenuVisible}
+                  onDismiss={() => setIsRoleMenuVisible(false)}
+                  anchor={
+                    <SecondaryButton
+                      title={isLoadingRoles ? 'Loading roles...' : selectedRole?.name || 'Select Role'}
+                      onPress={() => setIsRoleMenuVisible(true)}
+                      style={styles.dropdownButton}
+                      disabled={isLoadingRoles}
+                    />
+                  }
+                >
+                  {roles.map((role: Role) => (
+                    <Menu.Item
+                      key={role.id}
+                      title={role.name}
+                      onPress={() => {
+                        setValue('roleId', role.id, { shouldValidate: true });
+                        setIsRoleMenuVisible(false);
+                      }}
+                    />
+                  ))}
+                </Menu>
+              )}
+            />
+            {errors.roleId && (
+              <AppText variant="caption" color={theme.colors.error} style={styles.errorText}>
+                {errors.roleId.message}
+              </AppText>
+            )}
+          </Card>
         </ScrollView>
 
         <View style={[styles.footer, { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.divider }]}>
@@ -196,6 +250,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 14,
+  },
+  dropdownButton: {
+    alignSelf: 'stretch',
+  },
+  errorText: {
+    marginTop: 6,
   },
   footer: {
     padding: 16,

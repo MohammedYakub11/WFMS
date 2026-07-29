@@ -1,0 +1,383 @@
+# Testing Guidelines
+
+> Version: 1.0
+> Project: Workforce Management System (WFMS)
+> Applies To: Frontend, Backend, APIs, Database
+
+---
+
+# Purpose
+
+This document defines the testing strategy and quality expectations for the Workforce Management System (WFMS).
+
+Testing ensures that new functionality works as expected, existing functionality is not broken, and business rules remain correct as the application evolves.
+
+Testing is part of development—not a separate phase.
+
+---
+
+# Scope
+
+These guidelines apply to:
+
+- React Native frontend
+- NestJS backend
+- REST APIs
+- Database interactions
+- Business logic
+- UI components
+- Authentication
+- Authorization
+
+---
+
+# Testing Principles
+
+Every implementation should be:
+
+- Correct
+- Repeatable
+- Predictable
+- Isolated
+- Maintainable
+
+Testing should focus on behavior rather than implementation details.
+
+---
+
+# Testing Pyramid
+
+```
+            End-to-End Tests
+          -------------------
+         Integration Tests
+      -------------------------
+          Unit Tests
+```
+
+The majority of tests should be unit tests.
+
+Use integration and end-to-end tests selectively for complete workflows.
+
+---
+
+# Types of Tests
+
+## Unit Tests
+
+Purpose
+
+Verify individual functions, services, and components in isolation.
+
+Examples
+
+- Utility functions
+- Validation logic
+- Business calculations
+- Service methods
+
+---
+
+## Integration Tests
+
+Purpose
+
+Verify that multiple components work together.
+
+Examples
+
+- Controller → Service
+- Service → Repository
+- Repository → Database
+- Authentication flow
+
+---
+
+## End-to-End (E2E) Tests
+
+Purpose
+
+Verify complete user workflows.
+
+Examples
+
+- Login
+- Create Employee
+- Update Skills
+- Manager Approval
+- Search Employees
+
+---
+
+# Frontend Testing
+
+Test:
+
+- Screen rendering
+- Component behavior
+- User interactions
+- Form validation
+- Navigation
+- Loading states
+- Empty states
+- Error states
+
+Avoid testing implementation details.
+
+---
+
+# Backend Testing
+
+Test:
+
+- Controllers
+- Services
+- Business rules
+- DTO validation
+- Authorization
+- Authentication
+- Repository behavior
+
+Business logic should always be tested.
+
+---
+
+# API Testing
+
+Verify:
+
+- Status codes
+- Response structure
+- Validation
+- Authentication
+- Authorization
+- Pagination
+- Filtering
+- Sorting
+
+Every public API should have test coverage.
+
+---
+
+# Database Testing
+
+Verify:
+
+- Relationships
+- Constraints
+- Transactions
+- Migrations
+- Soft deletes
+- Audit fields
+
+Never assume database behavior without testing.
+
+---
+
+# Business Rule Testing
+
+Business rules require explicit tests.
+
+Examples
+
+- Employee cannot approve own skill.
+- Manager can approve assigned employees only.
+- Inactive users cannot log in.
+- Administrators can assign roles.
+
+Business rules are high-priority test cases.
+
+---
+
+# Test Naming
+
+Use descriptive names.
+
+Good
+
+```
+should_create_employee_successfully()
+
+should_reject_invalid_token()
+
+should_return_paginated_employees()
+```
+
+Avoid
+
+```
+test1()
+
+employeeTest()
+
+check()
+```
+
+---
+
+# Test Data
+
+Use:
+
+- Isolated test data
+- Predictable values
+- Minimal datasets
+
+Avoid dependencies on production data.
+
+---
+
+# Mocking
+
+Mock:
+
+- External APIs
+- Email services
+- File storage
+- Third-party integrations
+
+Avoid mocking business logic that should actually be tested.
+
+---
+
+# Error Testing
+
+Verify:
+
+- Invalid input
+- Unauthorized access
+- Forbidden actions
+- Missing resources
+- Database failures
+
+Expected failures are part of normal testing.
+
+---
+
+# Performance Testing
+
+Evaluate:
+
+- Large datasets
+- Pagination
+- Search performance
+- Concurrent requests
+
+Performance testing should be based on realistic usage patterns.
+
+---
+
+# Regression Testing
+
+Whenever a bug is fixed:
+
+1. Add a test that reproduces the issue.
+2. Verify the fix.
+3. Prevent future regressions.
+
+Every bug should strengthen the test suite.
+
+---
+
+# Code Coverage
+
+Aim for meaningful coverage rather than a specific percentage.
+
+Prioritize:
+
+- Business logic
+- Security
+- Critical workflows
+
+High coverage does not guarantee correctness.
+
+---
+
+# Manual Testing
+
+Before merging:
+
+Verify:
+
+- UI behavior
+- Navigation
+- Responsive layouts
+- Authentication
+- Error handling
+- Accessibility
+
+Manual testing complements automated testing.
+
+---
+
+# AI Agent Guidance
+
+When generating code:
+
+- Add or update tests where appropriate.
+- Reuse existing test utilities.
+- Test business behavior.
+- Avoid brittle tests.
+- Keep tests readable.
+
+Never mark work as complete without considering testing.
+
+---
+
+# Anti-Patterns
+
+Avoid:
+
+❌ Testing private implementation details
+
+❌ Duplicate tests
+
+❌ Flaky tests
+
+❌ Shared mutable test data
+
+❌ Tests dependent on execution order
+
+❌ Ignoring business rules
+
+❌ Skipping negative test cases
+
+---
+
+# Testing Checklist
+
+Before approving a feature:
+
+- [ ] Unit tests added or updated
+- [ ] Integration tests updated where needed
+- [ ] Business rules verified
+- [ ] Authentication tested
+- [ ] Authorization tested
+- [ ] Error handling tested
+- [ ] API responses verified
+- [ ] Manual testing completed
+- [ ] Regression tests added for bug fixes
+
+---
+
+# Related Documents
+
+- coding-standards.md
+- api-conventions.md
+- business-rules.md
+- security-guidelines.md
+
+---
+
+# Related ADRs
+
+- ADR-0002: Adopt REST API
+- ADR-0003: Adopt JWT Authentication
+
+---
+
+# Guiding Principle
+
+A feature is not complete when the code compiles.
+
+A feature is complete when its expected behavior has been verified and protected against future regressions.

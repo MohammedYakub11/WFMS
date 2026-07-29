@@ -1,0 +1,175 @@
+# ADR-0001: Adopt React Native for Mobile Application
+
+- **Status:** Accepted
+- **Date:** 2026-07-24
+- **Decision Makers:** WFMS Engineering Team
+
+---
+
+# Context
+
+The Workforce Management System requires a mobile application that supports enterprise users across Android and iOS while maintaining a single codebase.
+
+The application will evolve continuously with new business modules including:
+
+- Employee Management
+- Skill Management
+- Workforce Planning
+- Analytics
+- Notifications
+- Approvals
+- Administration
+
+The chosen technology must support long-term maintainability and enterprise scalability.
+
+---
+
+# Problem
+
+Selecting a mobile framework that:
+
+- Supports both Android and iOS
+- Uses a mature ecosystem
+- Has strong TypeScript support
+- Integrates well with REST APIs
+- Supports enterprise architecture
+- Has long-term community support
+
+---
+
+# Options Considered
+
+## Option A
+
+React Native
+
+Pros
+
+- Cross-platform
+- Mature ecosystem
+- Excellent TypeScript support
+- Strong community
+- Large talent pool
+- Excellent library ecosystem
+
+Cons
+
+- Native modules occasionally required
+
+---
+
+## Option B
+
+Flutter
+
+Pros
+
+- Excellent UI rendering
+- High performance
+
+Cons
+
+- Different language (Dart)
+- Smaller TypeScript ecosystem
+- Existing team expertise favors React Native
+
+---
+
+## Option C
+
+Native Android + iOS
+
+Pros
+
+- Maximum platform control
+
+Cons
+
+- Two codebases
+- Higher maintenance cost
+- Slower feature delivery
+
+---
+
+# Decision
+
+The project adopts **React Native** as the official mobile framework.
+
+---
+
+# Rationale
+
+React Native provides the best balance between:
+
+- Development speed
+- Maintainability
+- Team expertise
+- Ecosystem maturity
+- Enterprise scalability
+
+The engineering team already has knowledge of React Native and TypeScript, reducing onboarding and maintenance costs.
+
+---
+
+# Consequences
+
+Positive
+
+- Shared codebase
+- Faster development
+- Easier maintenance
+- Better hiring opportunities
+- Large community support
+
+Negative
+
+- Some native integrations may require platform-specific code.
+- Dependency management requires periodic maintenance.
+
+---
+
+# Alternatives Rejected
+
+Flutter
+
+Reason
+
+Existing engineering expertise and ecosystem alignment favored React Native.
+
+Native Development
+
+Reason
+
+Maintenance cost outweighs the benefits for this project.
+
+---
+
+# Future Considerations
+
+This decision may be revisited if:
+
+- React Native is no longer actively maintained.
+- Business requirements demand platform-specific capabilities that cannot be reasonably supported.
+- Organizational technology strategy changes.
+
+Until then, React Native remains the standard mobile framework.
+
+---
+
+# AI Guidance
+
+When implementing mobile features:
+
+- Use React Native conventions.
+- Reuse existing project architecture.
+- Avoid introducing Flutter concepts.
+- Avoid introducing platform-specific code unless necessary.
+- Follow the project's TypeScript standards.
+
+---
+
+# References
+
+- docs/architecture.md
+- docs/tech-stack.md
+- docs/coding-standards.md

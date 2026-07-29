@@ -34,6 +34,7 @@ export enum PermissionCode {
   VIEW_DASHBOARD = 'VIEW_DASHBOARD',
   VIEW_ANALYTICS = 'VIEW_ANALYTICS',
   EXPORT_REPORTS = 'EXPORT_REPORTS',
+  REPORT_VIEW = 'REPORT_VIEW',
 
   // Administration
   USER_MANAGEMENT = 'USER_MANAGEMENT',
@@ -41,6 +42,7 @@ export enum PermissionCode {
   PERMISSION_MANAGEMENT = 'PERMISSION_MANAGEMENT',
   SYSTEM_CONFIGURATION = 'SYSTEM_CONFIGURATION',
   VIEW_AUDIT_LOGS = 'VIEW_AUDIT_LOGS',
+  ORGANIZATION_MANAGEMENT = 'ORGANIZATION_MANAGEMENT',
 
   // Notifications
   NOTIFICATION_SEND = 'NOTIFICATION_SEND',
@@ -158,6 +160,11 @@ export const PERMISSION_CATALOG: Array<{
     name: 'Export Reports',
     category: 'Search & Analytics',
   },
+  {
+    code: PermissionCode.REPORT_VIEW,
+    name: 'View Reports',
+    category: 'Search & Analytics',
+  },
 
   {
     code: PermissionCode.USER_MANAGEMENT,
@@ -182,6 +189,11 @@ export const PERMISSION_CATALOG: Array<{
   {
     code: PermissionCode.VIEW_AUDIT_LOGS,
     name: 'View Audit Logs',
+    category: 'Administration',
+  },
+  {
+    code: PermissionCode.ORGANIZATION_MANAGEMENT,
+    name: 'Manage Organization Settings',
     category: 'Administration',
   },
 

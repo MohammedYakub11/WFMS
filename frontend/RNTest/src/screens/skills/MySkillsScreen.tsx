@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl, Keyboard } from 'react-native';
-import { FAB, useTheme } from 'react-native-paper';
+import { FAB, IconButton, useTheme } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../../store';
@@ -10,13 +10,12 @@ import { SkillCard } from '../../components/skills/SkillCard';
 import { SkillSkeleton } from '../../components/skills/SkillSkeleton';
 import { SkillFiltersModal } from '../../components/skills/SkillFiltersModal';
 import { AppHeader } from '../../components/AppHeader';
+import { renderAppIcon } from '../../components/AppIcon';
 import { AppTextField } from '../../components/AppTextField';
 import { StatCard } from '../../components/Cards';
 import { EmptyState } from '../../components/EmptyState';
 import { Loader } from '../../components/Loader';
 
-
-const CURRENT_EMPLOYEE_ID = 'CURRENT_USER_ID'; 
 
 export const MySkillsScreen = () => {
   const theme = useTheme();
@@ -24,6 +23,7 @@ export const MySkillsScreen = () => {
   const navigation = useNavigation<any>();
   
   const { searchQuery, selectedCategoryId, selectedProficiency, sortOption } = useSelector((state: RootState) => state.skills);
+  const user = useSelector((state: RootState) => state.auth.user);
   
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -41,17 +41,17 @@ export const MySkillsScreen = () => {
   const queryParams = useMemo(() => ({
     page,
     limit,
-    employeeId: CURRENT_EMPLOYEE_ID,
+    employeeId: user?.id,
     search: searchQuery,
     categoryId: selectedCategoryId,
     proficiency: selectedProficiency,
     sort: sortOption,
-  }), [page, limit, searchQuery, selectedCategoryId, selectedProficiency, sortOption]);
+  }), [page, limit, user?.id, searchQuery, selectedCategoryId, selectedProficiency, sortOption]);
 
   const { data, isLoading, isError, refetch, isFetching } = useEmployeeSkills(queryParams);
 
-  const skills = data?.data?.data || [];
-  const total = data?.data?.total || 0;
+  const skills = data?.items || [];
+  const total = data?.total || 0;
   
   const approvedCount = skills.filter((s: any) => s.approvalStatus === 'approved').length;
   const pendingCount = skills.filter((s: any) => s.approvalStatus === 'pending').length;
@@ -107,14 +107,13 @@ export const MySkillsScreen = () => {
           onChangeText={setLocalSearch}
           style={styles.searchField}
           rightIcon={
-            <FAB
-              icon="filter-variant"
-              size="small"
-              style={[
-                styles.filterFab,
-                (selectedCategoryId || selectedProficiency) ? { backgroundColor: theme.colors.primaryContainer } : null
-              ]}
+            <IconButton
+              icon={renderAppIcon("filter-variant")}
+              size={20}
+              iconColor={(selectedCategoryId || selectedProficiency) ? theme.colors.primary : theme.colors.onSurfaceVariant}
+              style={styles.filterIconButton}
               onPress={() => setIsFilterVisible(true)}
+              accessibilityLabel="Filter skills"
             />
           }
         />
@@ -167,7 +166,7 @@ export const MySkillsScreen = () => {
       />
 
       <FAB
-        icon="plus"
+        icon={renderAppIcon("plus")}
         style={styles.fab}
         onPress={() => navigation.navigate('AddSkill')}
         color="#FFF"
@@ -198,10 +197,8 @@ const styles = StyleSheet.create({
   searchField: {
     flex: 1,
   },
-  filterFab: {
-    elevation: 0,
-    backgroundColor: 'transparent',
-    marginRight: 4,
+  filterIconButton: {
+    margin: 0,
   },
   listContent: {
     paddingBottom: 80,

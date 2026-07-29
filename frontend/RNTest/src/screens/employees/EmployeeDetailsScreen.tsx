@@ -18,22 +18,12 @@ import {
 } from '../../hooks/useEmployee';
 import { useEmployeeAuditLog } from '../../hooks/useAuditLog';
 import { AuditLogEntry } from '../../services/auditLog.service';
+import { getAuditActionLabel } from '../../utils/auditActionLabels';
 import { CertificationRef } from '../../types/employees';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useSnackbar } from '../../components/providers/SnackbarProvider';
 import { RootState } from '../../store';
 import { lightTheme, darkTheme } from '../../theme/theme';
-
-const AUDIT_ACTION_LABELS: Record<string, string> = {
-  CREATE: 'Employee record created',
-  UPDATE: 'Employee details updated',
-  DELETE: 'Employee deactivated (soft delete)',
-  RESTORE: 'Employee restored',
-  ACTIVATE: 'Employee activated',
-  DEACTIVATE: 'Employee deactivated',
-  ROLE_ASSIGNED: 'Role assigned',
-  ROLE_REVOKED: 'Role revoked',
-};
 
 export const EmployeeDetailsScreen = () => {
   const navigation = useNavigation<any>();
@@ -123,7 +113,7 @@ export const EmployeeDetailsScreen = () => {
 
   const timelineEvents: TimelineEvent[] = (auditLog?.items || []).map((entry: AuditLogEntry) => ({
     id: entry.id,
-    title: AUDIT_ACTION_LABELS[entry.action] || entry.action,
+    title: getAuditActionLabel(entry.action),
     description: entry.user ? `by ${entry.user.first_name} ${entry.user.last_name}` : undefined,
     timestamp: entry.createdAt,
   }));

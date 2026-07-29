@@ -1,0 +1,495 @@
+# System Architecture
+
+## Project
+
+Workforce Management System (WFMS)
+
+---
+
+# Purpose
+
+The Workforce Management System (WFMS) is an enterprise application that enables organizations to manage employees, workforce skills, approvals, analytics, and administration from a centralized platform.
+
+The system is designed around a modular, scalable architecture that separates presentation, business logic, and data access responsibilities.
+
+---
+
+# High-Level Architecture
+
+```
+                Mobile App
+             (React Native)
+
+                    │
+                    │ HTTPS REST API
+                    ▼
+
+              NestJS Backend
+
+                    │
+
+        ┌───────────┼───────────┐
+        │           │           │
+        ▼           ▼           ▼
+
+   Authentication  Business   Database
+      Module        Modules   PostgreSQL
+
+                    │
+                    ▼
+
+              TypeORM ORM
+
+                    │
+                    ▼
+
+               PostgreSQL
+```
+
+---
+
+# Architecture Principles
+
+The project follows these principles:
+
+- Separation of Concerns
+- Single Responsibility Principle
+- Modular Design
+- Layered Architecture
+- Reusability
+- Scalability
+- Maintainability
+- Loose Coupling
+- High Cohesion
+
+Every module should own its own business logic while remaining independent from unrelated modules.
+
+---
+
+# Technology Layers
+
+The application consists of three primary layers.
+
+## 1. Presentation Layer
+
+Frontend
+
+Technology:
+
+- React Native
+- TypeScript
+
+Responsibilities:
+
+- Rendering UI
+- Form validation
+- Navigation
+- User interactions
+- API communication
+- Local state
+
+The presentation layer must not contain business rules.
+
+Business decisions belong in the backend.
+
+---
+
+## 2. Application Layer
+
+Backend
+
+Technology:
+
+- NestJS
+
+Responsibilities:
+
+- Authentication
+- Authorization
+- Business rules
+- Validation
+- Processing requests
+- Database coordination
+
+This layer is the source of truth for business logic.
+
+---
+
+## 3. Data Layer
+
+Technology:
+
+- PostgreSQL
+- TypeORM
+
+Responsibilities:
+
+- Data persistence
+- Relationships
+- Constraints
+- Transactions
+- Indexes
+
+No frontend component should directly depend on database implementation details.
+
+---
+
+# Request Lifecycle
+
+Every request follows this flow.
+
+```
+User
+
+↓
+
+React Native Screen
+
+↓
+
+Service Layer
+
+↓
+
+HTTP Request
+
+↓
+
+NestJS Controller
+
+↓
+
+NestJS Service
+
+↓
+
+Repository
+
+↓
+
+PostgreSQL
+
+↓
+
+Repository
+
+↓
+
+Service
+
+↓
+
+Controller
+
+↓
+
+Response
+
+↓
+
+React Query
+
+↓
+
+UI
+```
+
+---
+
+# Frontend Architecture
+
+The frontend follows a feature-based architecture.
+
+Example:
+
+```
+src/
+
+components/
+
+constants/
+
+features/
+
+hooks/
+
+navigation/
+
+screens/
+
+services/
+
+store/
+
+theme/
+
+types/
+
+utils/
+```
+
+Each feature should encapsulate:
+
+- Screens
+- Components
+- Hooks
+- API services
+- Types
+- Validation
+- Utilities
+
+Avoid creating shared components unless they are reusable by multiple features.
+
+---
+
+# Backend Architecture
+
+NestJS follows a modular architecture.
+
+Each module contains:
+
+```
+module
+
+controller
+
+service
+
+entity
+
+dto
+
+repository (if required)
+
+guards
+
+interceptors
+
+decorators
+
+validators
+```
+
+Responsibilities:
+
+Controller
+
+↓
+
+Receives HTTP requests.
+
+↓
+
+Calls services.
+
+↓
+
+Returns responses.
+
+Service
+
+↓
+
+Contains business logic.
+
+↓
+
+Coordinates repositories.
+
+↓
+
+Performs validation.
+
+Repository
+
+↓
+
+Reads and writes data.
+
+↓
+
+Contains database access only.
+
+---
+
+# Authentication Flow
+
+```
+User
+
+↓
+
+Login Screen
+
+↓
+
+Authentication API
+
+↓
+
+JWT Token
+
+↓
+
+Secure Storage
+
+↓
+
+Authenticated Requests
+
+↓
+
+Protected Backend Routes
+```
+
+Authentication should remain stateless.
+
+The backend validates every request independently.
+
+---
+
+# Authorization
+
+Authorization is role-based.
+
+Typical roles include:
+
+- Administrator
+- Manager
+- Employee
+
+Permissions should be enforced by the backend.
+
+Frontend authorization is only for user experience and must never replace backend security.
+
+---
+
+# Database Architecture
+
+Database access follows:
+
+```
+Controller
+
+↓
+
+Service
+
+↓
+
+Repository
+
+↓
+
+Entity
+
+↓
+
+PostgreSQL
+```
+
+Business logic must never be embedded inside entities.
+
+---
+
+# Error Handling
+
+Errors should be handled at the appropriate layer.
+
+Frontend
+
+- Friendly messages
+- Retry where appropriate
+- Graceful failure
+
+Backend
+
+- Validation
+- Exception filters
+- Proper HTTP status codes
+
+Database
+
+- Constraints
+- Transactions
+- Referential integrity
+
+---
+
+# API Design
+
+The frontend communicates with the backend only through REST APIs.
+
+The frontend must never assume implementation details.
+
+API contracts are considered stable interfaces.
+
+Breaking changes require versioning or coordinated updates.
+
+---
+
+# State Management
+
+Frontend state should be divided into:
+
+Local State
+
+- UI
+- Dialogs
+- Temporary forms
+
+Server State
+
+- API responses
+- Lists
+- Search
+- Pagination
+- Cache
+
+Authentication State
+
+- Current user
+- Access token
+- Session
+
+Avoid duplicating server state in local state.
+
+---
+
+# Design Philosophy
+
+The architecture favors:
+
+- Small modules
+- Explicit dependencies
+- Predictable data flow
+- Minimal coupling
+- Clear ownership
+
+Every class, function, and module should have one clear responsibility.
+
+---
+
+# Scalability
+
+The architecture should support future additions without major refactoring.
+
+Examples:
+
+- New employee roles
+- Additional approval workflows
+- Multiple organizations
+- Notifications
+- Reports
+- AI-powered recommendations
+- Workforce forecasting
+
+New functionality should extend existing modules rather than replace them.
+
+---
+
+# Guiding Principle
+
+The architecture exists to make change easier.
+
+Every implementation should improve readability, maintainability, and scalability without sacrificing simplicity.

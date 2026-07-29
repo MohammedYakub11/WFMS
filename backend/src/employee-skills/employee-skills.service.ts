@@ -11,6 +11,7 @@ import { CreateEmployeeSkillDto } from './dto/create-employee-skill.dto';
 import { UpdateEmployeeSkillDto } from './dto/update-employee-skill.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/entities/notification.entity';
+import { AuditLogService } from '../audit-logs/audit-log.service';
 
 @Injectable()
 export class EmployeeSkillsService {
@@ -20,6 +21,7 @@ export class EmployeeSkillsService {
     @InjectRepository(EmployeeSkill)
     private readonly employeeSkillRepository: Repository<EmployeeSkill>,
     private readonly notificationsService: NotificationsService,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   async create(createDto: CreateEmployeeSkillDto): Promise<EmployeeSkill> {
@@ -63,14 +65,53 @@ export class EmployeeSkillsService {
     };
   }
 
-  async findPending(page: number = 1, limit: number = 10) {
+  async findPending(
+    page: number = 1,
+    limit: number = 10,
+    filters?: {
+      search?: string;
+      department?: string;
+      categoryId?: string;
+      status?: 'new' | 'resubmitted';
+      sortBy?: 'submittedAt' | 'employeeName';
+      sortOrder?: 'ASC' | 'DESC';
+    },
+  ) {
     const query = this.employeeSkillRepository
       .createQueryBuilder('employeeSkill')
       .leftJoinAndSelect('employeeSkill.skill', 'skill')
       .leftJoinAndSelect('skill.category', 'category')
       .leftJoinAndSelect('employeeSkill.employee', 'employee')
-      .where('employeeSkill.approvalStatus = :status', { status: 'pending' })
-      .orderBy('employeeSkill.submittedAt', 'ASC');
+      .where('employeeSkill.approvalStatus = :status', { status: 'pending' });
+
+    if (filters?.search) {
+      query.andWhere(
+        '(employee.first_name ILIKE :search OR employee.last_name ILIKE :search OR skill.skillName ILIKE :search)',
+        { search: `%${filters.search}%` },
+      );
+    }
+    if (filters?.department) {
+      query.andWhere('employee.department = :department', {
+        department: filters.department,
+      });
+    }
+    if (filters?.categoryId) {
+      query.andWhere('skill.categoryId = :categoryId', {
+        categoryId: filters.categoryId,
+      });
+    }
+    if (filters?.status === 'new') {
+      query.andWhere('employeeSkill.previousStatus IS NULL');
+    } else if (filters?.status === 'resubmitted') {
+      query.andWhere('employeeSkill.previousStatus IS NOT NULL');
+    }
+
+    const sortOrder = filters?.sortOrder || 'ASC';
+    if (filters?.sortBy === 'employeeName') {
+      query.orderBy('employee.first_name', sortOrder).addOrderBy('employee.last_name', sortOrder);
+    } else {
+      query.orderBy('employeeSkill.submittedAt', sortOrder);
+    }
 
     const [items, total] = await query
       .skip((page - 1) * limit)
@@ -140,6 +181,22 @@ export class EmployeeSkillsService {
     const saved = await this.employeeSkillRepository.save(skill);
 
     try {
+      await this.auditLogService.record({
+        userId: reviewerId,
+        module: 'EMPLOYEE_SKILLS',
+        entity: 'EmployeeSkill',
+        entityId: id,
+        action: 'SKILL_APPROVED',
+        newValue: { comments },
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to write audit log for employeeSkill ${id} approval`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
+
+    try {
       await this.notificationsService.create({
         employeeId: skill.employeeId,
         title: 'Skill Approved',
@@ -175,6 +232,22 @@ export class EmployeeSkillsService {
     const saved = await this.employeeSkillRepository.save(skill);
 
     try {
+      await this.auditLogService.record({
+        userId: reviewerId,
+        module: 'EMPLOYEE_SKILLS',
+        entity: 'EmployeeSkill',
+        entityId: id,
+        action: 'SKILL_REJECTED',
+        newValue: { comments },
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to write audit log for employeeSkill ${id} rejection`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
+
+    try {
       await this.notificationsService.create({
         employeeId: skill.employeeId,
         title: 'Skill Rejected',
@@ -205,6 +278,22 @@ export class EmployeeSkillsService {
     skill.reviewedAt = new Date();
     if (comments) skill.reviewComments = comments;
     const saved = await this.employeeSkillRepository.save(skill);
+
+    try {
+      await this.auditLogService.record({
+        userId: reviewerId,
+        module: 'EMPLOYEE_SKILLS',
+        entity: 'EmployeeSkill',
+        entityId: id,
+        action: 'CHANGES_REQUESTED',
+        newValue: { comments },
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to write audit log for employeeSkill ${id} changes-requested`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
 
     try {
       await this.notificationsService.create({

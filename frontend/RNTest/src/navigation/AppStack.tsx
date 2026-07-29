@@ -19,6 +19,7 @@ import { RoleManagementScreen } from '../screens/roles/RoleManagementScreen';
 import { RoleFormScreen } from '../screens/roles/RoleFormScreen';
 import { PermissionMatrixScreen } from '../screens/roles/PermissionMatrixScreen';
 import { AdminOverviewScreen } from '../screens/dashboard/AdminOverviewScreen';
+import { AuditLogsScreen } from '../screens/audit/AuditLogsScreen';
 import { SkillAdminDirectoryScreen } from '../screens/skillAdmin/SkillAdminDirectoryScreen';
 import { SkillFormScreen } from '../screens/skillAdmin/SkillFormScreen';
 import { SkillAdminDetailsScreen } from '../screens/skillAdmin/SkillAdminDetailsScreen';
@@ -27,6 +28,25 @@ import { CategoryFormScreen } from '../screens/skillAdmin/CategoryFormScreen';
 import { NotificationCenterScreen } from '../screens/notifications/NotificationCenterScreen';
 import { NotificationPreferencesScreen } from '../screens/notifications/NotificationPreferencesScreen';
 import { SendNotificationScreen } from '../screens/notifications/SendNotificationScreen';
+import { ReportsDashboardScreen } from '../screens/reports/ReportsDashboardScreen';
+import { ReportGenerateScreen } from '../screens/reports/ReportGenerateScreen';
+import { ReportPreviewScreen } from '../screens/reports/ReportPreviewScreen';
+import { ReportHistoryScreen } from '../screens/reports/ReportHistoryScreen';
+import { OrgSettingsDashboardScreen } from '../screens/orgSettings/OrgSettingsDashboardScreen';
+import { DepartmentListScreen } from '../screens/orgSettings/DepartmentListScreen';
+import { DepartmentFormScreen } from '../screens/orgSettings/DepartmentFormScreen';
+import { DesignationListScreen } from '../screens/orgSettings/DesignationListScreen';
+import { DesignationFormScreen } from '../screens/orgSettings/DesignationFormScreen';
+import { LocationListScreen } from '../screens/orgSettings/LocationListScreen';
+import { LocationFormScreen } from '../screens/orgSettings/LocationFormScreen';
+import { BusinessUnitListScreen } from '../screens/orgSettings/BusinessUnitListScreen';
+import { BusinessUnitFormScreen } from '../screens/orgSettings/BusinessUnitFormScreen';
+import { HolidayCalendarScreen } from '../screens/orgSettings/HolidayCalendarScreen';
+import { HolidayFormScreen } from '../screens/orgSettings/HolidayFormScreen';
+import { OrganizationProfileScreen } from '../screens/orgSettings/OrganizationProfileScreen';
+import { PasswordPolicyScreen } from '../screens/orgSettings/PasswordPolicyScreen';
+import { SessionSettingsScreen } from '../screens/orgSettings/SessionSettingsScreen';
+import { PreferencesScreen } from '../screens/orgSettings/PreferencesScreen';
 
 const Stack = createStackNavigator();
 
@@ -110,6 +130,13 @@ export const AppStack = () => {
           </ProtectedScreen>
         )}
       </Stack.Screen>
+      <Stack.Screen name="AuditLogs" options={{ title: 'Audit Logs' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <AuditLogsScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
       <Stack.Screen name="SkillAdminDirectory" options={{ title: 'Skill Administration' }}>
         {() => (
           <ProtectedScreen requiredPermission="SKILL_VIEW">
@@ -190,6 +217,139 @@ export const AppStack = () => {
         {() => (
           <ProtectedScreen requiredPermission="NOTIFICATION_SEND">
             <SendNotificationScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="ReportsDashboard" options={{ title: 'Reports' }}>
+        {() => (
+          <ProtectedScreen requiredPermission="REPORT_VIEW">
+            <ReportsDashboardScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="ReportGenerate" options={{ title: 'Generate Report' }}>
+        {() => (
+          <ProtectedScreen requiredPermission="REPORT_VIEW">
+            <ReportGenerateScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="ReportPreview" options={{ title: 'Report Preview' }}>
+        {() => (
+          <ProtectedScreen requiredPermission="REPORT_VIEW">
+            <ReportPreviewScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="ReportHistory" options={{ title: 'Report History' }}>
+        {() => (
+          <ProtectedScreen requiredPermission="REPORT_VIEW">
+            <ReportHistoryScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="OrgSettingsDashboard" options={{ title: 'Organization Settings' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <OrgSettingsDashboardScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="DepartmentList" options={{ title: 'Departments' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <DepartmentListScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="DepartmentForm" options={{ title: 'Department' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <DepartmentFormScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="DesignationList" options={{ title: 'Designations' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <DesignationListScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="DesignationForm" options={{ title: 'Designation' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <DesignationFormScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="LocationList" options={{ title: 'Locations' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <LocationListScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="LocationForm" options={{ title: 'Location' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <LocationFormScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="BusinessUnitList" options={{ title: 'Business Units' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <BusinessUnitListScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="BusinessUnitForm" options={{ title: 'Business Unit' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <BusinessUnitFormScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="HolidayCalendar" options={{ title: 'Holiday Calendar' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <HolidayCalendarScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="HolidayForm" options={{ title: 'Holiday' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <HolidayFormScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="OrganizationProfile" options={{ title: 'Organization Profile' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <OrganizationProfileScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="PasswordPolicy" options={{ title: 'Password Policy' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <PasswordPolicyScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="SessionSettings" options={{ title: 'Session Settings' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <SessionSettingsScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Preferences" options={{ title: 'Preferences' }}>
+        {() => (
+          <ProtectedScreen allowedRoles={['Administrator']}>
+            <PreferencesScreen />
           </ProtectedScreen>
         )}
       </Stack.Screen>

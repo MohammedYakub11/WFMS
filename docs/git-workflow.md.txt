@@ -1,0 +1,461 @@
+# Git Workflow
+
+> Version: 1.0
+> Project: Workforce Management System (WFMS)
+> Version Control: Git
+
+---
+
+# Purpose
+
+This document defines the Git workflow used by the Workforce Management System (WFMS).
+
+Its purpose is to ensure:
+
+- Predictable collaboration
+- Clean commit history
+- Safe releases
+- Easy code reviews
+- Consistent branching
+
+Every contributor should follow this workflow.
+
+---
+
+# Scope
+
+Applies to:
+
+- Developers
+- Architects
+- QA Engineers
+- DevOps Engineers
+- AI Coding Agents
+
+---
+
+# Guiding Principles
+
+The Git workflow should prioritize:
+
+- Small changes
+- Frequent commits
+- Meaningful history
+- Easy reviews
+- Safe merges
+- Stable main branch
+
+---
+
+# Branch Strategy
+
+The repository uses a feature branch workflow.
+
+Protected branches:
+
+```
+main
+develop
+```
+
+Working branches:
+
+```
+feature/*
+bugfix/*
+hotfix/*
+release/*
+chore/*
+docs/*
+refactor/*
+```
+
+---
+
+# Branch Naming
+
+Feature
+
+```
+feature/employee-role-management
+```
+
+Bug Fix
+
+```
+bugfix/login-validation
+```
+
+Hotfix
+
+```
+hotfix/jwt-expiration
+```
+
+Release
+
+```
+release/v1.2.0
+```
+
+Documentation
+
+```
+docs/security-guidelines
+```
+
+Refactoring
+
+```
+refactor/api-service
+```
+
+Avoid generic names such as:
+
+```
+new
+test
+update
+changes
+mybranch
+```
+
+---
+
+# Branch Lifecycle
+
+```
+develop
+    │
+    ▼
+feature/*
+    │
+    ▼
+Pull Request
+    │
+    ▼
+Code Review
+    │
+    ▼
+Merge into develop
+    │
+    ▼
+Release
+    │
+    ▼
+main
+```
+
+---
+
+# Commit Principles
+
+Every commit should:
+
+- Be focused
+- Be atomic
+- Build successfully
+- Leave the project in a working state
+
+Avoid combining unrelated changes.
+
+---
+
+# Commit Message Format
+
+Use Conventional Commits.
+
+Examples
+
+```
+feat(employee): add role assignment
+
+fix(auth): validate expired JWT
+
+docs(api): update response format
+
+refactor(skill): simplify approval workflow
+
+test(employee): add pagination tests
+
+chore(deps): update NestJS dependencies
+```
+
+---
+
+# Commit Types
+
+```
+feat
+fix
+docs
+style
+refactor
+test
+chore
+build
+ci
+perf
+revert
+```
+
+---
+
+# Pull Requests
+
+Each Pull Request should:
+
+- Solve one problem
+- Have a clear description
+- Reference related issues
+- Include testing information
+- Be small enough to review effectively
+
+Large Pull Requests should be split where practical.
+
+---
+
+# Pull Request Checklist
+
+Before opening a Pull Request:
+
+- [ ] Project builds successfully
+- [ ] Tests pass
+- [ ] Documentation updated if required
+- [ ] No debugging code remains
+- [ ] No secrets committed
+- [ ] Code reviewed locally
+
+---
+
+# Code Review
+
+Reviewers should verify:
+
+- Correctness
+- Readability
+- Maintainability
+- Security
+- Performance
+- Consistency
+- Architecture compliance
+
+Code reviews should focus on improving the code, not criticizing the author.
+
+---
+
+# Merge Strategy
+
+Preferred:
+
+```
+Squash and Merge
+```
+
+Benefits:
+
+- Cleaner history
+- One logical commit per feature
+- Easier rollback
+
+Avoid unnecessary merge commits.
+
+---
+
+# Conflict Resolution
+
+When conflicts occur:
+
+1. Pull latest changes.
+2. Resolve conflicts carefully.
+3. Rebuild the project.
+4. Re-run relevant tests.
+5. Verify functionality.
+
+Never resolve conflicts without understanding both changes.
+
+---
+
+# Hotfix Workflow
+
+```
+main
+    │
+    ▼
+hotfix/*
+    │
+    ▼
+Review
+    │
+    ▼
+main
+    │
+    ▼
+develop
+```
+
+Critical production fixes should follow the hotfix process.
+
+---
+
+# Release Workflow
+
+```
+develop
+    │
+    ▼
+release/*
+    │
+    ▼
+Testing
+    │
+    ▼
+main
+```
+
+Only tested and approved code should reach the main branch.
+
+---
+
+# Reverting Changes
+
+If a change introduces issues:
+
+- Prefer reverting the commit.
+- Avoid rewriting shared Git history.
+
+Protect the integrity of the repository history.
+
+---
+
+# Documentation Updates
+
+Documentation should be updated whenever changes affect:
+
+- Architecture
+- APIs
+- Business rules
+- Configuration
+- Deployment
+- Security
+
+Code and documentation should evolve together.
+
+---
+
+# AI-Assisted Development
+
+When using AI tools:
+
+- Review all generated code.
+- Ensure it follows project standards.
+- Verify tests.
+- Remove unused code.
+- Confirm documentation remains accurate.
+
+AI-generated code is subject to the same review standards as manually written code.
+
+---
+
+# Branch Protection
+
+Protected branches should require:
+
+- Pull Request approval
+- Successful CI checks
+- No direct pushes
+- Up-to-date branches before merge
+
+---
+
+# Tags
+
+Use semantic versioning.
+
+Examples
+
+```
+v1.0.0
+
+v1.1.0
+
+v1.1.1
+```
+
+---
+
+# Release Notes
+
+Each release should include:
+
+- New features
+- Bug fixes
+- Breaking changes
+- Security updates
+- Migration notes
+
+---
+
+# Anti-Patterns
+
+Avoid:
+
+❌ Direct commits to main
+
+❌ Large unrelated commits
+
+❌ Generic commit messages
+
+❌ Skipping code review
+
+❌ Force pushing shared branches
+
+❌ Committing generated files unnecessarily
+
+❌ Committing secrets
+
+---
+
+# AI Agent Guidance
+
+When generating Git-related changes:
+
+- Keep commits focused.
+- Follow Conventional Commits.
+- Update documentation if behavior changes.
+- Respect branch naming conventions.
+- Avoid unrelated modifications.
+
+Never generate a Pull Request that mixes multiple unrelated concerns.
+
+---
+
+# Git Workflow Checklist
+
+Before merging:
+
+- [ ] Branch name follows convention
+- [ ] Commit messages follow Conventional Commits
+- [ ] Tests pass
+- [ ] Documentation updated
+- [ ] Code reviewed
+- [ ] No merge conflicts
+- [ ] No secrets committed
+- [ ] CI pipeline successful
+
+---
+
+# Related Documents
+
+- coding-standards.md
+- testing-guidelines.md
+- deployment.md
+- security-guidelines.md
+
+---
+
+# Guiding Principle
+
+Version control is not just about storing code.
+
+It is about preserving the history of engineering decisions in a way that is clear, reliable, and easy to understand.

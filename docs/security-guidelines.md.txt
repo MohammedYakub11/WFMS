@@ -1,0 +1,477 @@
+# Security Guidelines
+
+> Version: 1.0
+> Project: Workforce Management System (WFMS)
+> Applies To: Frontend, Backend, Database, Infrastructure
+
+---
+
+# Purpose
+
+This document defines the security standards and best practices for the Workforce Management System (WFMS).
+
+Its purpose is to ensure that every feature is designed, implemented, tested, and deployed with security in mind.
+
+Security is everyone's responsibility.
+
+---
+
+# Scope
+
+These guidelines apply to:
+
+- React Native
+- NestJS
+- PostgreSQL
+- REST APIs
+- Authentication
+- Authorization
+- Infrastructure
+- CI/CD
+- Logging
+- Third-party integrations
+
+---
+
+# Security Principles
+
+Every implementation should follow these principles:
+
+- Least Privilege
+- Defense in Depth
+- Secure by Default
+- Fail Securely
+- Zero Trust
+- Principle of Explicit Access
+- Minimize Attack Surface
+
+---
+
+# Authentication
+
+Authentication verifies **who the user is**.
+
+WFMS uses:
+
+- JWT Authentication
+- Stateless Authentication
+- Secure Token Validation
+
+Rules:
+
+- Every protected endpoint requires authentication.
+- Expired tokens must be rejected.
+- Invalid tokens must be rejected.
+- Authentication logic belongs in the backend.
+
+Never trust authentication performed by the client.
+
+---
+
+# Authorization
+
+Authorization determines **what the user can do**.
+
+Authorization should always be enforced in the backend.
+
+Examples:
+
+Employee
+
+- Own profile only
+
+Manager
+
+- Assigned employees only
+
+Administrator
+
+- Full access
+
+Never expose privileged functionality based only on frontend checks.
+
+---
+
+# Password Policy
+
+Passwords must:
+
+- Be hashed using a strong password hashing algorithm (e.g. bcrypt or Argon2).
+- Never be stored in plain text.
+- Never be logged.
+- Never be returned in API responses.
+
+Avoid custom password hashing implementations.
+
+---
+
+# Secrets Management
+
+Secrets include:
+
+- JWT secrets
+- Database credentials
+- API keys
+- Encryption keys
+- Third-party credentials
+
+Rules:
+
+- Store secrets in environment variables or a dedicated secrets manager.
+- Never commit secrets to version control.
+- Rotate secrets periodically.
+- Restrict access to secrets.
+
+---
+
+# Environment Configuration
+
+Environment-specific values belong in configuration files or secret stores.
+
+Never hardcode:
+
+- Passwords
+- Tokens
+- API keys
+- Database URLs
+- Encryption keys
+
+---
+
+# API Security
+
+Every API should:
+
+- Validate input
+- Authenticate users
+- Authorize actions
+- Return appropriate HTTP status codes
+- Handle errors securely
+
+Avoid exposing internal implementation details.
+
+---
+
+# Input Validation
+
+Validate all external input.
+
+Examples:
+
+- Request body
+- Query parameters
+- Route parameters
+- Headers
+
+Validation should occur before business logic executes.
+
+Never trust client input.
+
+---
+
+# Output Encoding
+
+Sanitize and encode data before rendering it in the UI where appropriate.
+
+Prevent:
+
+- Cross-Site Scripting (XSS) in applicable contexts.
+- Injection attacks.
+
+---
+
+# SQL Injection
+
+Use:
+
+- Parameterized queries
+- ORM features
+- Repository methods
+
+Avoid:
+
+- String concatenation in SQL
+- Dynamic SQL without validation
+
+---
+
+# Access Control
+
+Access should always be:
+
+- Explicit
+- Role-based
+- Ownership-aware
+
+Every protected operation should verify:
+
+- Authentication
+- Authorization
+- Entity ownership
+- Business permissions
+
+---
+
+# Logging
+
+Log:
+
+- Authentication failures
+- Authorization failures
+- Critical business events
+- Unexpected exceptions
+
+Do NOT log:
+
+- Passwords
+- JWT tokens
+- Secrets
+- Sensitive personal information
+
+Logs should support auditing without exposing confidential data.
+
+---
+
+# Error Handling
+
+Error messages should:
+
+- Help users understand what happened.
+- Avoid revealing internal implementation details.
+
+Bad
+
+```
+Database connection failed at host X using password Y
+```
+
+Good
+
+```
+An unexpected error occurred.
+Please try again later.
+```
+
+---
+
+# Rate Limiting
+
+Protect sensitive endpoints such as:
+
+- Login
+- Password reset
+- OTP verification
+- Account recovery
+
+Use rate limiting to reduce brute-force attacks.
+
+---
+
+# HTTPS
+
+All communication between clients and servers must use HTTPS in production.
+
+Never transmit credentials over unencrypted connections.
+
+---
+
+# Data Protection
+
+Protect sensitive data:
+
+At Rest
+
+- Encrypt where appropriate.
+
+In Transit
+
+- Use HTTPS/TLS.
+
+Avoid storing unnecessary personal information.
+
+---
+
+# File Uploads
+
+When supporting file uploads:
+
+- Validate file type.
+- Validate file size.
+- Scan for malware where applicable.
+- Store files outside the application root if appropriate.
+- Generate unique file names.
+
+Never trust file extensions alone.
+
+---
+
+# Third-Party Dependencies
+
+Only use trusted libraries.
+
+Before adding a dependency:
+
+- Evaluate maintenance status.
+- Review community adoption.
+- Check known vulnerabilities.
+- Confirm license compatibility.
+
+Remove unused dependencies.
+
+---
+
+# Dependency Updates
+
+Regularly:
+
+- Update packages.
+- Review security advisories.
+- Apply security patches promptly.
+
+Do not postpone critical security updates without a documented reason.
+
+---
+
+# Database Security
+
+- Use least-privilege database accounts.
+- Restrict direct production access.
+- Backup regularly.
+- Monitor failed login attempts.
+- Enforce foreign keys and constraints.
+
+---
+
+# Mobile Security
+
+For React Native:
+
+- Store tokens securely using the project's approved secure storage mechanism.
+- Do not hardcode API keys.
+- Do not embed secrets in the application bundle.
+- Validate SSL/TLS certificates where applicable.
+
+---
+
+# Session Management
+
+JWTs should:
+
+- Have reasonable expiration times.
+- Be invalidated when appropriate.
+- Be transmitted securely.
+
+Avoid excessively long-lived access tokens.
+
+---
+
+# Audit Logging
+
+Audit critical actions such as:
+
+- Login
+- Logout
+- Role assignment
+- Employee creation
+- Employee updates
+- Skill approval
+- Administrative changes
+
+Audit logs should include:
+
+- User
+- Timestamp
+- Action
+- Target entity
+
+---
+
+# Incident Response
+
+When a security issue is identified:
+
+1. Assess impact.
+2. Contain the issue.
+3. Preserve evidence.
+4. Apply a fix.
+5. Notify stakeholders if required.
+6. Conduct a post-incident review.
+
+---
+
+# AI Agent Guidance
+
+Before implementing a feature:
+
+- Verify authentication requirements.
+- Verify authorization requirements.
+- Validate all external input.
+- Avoid exposing sensitive information.
+- Reuse existing security mechanisms.
+- Follow approved authentication flows.
+
+Never bypass security checks for convenience.
+
+---
+
+# Anti-Patterns
+
+Avoid:
+
+❌ Hardcoded secrets
+
+❌ Plain-text passwords
+
+❌ Logging sensitive information
+
+❌ Trusting frontend validation
+
+❌ Skipping authorization checks
+
+❌ Building SQL queries with string concatenation
+
+❌ Returning internal exception details
+
+❌ Disabling HTTPS
+
+---
+
+# Security Review Checklist
+
+Before approving a feature:
+
+- [ ] Authentication enforced
+- [ ] Authorization verified
+- [ ] Input validated
+- [ ] Sensitive data protected
+- [ ] Secrets externalized
+- [ ] Logs reviewed
+- [ ] Error messages sanitized
+- [ ] Dependencies reviewed
+- [ ] Audit logging implemented where required
+- [ ] Security testing completed
+
+---
+
+# Related Documents
+
+- architecture.md
+- api-conventions.md
+- coding-standards.md
+- business-rules.md
+- database-conventions.md
+
+---
+
+# Related ADRs
+
+- ADR-0002: Adopt REST API
+- ADR-0003: Adopt JWT Authentication
+
+---
+
+# Guiding Principle
+
+Security is not a feature added at the end of development.
+
+It is a responsibility that influences every architectural decision, every line of code, and every deployment.

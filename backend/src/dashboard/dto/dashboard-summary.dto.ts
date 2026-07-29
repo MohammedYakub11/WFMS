@@ -8,6 +8,15 @@ export interface TrendInfoDto {
   positive: boolean;
 }
 
+export interface MySkillsSummaryDto {
+  total: number;
+  approved: number;
+  pending: number;
+  rejected: number;
+  changesRequested: number;
+  completionPercentage: number;
+}
+
 export class DashboardSummaryDto {
   totalEmployees: number;
   totalSkills: number;
@@ -18,4 +27,5 @@ export class DashboardSummaryDto {
   notificationCount: number;
   employeeTrend: TrendInfoDto;
   skillTrend: TrendInfoDto;
+  mySkills: MySkillsSummaryDto;
 }

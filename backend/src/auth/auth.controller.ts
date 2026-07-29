@@ -1,9 +1,18 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -16,15 +25,12 @@ export class AuthController {
   }
 
   @Post('logout')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  logout() {
+  logout(@Request() req: { user?: { sub?: string; id?: string } }) {
     // Client should discard the token. Real implementation might blacklist tokens.
-    return {
-      success: true,
-      message: 'Logged out successfully',
-      data: {},
-      errors: null,
-    };
+    const userId = req.user?.sub || req.user?.id;
+    return this.authService.logout(userId);
   }
 
   @Post('refresh-token')

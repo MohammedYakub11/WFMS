@@ -2,17 +2,14 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, View } from 'react-native';
 import { lightTheme as theme } from '../theme/theme';
-import { AppText } from '../components/AppText';
 import { Svg, Path, Circle, Rect } from 'react-native-svg';
 import { DashboardTabScreen } from '../screens/dashboard/DashboardTabScreen';
 import { MyProfileScreen } from '../screens/profile/MyProfileScreen';
 
 import { MySkillsScreen } from '../screens/skills/MySkillsScreen';
+import { WorkforceSearchScreen } from '../screens/search/WorkforceSearchScreen';
 import { NotificationCenterScreen } from '../screens/notifications/NotificationCenterScreen';
 import { useUnreadNotificationCount } from '../hooks/useNotifications';
-
-// Placeholder Screens
-const SearchScreen = () => <View style={styles.screen}><AppText>Search Screen</AppText></View>;
 
 export type BottomTabParamList = {
   Dashboard: undefined;
@@ -110,7 +107,7 @@ export const BottomTabNavigator = (_props: BottomTabNavigatorProps) => {
     >
       <Tab.Screen name="Dashboard" component={DashboardTabScreen} />
       <Tab.Screen name="Skills" component={MySkillsScreen} />
-      <Tab.Screen name="Search" component={SearchScreen} />
+      <Tab.Screen name="Search" component={WorkforceSearchScreen} />
       <Tab.Screen
         name="Notifications"
         component={NotificationCenterScreen}
@@ -122,12 +119,6 @@ export const BottomTabNavigator = (_props: BottomTabNavigatorProps) => {
 };
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-  },
   iconContainer: {
     padding: 4,
   },

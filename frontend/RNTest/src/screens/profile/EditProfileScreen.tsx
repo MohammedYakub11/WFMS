@@ -61,7 +61,7 @@ export const EditProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <AppHeader title="Edit Profile" showBack />
+      <AppHeader title="Edit Profile" showBack showAvatar={false} />
       
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.avatarSection}>

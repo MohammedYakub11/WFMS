@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import { SkillCategory, Skill, EmployeeSkill, PaginatedResponse, PaginatedListResult } from '../types/skills';
+import { SkillCategory, Skill, EmployeeSkill, PaginatedListResult } from '../types/skills';
 
 export const skillService = {
   // Categories
@@ -78,9 +78,9 @@ export const skillService = {
       .then((r) => r.data),
 
   // Employee Skills
-  getEmployeeSkills: async (params?: any) => {
-    const response = await apiClient.get<PaginatedResponse<EmployeeSkill>>('/employee-skills', { params });
-    return response.data;
+  getEmployeeSkills: async (params?: any): Promise<PaginatedListResult<EmployeeSkill>> => {
+    const response = await apiClient.get('/employee-skills', { params });
+    return response.data.data;
   },
   getEmployeeSkillDetail: async (id: string) => {
     const response = await apiClient.get<{ success: boolean; data: EmployeeSkill }>(`/employee-skills/${id}`);
@@ -99,9 +99,9 @@ export const skillService = {
   },
 
   // Manager Approval Workflows
-  getPendingSkills: async (params?: any) => {
-    const response = await apiClient.get<PaginatedResponse<EmployeeSkill>>('/employee-skills/pending', { params });
-    return response.data;
+  getPendingSkills: async (params?: any): Promise<PaginatedListResult<EmployeeSkill>> => {
+    const response = await apiClient.get('/employee-skills/pending', { params });
+    return response.data.data;
   },
   approveSkill: async (id: string, comments?: string) => {
     const response = await apiClient.patch<EmployeeSkill>(`/employee-skills/${id}/approve`, { comments });
