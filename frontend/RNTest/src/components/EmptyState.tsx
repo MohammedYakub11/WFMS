@@ -3,6 +3,8 @@ import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { AppText } from './AppText';
 import { PrimaryButton } from './PrimaryButton';
 import { lightTheme as theme } from '../theme/theme';
+import { NeuIconCircle, NEU_BACKGROUND } from './Cards';
+import { AppIcon } from './AppIcon';
 
 interface EmptyStateProps {
   title: string;
@@ -26,9 +28,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       {icon ? (
         <View style={styles.iconContainer}>{icon}</View>
       ) : (
-        <View style={styles.iconContainer}>
-          <AppText style={styles.icon}>📭</AppText>
-        </View>
+        <NeuIconCircle size={80} style={styles.iconContainer}>
+          <AppIcon name="inbox" size={40} color={theme.colors.textSecondary} />
+        </NeuIconCircle>
       )}
       <AppText variant="h2" style={styles.title}>{title}</AppText>
       <AppText style={styles.description}>{description}</AppText>
@@ -50,14 +52,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 32,
-    backgroundColor: theme.colors.background,
+    backgroundColor: NEU_BACKGROUND,
   },
   iconContainer: {
     marginBottom: 24,
-    opacity: 0.8,
-  },
-  icon: {
-    fontSize: 48,
   },
   title: {
     color: theme.colors.textPrimary,

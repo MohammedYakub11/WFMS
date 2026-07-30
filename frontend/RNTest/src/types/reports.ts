@@ -70,14 +70,16 @@ export interface ReportTypeOption {
   description: string;
 }
 
+// `icon` values are Octicons glyph names (see components/AppIcon.tsx) — the
+// app's single icon family, not raw emoji.
 export const REPORT_TYPE_OPTIONS: ReportTypeOption[] = [
-  { type: 'employees', label: 'Employees', icon: '👥', description: 'Employee directory data' },
-  { type: 'skills', label: 'Skills', icon: '⚡', description: 'Skill catalog data' },
-  { type: 'departments', label: 'Departments', icon: '🏢', description: 'Workforce by department' },
-  { type: 'designations', label: 'Designations', icon: '🎖️', description: 'Workforce by designation' },
-  { type: 'locations', label: 'Locations', icon: '📍', description: 'Workforce by location' },
-  { type: 'workforce_analytics', label: 'Workforce Analytics', icon: '📊', description: 'Cross-dimension workforce breakdown' },
-  { type: 'audit_logs', label: 'Audit Logs', icon: '📜', description: 'System activity trail' },
-  { type: 'skill_approvals', label: 'Skill Approvals', icon: '✅', description: 'Skill approval workflow status' },
-  { type: 'certifications', label: 'Certifications', icon: '🎓', description: 'Employee certifications' },
+  { type: 'employees', label: 'Employees', icon: 'people', description: 'Employee directory data' },
+  { type: 'skills', label: 'Skills', icon: 'star', description: 'Skill catalog data' },
+  { type: 'departments', label: 'Departments', icon: 'organization', description: 'Workforce by department' },
+  { type: 'designations', label: 'Designations', icon: 'briefcase', description: 'Workforce by designation' },
+  { type: 'locations', label: 'Locations', icon: 'location', description: 'Workforce by location' },
+  { type: 'workforce_analytics', label: 'Workforce Analytics', icon: 'graph', description: 'Cross-dimension workforce breakdown' },
+  { type: 'audit_logs', label: 'Audit Logs', icon: 'history', description: 'System activity trail' },
+  { type: 'skill_approvals', label: 'Skill Approvals', icon: 'check-circle', description: 'Skill approval workflow status' },
+  { type: 'certifications', label: 'Certifications', icon: 'verified', description: 'Employee certifications' },
 ];

@@ -5,9 +5,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { loginSchema } from '../../validations/authValidation';
 import { useAuthentication } from '../../hooks/useAuthentication';
 import { AppText } from '../../components/AppText';
+import { AppIcon } from '../../components/AppIcon';
 import { AppTextField } from '../../components/AppTextField';
 import { PasswordField } from '../../components/PasswordField';
 import { PrimaryButton } from '../../components/PrimaryButton';
+import { NeuIconCircle } from '../../components/Cards';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { lightTheme, darkTheme } from '../../theme/theme';
@@ -38,6 +40,19 @@ export const LoginScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+        {/* WFMS brand mark + "Workforce Management System" title — same icon,
+            name, and tagline the Dashboard header uses, so the two screens
+            read as one consistent app. */}
+        <View style={styles.brandContainer}>
+          <NeuIconCircle size={64} style={styles.brandIcon}>
+            <AppIcon name="account-group" size={30} color={theme.colors.primary} />
+          </NeuIconCircle>
+          <AppText variant="h2" weight="bold" color={theme.colors.primary}>WFMS</AppText>
+          <AppText variant="caption" color={theme.colors.textSecondary} style={styles.brandSubtitle}>
+            Workforce Management System
+          </AppText>
+        </View>
+
         <View style={styles.headerContainer}>
           <AppText variant="screenTitle" weight="bold" style={styles.title}>
             Welcome Back
@@ -113,8 +128,18 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: 'center',
   },
+  brandContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  brandIcon: {
+    marginBottom: 12,
+  },
+  brandSubtitle: {
+    marginTop: 2,
+  },
   headerContainer: {
-    marginBottom: 40,
+    marginBottom: 32,
   },
   title: {
     marginBottom: 8,

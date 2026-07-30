@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, Keyboard } from 'react-native';
-import { FAB, IconButton, useTheme } from 'react-native-paper';
+import { View, StyleSheet, FlatList, RefreshControl, Keyboard, TouchableOpacity } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../../store';
@@ -10,15 +9,14 @@ import { SkillCard } from '../../components/skills/SkillCard';
 import { SkillSkeleton } from '../../components/skills/SkillSkeleton';
 import { SkillFiltersModal } from '../../components/skills/SkillFiltersModal';
 import { AppHeader } from '../../components/AppHeader';
-import { renderAppIcon } from '../../components/AppIcon';
+import { AppIcon } from '../../components/AppIcon';
 import { AppTextField } from '../../components/AppTextField';
-import { StatCard } from '../../components/Cards';
+import { StatCard, NeuIconCircle, NEU_BACKGROUND } from '../../components/Cards';
 import { EmptyState } from '../../components/EmptyState';
 import { Loader } from '../../components/Loader';
-
+import { lightTheme as theme } from '../../theme/theme';
 
 export const MySkillsScreen = () => {
-  const theme = useTheme();
   const dispatch = useDispatch();
   const navigation = useNavigation<any>();
   
@@ -95,9 +93,9 @@ export const MySkillsScreen = () => {
   const renderHeader = () => (
     <View style={styles.headerContent}>
       <View style={styles.statsRow}>
-        <StatCard title="Total Skills" value={total} />
-        <StatCard title="Approved" value={approvedCount} />
-        <StatCard title="Pending" value={pendingCount} />
+        <StatCard layout="centered" title="Total Skills" value={total} icon={<AppIcon name="code-tags" size={24} color={theme.colors.primary} />} />
+        <StatCard layout="centered" title="Approved" value={approvedCount} icon={<AppIcon name="check-circle-outline" size={24} color={theme.colors.primary} />} />
+        <StatCard layout="centered" title="Pending" value={pendingCount} icon={<AppIcon name="clock" size={24} color={theme.colors.primary} />} />
       </View>
       <View style={styles.searchContainer}>
         <AppTextField
@@ -107,14 +105,9 @@ export const MySkillsScreen = () => {
           onChangeText={setLocalSearch}
           style={styles.searchField}
           rightIcon={
-            <IconButton
-              icon={renderAppIcon("filter-variant")}
-              size={20}
-              iconColor={(selectedCategoryId || selectedProficiency) ? theme.colors.primary : theme.colors.onSurfaceVariant}
-              style={styles.filterIconButton}
-              onPress={() => setIsFilterVisible(true)}
-              accessibilityLabel="Filter skills"
-            />
+            <TouchableOpacity onPress={() => setIsFilterVisible(true)} activeOpacity={0.7} style={styles.filterIconButton}>
+              <AppIcon name="filter-variant" size={20} color={(selectedCategoryId || selectedProficiency) ? theme.colors.primary : theme.colors.textSecondary} />
+            </TouchableOpacity>
           }
         />
       </View>
@@ -154,7 +147,7 @@ export const MySkillsScreen = () => {
           ListEmptyComponent={renderEmptyState}
           ListFooterComponent={renderFooter}
           refreshControl={
-            <RefreshControl refreshing={isFetching && page === 1} onRefresh={handleRefresh} />
+            <RefreshControl refreshing={isFetching && page === 1} onRefresh={handleRefresh} tintColor={theme.colors.primary} />
           }
           onScroll={() => Keyboard.dismiss()}
         />
@@ -165,12 +158,11 @@ export const MySkillsScreen = () => {
         onDismiss={() => setIsFilterVisible(false)} 
       />
 
-      <FAB
-        icon={renderAppIcon("plus")}
-        style={styles.fab}
-        onPress={() => navigation.navigate('AddSkill')}
-        color="#FFF"
-      />
+      <View style={styles.fabContainer}>
+        <NeuIconCircle size={60} contentStyle={styles.fabInner} onPress={() => navigation.navigate('AddSkill')}>
+          <AppIcon name="plus" size={24} color="#FFF" />
+        </NeuIconCircle>
+      </View>
     </View>
   );
 };
@@ -179,7 +171,7 @@ const styles = StyleSheet.create({
   loader: { marginVertical: 16 },
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: NEU_BACKGROUND,
   },
   headerContent: {
     padding: 16,
@@ -198,16 +190,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filterIconButton: {
-    margin: 0,
+    padding: 8,
   },
   listContent: {
     paddingBottom: 80,
   },
-  fab: {
+  fabContainer: {
     position: 'absolute',
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#22C55E', // primary
+  },
+  fabInner: {
+    backgroundColor: theme.colors.primary,
   },
 });

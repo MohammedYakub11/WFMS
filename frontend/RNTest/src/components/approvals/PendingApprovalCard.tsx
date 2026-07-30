@@ -43,68 +43,67 @@ export const PendingApprovalCard: React.FC<PendingApprovalCardProps> = ({
 
   return (
     <Card style={styles.card} onPress={() => onPress(employeeSkill)}>
-      <View style={styles.employeeRow}>
-        <Avatar name={employeeName} uri={employee?.profile_image} size={40} />
-        <View style={styles.employeeInfo}>
-          <AppText variant="cardTitle" weight="semiBold" numberOfLines={1}>{employeeName}</AppText>
-          <AppText variant="caption" color={theme.colors.textSecondary}>
-            ID: {employee?.employee_code || 'N/A'} · {employee?.department || 'No Department'}
-          </AppText>
+      <View style={styles.content}>
+        <View style={styles.employeeRow}>
+          <Avatar name={employeeName} uri={employee?.profile_image} size={40} />
+          <View style={styles.employeeInfo}>
+            <AppText variant="cardTitle" weight="semiBold" numberOfLines={1}>{employeeName}</AppText>
+            <AppText variant="caption" color={theme.colors.textSecondary}>
+              ID: {employee?.employee_code || 'N/A'} · {employee?.department || 'No Dept'}
+            </AppText>
+          </View>
+          <View style={[styles.statusBadge, { backgroundColor: isResubmission ? theme.colors.statusDraft : theme.colors.statusPending }]}>
+            <AppText variant="caption" style={styles.statusText}>
+              {isResubmission ? 'RESUBMITTED' : 'NEW'}
+            </AppText>
+          </View>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: isResubmission ? theme.colors.statusDraft : theme.colors.statusPending }]}>
-          <AppText variant="caption" style={styles.statusText}>
-            {isResubmission ? 'RESUBMITTED' : 'NEW'}
-          </AppText>
-        </View>
-      </View>
 
-      <View style={[styles.divider, { backgroundColor: theme.colors.divider }]} />
-
-      <View style={styles.skillRow}>
-        <View style={styles.flex1}>
+        <View style={styles.skillRow}>
           <AppText variant="bodyText" weight="semiBold" numberOfLines={1}>{skillName}</AppText>
-          <Chip style={[styles.categoryChip, { backgroundColor: theme.colors.border }]} textStyle={styles.chipText} compact>
+          <Chip style={styles.categoryChip} textStyle={styles.chipText} compact>
             {categoryName}
           </Chip>
         </View>
-      </View>
 
-      <View style={styles.proficiencyRow}>
-        <AppText variant="caption" style={styles.detailLabel} color={theme.colors.textSecondary}>Proficiency</AppText>
-        <SkillProficiencyRating rating={employeeSkill.proficiencyRating} readonly size={14} />
-      </View>
+        <View style={styles.detailsRow}>
+          <View style={styles.detailCol}>
+            <AppText variant="caption" style={styles.detailLabel} color={theme.colors.textSecondary}>Proficiency</AppText>
+            <SkillProficiencyRating rating={employeeSkill.proficiencyRating} readonly size={16} />
+          </View>
+          <View style={styles.detailCol}>
+            <AppText variant="caption" style={styles.detailLabel} color={theme.colors.textSecondary}>Experience</AppText>
+            <AppText variant="bodyText">{employeeSkill.yearsOfExperience || 0} yrs</AppText>
+          </View>
+          <View style={styles.detailColRight}>
+            <AppText variant="caption" style={styles.detailLabel} color={theme.colors.textSecondary}>Submitted</AppText>
+            <AppText variant="bodyText">{submittedDate ? new Date(submittedDate).toLocaleDateString() : 'N/A'}</AppText>
+          </View>
+        </View>
 
-      <View style={styles.detailsRow}>
-        <View style={styles.detailItem}>
-          <AppText variant="caption" style={styles.detailLabel} color={theme.colors.textSecondary}>Experience</AppText>
-          <AppText variant="bodyText">{employeeSkill.yearsOfExperience || 0} years</AppText>
-        </View>
-        <View style={styles.detailItem}>
-          <AppText variant="caption" style={styles.detailLabel} color={theme.colors.textSecondary}>Submitted</AppText>
-          <AppText variant="bodyText">{submittedDate ? new Date(submittedDate).toLocaleDateString() : 'N/A'}</AppText>
-        </View>
+        {canReview && (
+          <View style={styles.actionsWrapper}>
+            <SecondaryButton
+              title="Request Changes"
+              onPress={() => onRequestChanges(employeeSkill)}
+              style={styles.fullWidthAction}
+            />
+            <View style={styles.actionsRow}>
+              <SecondaryButton
+                title="Reject"
+                onPress={() => onReject(employeeSkill)}
+                style={styles.actionBtn}
+              />
+              <PrimaryButton
+                title="Approve"
+                onPress={() => onApprove(employeeSkill)}
+                isLoading={isApproving}
+                style={styles.actionBtn}
+              />
+            </View>
+          </View>
+        )}
       </View>
-
-      {canReview && (
-        <View style={[styles.actionsRow, { borderTopColor: theme.colors.divider }]}>
-          <SecondaryButton
-            title="Request Changes"
-            onPress={() => onRequestChanges(employeeSkill)}
-            style={styles.actionBtn}
-          />
-          <SecondaryButton
-            title="Reject"
-            onPress={() => onReject(employeeSkill)}
-            style={[styles.actionBtn, { backgroundColor: theme.colors.error + '1A' }]}
-          />
-          <PrimaryButton
-            title="Approve"
-            onPress={() => onApprove(employeeSkill)}
-            isLoading={isApproving}
-            style={styles.actionBtn}
-          />
-        </View>
-      )}
     </Card>
   );
 };
@@ -112,63 +111,78 @@ export const PendingApprovalCard: React.FC<PendingApprovalCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
+    marginVertical: 8,
+  },
+  content: {
+    paddingVertical: 4,
   },
   employeeRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 12,
   },
   employeeInfo: {
     flex: 1,
     marginLeft: 12,
+    marginRight: 8,
   },
   statusBadge: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 4,
     borderRadius: 4,
   },
   statusText: {
     color: '#FFFFFF',
     fontSize: 10,
-  },
-  divider: {
-    height: 1,
-    marginVertical: 12,
+    fontFamily: lightTheme.typography.fontFamily.bold,
   },
   skillRow: {
-    marginBottom: 12,
-  },
-  flex1: {
-    flex: 1,
-  },
-  categoryChip: {
-    alignSelf: 'flex-start',
-    marginTop: 4,
-  },
-  chipText: {
-    fontSize: 12,
-  },
-  proficiencyRow: {
-    marginBottom: 12,
-  },
-  detailsRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 12,
   },
-  detailItem: {
-    flex: 1,
+  categoryChip: {
+    backgroundColor: 'rgba(0,0,0,0.03)',
+  },
+  chipText: {
+    fontSize: 11,
+    color: lightTheme.colors.textSecondary,
+    fontFamily: lightTheme.typography.fontFamily.medium,
+  },
+  detailsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+    backgroundColor: 'rgba(0,0,0,0.02)',
+    padding: 12,
+    borderRadius: lightTheme.radius.m,
+    marginBottom: 16,
+  },
+  detailCol: {
+    flexGrow: 1,
+    flexBasis: '40%',
+    minWidth: 100,
+  },
+  detailColRight: {
+    flexGrow: 1,
+    flexBasis: '40%',
+    minWidth: 100,
   },
   detailLabel: {
     marginBottom: 4,
   },
+  actionsWrapper: {
+    gap: 8,
+  },
   actionsRow: {
     flexDirection: 'row',
     gap: 8,
-    borderTopWidth: 1,
-    paddingTop: 12,
+  },
+  fullWidthAction: {
+    width: '100%',
   },
   actionBtn: {
     flex: 1,
-    height: 40,
   },
 });

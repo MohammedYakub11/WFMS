@@ -24,14 +24,14 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({ employee, on
       <View style={styles.header}>
         <Avatar name={fullName} uri={employee.profile_image} size={48} />
         <View style={styles.titleContainer}>
-          <AppText variant="h2" numberOfLines={1}>{fullName}</AppText>
+          <AppText variant="cardTitle" weight="semiBold" numberOfLines={1}>{fullName}</AppText>
           <AppText variant="caption" color={theme.colors.textSecondary} numberOfLines={1}>
             {employee.designation || 'No designation'} · {employee.department || 'No department'}
           </AppText>
         </View>
       </View>
 
-      <View style={[styles.statsRow, { backgroundColor: theme.colors.border }]}>
+      <View style={styles.statsRow}>
         <View style={styles.statBox}>
           <AppText variant="h3">{employee.totalSkills ?? 0}</AppText>
           <AppText variant="caption" color={theme.colors.textSecondary}>Skills</AppText>
@@ -49,12 +49,12 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({ employee, on
       {employee.primarySkills?.length > 0 && (
         <View style={styles.skillsRow}>
           {employee.primarySkills.map((skillName: string, index: number) => (
-            <Chip key={index} style={[styles.chip, { backgroundColor: theme.colors.border }]} textStyle={styles.chipText} compact>
+            <Chip key={index} style={styles.chip} textStyle={styles.chipText} compact>
               {skillName}
             </Chip>
           ))}
           {extraSkillsCount > 0 && (
-            <Chip style={[styles.chip, { backgroundColor: theme.colors.border }]} textStyle={styles.chipText} compact>
+            <Chip style={styles.chip} textStyle={styles.chipText} compact>
               +{extraSkillsCount} more
             </Chip>
           )}
@@ -67,6 +67,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({ employee, on
 const styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
+    marginVertical: 8,
   },
   header: {
     flexDirection: 'row',
@@ -81,8 +82,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+    borderRadius: lightTheme.radius.m,
+    marginBottom: 16,
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   statBox: {
     alignItems: 'center',
@@ -95,8 +97,11 @@ const styles = StyleSheet.create({
   chip: {
     height: 28,
     justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   chipText: {
     fontSize: 12,
+    color: lightTheme.colors.textSecondary,
+    fontFamily: lightTheme.typography.fontFamily.medium,
   },
 });

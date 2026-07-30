@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
+import { AppText } from '../AppText';
+import { lightTheme as theme } from '../../theme/theme';
 
 export interface TimelineEvent {
   id: string;
@@ -11,19 +12,30 @@ export interface TimelineEvent {
   color?: string;
 }
 
+// Shared timeline row — used by Audit Logs, Employee Details, and Employee
+// Skill Details. Previously rendered via react-native-paper's raw <Text>/
+// useTheme() (Paper's generic Material palette, not this app's theme), which
+// is why text contrast here didn't match the rest of the app.
 export const SkillTimeline = ({ events }: { events: TimelineEvent[] }) => {
-  const theme = useTheme();
   return (
     <View style={styles.container}>
-      {events.map((event, index) => (
+      {events.map((event) => (
         <View key={event.id} style={styles.eventContainer}>
-          <View style={[styles.dot, { backgroundColor: event.color || theme.colors.primary }]} />
+          <View style={styles.dotColumn}>
+            <View style={[styles.dot, { backgroundColor: event.color || theme.colors.primary }]} />
+          </View>
           <View style={styles.content}>
-            <Text variant="titleMedium">{event.title}</Text>
-            {event.description ? <Text variant="bodyMedium">{event.description}</Text> : null}
-            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+            <AppText variant="cardTitle" weight="semiBold" numberOfLines={2}>
+              {event.title}
+            </AppText>
+            {event.description ? (
+              <AppText variant="body" color={theme.colors.textSecondary} style={styles.description} numberOfLines={2}>
+                {event.description}
+              </AppText>
+            ) : null}
+            <AppText variant="caption" color={theme.colors.textSecondary} style={styles.timestamp}>
               {new Date(event.timestamp).toLocaleString()}
-            </Text>
+            </AppText>
           </View>
         </View>
       ))}
@@ -37,16 +49,26 @@ const styles = StyleSheet.create({
   },
   eventContainer: {
     flexDirection: 'row',
-    marginBottom: 16,
+    marginBottom: 24,
+  },
+  dotColumn: {
+    width: 12,
+    alignItems: 'center',
+    marginRight: 14,
   },
   dot: {
     width: 12,
     height: 12,
     borderRadius: 6,
     marginTop: 6,
-    marginRight: 12,
   },
   content: {
     flex: 1,
+  },
+  description: {
+    marginTop: 2,
+  },
+  timestamp: {
+    marginTop: 4,
   },
 });

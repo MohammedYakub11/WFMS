@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { AppHeader } from '../../components/AppHeader';
 import { AppText } from '../../components/AppText';
+import { AppIcon } from '../../components/AppIcon';
 import { Card } from '../../components/Cards';
 import { EmptyState } from '../../components/EmptyState';
 import { Loader } from '../../components/Loader';
@@ -40,9 +41,13 @@ export const ReportsDashboardScreen = () => {
               style={styles.typeCard}
               onPress={() => navigation.navigate('ReportGenerate', { reportType: option.type })}
             >
-              <AppText style={styles.typeIcon}>{option.icon}</AppText>
-              <AppText variant="cardTitle" weight="semiBold" style={styles.typeLabel}>{option.label}</AppText>
-              <AppText variant="caption" color={theme.colors.textSecondary}>{option.description}</AppText>
+              <AppIcon name={option.icon} size={24} color={theme.colors.primary} style={styles.typeIcon} />
+              <AppText variant="cardTitle" weight="semiBold" style={styles.typeLabel} numberOfLines={2}>
+                {option.label}
+              </AppText>
+              <AppText variant="caption" color={theme.colors.textSecondary} numberOfLines={2} style={styles.typeDescription}>
+                {option.description}
+              </AppText>
             </Card>
           ))}
         </View>
@@ -68,9 +73,9 @@ export const ReportsDashboardScreen = () => {
               const option = REPORT_TYPE_OPTIONS.find((o) => o.type === entry.reportType);
               return (
                 <View key={entry.id} style={styles.recentRow}>
-                  <AppText style={styles.recentIcon}>{option?.icon ?? '📄'}</AppText>
+                  <AppIcon name={option?.icon ?? 'file'} size={20} color={theme.colors.primary} style={styles.recentIcon} />
                   <View style={styles.recentInfo}>
-                    <AppText weight="medium">{option?.label ?? entry.reportType}</AppText>
+                    <AppText weight="medium" numberOfLines={1}>{option?.label ?? entry.reportType}</AppText>
                     <AppText variant="caption" color={theme.colors.textSecondary}>
                       {entry.format.toUpperCase()} · {new Date(entry.generatedAt).toLocaleDateString()}
                     </AppText>
@@ -90,12 +95,17 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 16, paddingBottom: 40 },
   sectionTitle: { marginBottom: 12 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4, marginBottom: 8 },
-  typeCard: { width: '47%', marginHorizontal: '1.5%', alignItems: 'flex-start' },
-  typeIcon: { fontSize: 28, marginBottom: 8 },
+  // `width` here is a percentage (proportional to screen width), not a fixed
+  // pixel value, so the 2-column grid already reflows naturally on any
+  // device size. `minHeight` keeps every card the same height regardless of
+  // whether its title/description wraps to one or two lines.
+  typeCard: { width: '47%', marginHorizontal: '1.5%', marginBottom: 8, alignItems: 'flex-start', minHeight: 132 },
+  typeIcon: { marginBottom: 8 },
   typeLabel: { marginBottom: 4 },
+  typeDescription: { lineHeight: 16 },
   recentHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 12 },
   recentRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
-  recentIcon: { fontSize: 20, marginRight: 12 },
+  recentIcon: { marginRight: 12 },
   recentInfo: { flex: 1 },
   emptyState: { flex: undefined, paddingVertical: 24 },
 });

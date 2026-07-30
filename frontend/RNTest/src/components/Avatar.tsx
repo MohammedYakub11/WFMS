@@ -2,6 +2,8 @@ import React from 'react';
 import { View, StyleSheet, Image, ViewStyle, StyleProp, TouchableOpacity } from 'react-native';
 import { AppText } from './AppText';
 import { lightTheme as theme } from '../theme/theme';
+import { NeuIconCircle } from './Cards';
+import { AppIcon } from './AppIcon';
 
 interface AvatarProps {
   uri?: string;
@@ -24,19 +26,21 @@ export const Avatar: React.FC<AvatarProps> = ({ uri, name, size = 48, style, onP
 
   return (
     <Container style={[styles.container, style]} onPress={onPress} activeOpacity={0.8}>
-      {uri ? (
-        <Image source={{ uri }} style={[styles.image, { width: size, height: size, borderRadius: size / 2 }]} />
-      ) : (
-        <View style={[styles.placeholder, { width: size, height: size, borderRadius: size / 2 }]}>
-          <AppText style={[styles.initials, { fontSize: size * 0.4 }]}>{initials}</AppText>
-        </View>
-      )}
+      <NeuIconCircle size={size} contentStyle={styles.neuAvatarInner}>
+        {uri ? (
+          <Image source={{ uri }} style={{ width: size, height: size, borderRadius: size / 2 }} />
+        ) : (
+          <View style={[styles.placeholder, { width: size, height: size, borderRadius: size / 2 }]}>
+            <AppText style={[styles.initials, { fontSize: size * 0.4 }]}>{initials}</AppText>
+          </View>
+        )}
+      </NeuIconCircle>
       
       {showEditIcon && (
         <View style={styles.editIconContainer}>
-          <View style={styles.editIconInner}>
-            <AppText style={styles.editIconText}>📷</AppText>
-          </View>
+          <NeuIconCircle size={24} contentStyle={styles.editIconInner}>
+            <AppIcon name="pencil" size={12} color={theme.colors.surface} />
+          </NeuIconCircle>
         </View>
       )}
     </Container>
@@ -49,8 +53,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  image: {
-    backgroundColor: theme.colors.surface,
+  neuAvatarInner: {
+    overflow: 'hidden',
   },
   placeholder: {
     backgroundColor: theme.colors.primary,
@@ -63,21 +67,10 @@ const styles = StyleSheet.create({
   },
   editIconContainer: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    padding: 2,
+    bottom: -4,
+    right: -4,
   },
   editIconInner: {
     backgroundColor: theme.colors.primary,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  editIconText: {
-    fontSize: 12,
   },
 });

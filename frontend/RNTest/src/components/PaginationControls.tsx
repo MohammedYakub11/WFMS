@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { useSelector } from 'react-redux';
+import { View, StyleSheet } from 'react-native';
 import { AppText } from './AppText';
-import { RootState } from '../store';
-import { lightTheme, darkTheme } from '../theme/theme';
+import { NeuSurface, NEU_BACKGROUND } from './Cards';
+import { lightTheme as theme } from '../theme/theme';
 
 interface PaginationControlsProps {
   page: number;
@@ -18,38 +17,52 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
   onPageChange,
   disabled,
 }) => {
-  const isDarkMode = useSelector((state: RootState) => state.theme.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
   const canGoPrev = page > 1 && !disabled;
   const canGoNext = page < totalPages && !disabled;
 
   return (
-    <View style={[styles.container, { borderTopColor: theme.colors.border, backgroundColor: theme.colors.surface }]}>
-      <TouchableOpacity
+    <View style={styles.container}>
+      <NeuSurface
+        radius={theme.radius.l}
+        style={styles.buttonWrapper}
+        contentStyle={styles.button}
+        onPress={canGoPrev ? () => onPageChange(page - 1) : undefined}
         accessibilityRole="button"
         accessibilityLabel="Previous page"
         accessibilityState={{ disabled: !canGoPrev }}
-        disabled={!canGoPrev}
-        onPress={() => onPageChange(page - 1)}
-        style={[styles.button, { borderColor: theme.colors.border }, !canGoPrev && styles.disabled]}
       >
-        <AppText variant="caption" color={theme.colors.textPrimary}>Prev</AppText>
-      </TouchableOpacity>
+        <AppText
+          variant="buttonText"
+          weight="semiBold"
+          color={canGoPrev ? theme.colors.primary : theme.colors.textSecondary}
+          style={!canGoPrev && styles.disabledText}
+        >
+          Prev
+        </AppText>
+      </NeuSurface>
 
       <AppText variant="caption" color={theme.colors.textSecondary}>
         Page {page} of {Math.max(totalPages, 1)}
       </AppText>
 
-      <TouchableOpacity
+      <NeuSurface
+        radius={theme.radius.l}
+        style={styles.buttonWrapper}
+        contentStyle={styles.button}
+        onPress={canGoNext ? () => onPageChange(page + 1) : undefined}
         accessibilityRole="button"
         accessibilityLabel="Next page"
         accessibilityState={{ disabled: !canGoNext }}
-        disabled={!canGoNext}
-        onPress={() => onPageChange(page + 1)}
-        style={[styles.button, { borderColor: theme.colors.border }, !canGoNext && styles.disabled]}
       >
-        <AppText variant="caption" color={theme.colors.textPrimary}>Next</AppText>
-      </TouchableOpacity>
+        <AppText
+          variant="buttonText"
+          weight="semiBold"
+          color={canGoNext ? theme.colors.primary : theme.colors.textSecondary}
+          style={!canGoNext && styles.disabledText}
+        >
+          Next
+        </AppText>
+      </NeuSurface>
     </View>
   );
 };
@@ -61,15 +74,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderTopWidth: 1,
+    backgroundColor: NEU_BACKGROUND,
+  },
+  buttonWrapper: {
+    // Guarantees the ≥44dp minimum touch target regardless of the "Prev"/
+    // "Next" label's own text metrics.
+    minWidth: 44,
+    minHeight: 44,
   },
   button: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingHorizontal: 20,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  disabled: {
-    opacity: 0.4,
+  disabledText: {
+    opacity: 0.5,
   },
 });

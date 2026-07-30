@@ -42,7 +42,12 @@ const EmployeeCardComponent: React.FC<EmployeeCardProps> = ({ employee, onPress,
 
       <View style={styles.metaRow}>
         {employee.department && (
-          <Chip style={[styles.chip, { backgroundColor: theme.colors.border }]} textStyle={{ color: theme.colors.textSecondary, fontSize: 12 }} compact>
+          <Chip
+            style={[styles.chip, { backgroundColor: theme.colors.border }]}
+            textStyle={{ color: theme.colors.textSecondary, fontSize: 12 }}
+            ellipsizeMode="tail"
+            compact
+          >
             {employee.department}
           </Chip>
         )}
@@ -54,8 +59,12 @@ const EmployeeCardComponent: React.FC<EmployeeCardProps> = ({ employee, onPress,
       </View>
 
       <View style={[styles.footer, { borderTopColor: theme.colors.divider }]}>
-        <AppText variant="caption" color={theme.colors.textSecondary}>{employee.employee_code}</AppText>
-        <AppText variant="caption" color={theme.colors.textSecondary}>{employee.location || '—'}</AppText>
+        <AppText variant="caption" color={theme.colors.textSecondary} numberOfLines={1} style={styles.footerId}>
+          {employee.employee_code}
+        </AppText>
+        <AppText variant="caption" color={theme.colors.textSecondary} numberOfLines={1} style={styles.footerLocation}>
+          {employee.location || '—'}
+        </AppText>
       </View>
     </Card>
   );
@@ -77,14 +86,22 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 8,
+    rowGap: 8,
     marginBottom: 12,
   },
-  chip: {},
+  // Lets a long department name shrink/truncate instead of pushing the
+  // status badge off-screen or forcing the row to overflow horizontally.
+  chip: {
+    flexShrink: 1,
+    maxWidth: '65%',
+  },
   statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
+    flexShrink: 0,
   },
   statusText: {
     color: '#FFFFFF',
@@ -93,8 +110,18 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    rowGap: 4,
     borderTopWidth: 1,
     paddingTop: 8,
+  },
+  footerId: {
+    flexShrink: 1,
+    marginRight: 8,
+  },
+  footerLocation: {
+    flexShrink: 1,
+    textAlign: 'right',
   },
 });
 

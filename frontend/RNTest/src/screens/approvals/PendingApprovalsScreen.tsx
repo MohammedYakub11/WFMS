@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, Keyboard, ScrollView } from 'react-native';
-import { Chip, Menu, IconButton } from 'react-native-paper';
+import { View, StyleSheet, FlatList, RefreshControl, Keyboard, ScrollView, TouchableOpacity } from 'react-native';
+import { Chip, Menu } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../../store';
@@ -12,12 +12,12 @@ import { useSnackbar } from '../../components/providers/SnackbarProvider';
 import { PendingApprovalCard } from '../../components/approvals/PendingApprovalCard';
 import { AppHeader } from '../../components/AppHeader';
 import { AppTextField } from '../../components/AppTextField';
-import { StatCard } from '../../components/Cards';
+import { StatCard, NEU_BACKGROUND } from '../../components/Cards';
 import { EmptyState } from '../../components/EmptyState';
 import { Loader } from '../../components/Loader';
 import { ConfirmationDialog } from '../../components/ConfirmationDialog';
 import { PaginationControls } from '../../components/PaginationControls';
-import { renderAppIcon } from '../../components/AppIcon';
+import { AppIcon } from '../../components/AppIcon';
 import { EmployeeSkill, SkillCategory } from '../../types/skills';
 import { lightTheme, darkTheme } from '../../theme/theme';
 
@@ -164,7 +164,7 @@ export const PendingApprovalsScreen = () => {
   const renderHeader = () => (
     <View style={styles.headerContent}>
       <View style={styles.statsRow}>
-        <StatCard title="Pending Approvals" value={total} />
+        <StatCard layout="centered" title="Pending Approvals" value={total} icon={<AppIcon name="clock" size={24} color={theme.colors.primary} />} />
       </View>
 
       <View style={styles.searchContainer}>
@@ -179,13 +179,9 @@ export const PendingApprovalsScreen = () => {
               visible={sortMenuVisible}
               onDismiss={() => setSortMenuVisible(false)}
               anchor={
-                <IconButton
-                  icon={renderAppIcon("sort")}
-                  size={20}
-                  style={styles.filterIconButton}
-                  onPress={() => setSortMenuVisible(true)}
-                  accessibilityLabel="Sort options"
-                />
+                <TouchableOpacity onPress={() => setSortMenuVisible(true)} activeOpacity={0.7} style={styles.filterIconButton}>
+                  <AppIcon name="sort" size={20} color={theme.colors.textSecondary} />
+                </TouchableOpacity>
               }
             >
               {(Object.keys(sortLabels) as SortOption[]).map((option) => (
@@ -212,6 +208,7 @@ export const PendingApprovalsScreen = () => {
             setPage(1);
           }}
           style={styles.chip}
+          textStyle={styles.chipText}
         >
           New
         </Chip>
@@ -222,6 +219,7 @@ export const PendingApprovalsScreen = () => {
             setPage(1);
           }}
           style={styles.chip}
+          textStyle={styles.chipText}
         >
           Resubmitted
         </Chip>
@@ -234,6 +232,7 @@ export const PendingApprovalsScreen = () => {
               setPage(1);
             }}
             style={styles.chip}
+            textStyle={styles.chipText}
           >
             {dept}
           </Chip>
@@ -247,6 +246,7 @@ export const PendingApprovalsScreen = () => {
               setPage(1);
             }}
             style={styles.chip}
+            textStyle={styles.chipText}
           >
             {cat.categoryName}
           </Chip>
@@ -256,7 +256,7 @@ export const PendingApprovalsScreen = () => {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor: NEU_BACKGROUND }]}>
       <AppHeader title="Pending Approvals" showBack />
 
       {isLoading && page === 1 ? (
@@ -280,7 +280,7 @@ export const PendingApprovalsScreen = () => {
             onEndReachedThreshold={0.5}
             ListEmptyComponent={renderEmptyState}
             ListFooterComponent={renderFooter}
-            refreshControl={<RefreshControl refreshing={isFetching && page === 1} onRefresh={handleRefresh} />}
+            refreshControl={<RefreshControl refreshing={isFetching && page === 1} onRefresh={handleRefresh} tintColor={theme.colors.primary} />}
             onScroll={() => Keyboard.dismiss()}
           />
           {isWideLayout && items.length > 0 && (
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filterIconButton: {
-    margin: 0,
+    padding: 8,
   },
   chipsRow: {
     marginBottom: 8,
@@ -334,6 +334,12 @@ const styles = StyleSheet.create({
   },
   chip: {
     marginRight: 0,
+    backgroundColor: 'rgba(0,0,0,0.03)',
+  },
+  chipText: {
+    color: lightTheme.colors.textSecondary,
+    fontFamily: lightTheme.typography.fontFamily.medium,
+    fontSize: 12,
   },
   listContent: {
     paddingBottom: 40,

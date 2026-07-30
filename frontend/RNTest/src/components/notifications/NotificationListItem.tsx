@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Card } from '../Cards';
 import { AppText } from '../AppText';
+import { AppIcon } from '../AppIcon';
 import { RootState } from '../../store';
 import { lightTheme, darkTheme } from '../../theme/theme';
 import { AppNotification } from '../../types/notifications';
@@ -39,7 +40,7 @@ const NotificationListItemComponent: React.FC<NotificationListItemProps> = ({
     >
       <View style={styles.row}>
         <View style={[styles.iconCircle, { backgroundColor: theme.colors.border }]}>
-          <AppText style={styles.icon}>{meta.icon}</AppText>
+          <AppIcon name={meta.icon} size={18} color={meta.color} />
         </View>
         <View style={styles.body}>
           <View style={styles.titleRow}>
@@ -74,7 +75,7 @@ const NotificationListItemComponent: React.FC<NotificationListItemProps> = ({
             accessibilityLabel="Remove notification"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <AppText style={[styles.removeIcon, { color: theme.colors.textSecondary }]}>✕</AppText>
+            <AppIcon name="close" size={16} color={theme.colors.textSecondary} />
           </TouchableOpacity>
         )}
       </View>
@@ -98,9 +99,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
-  },
-  icon: {
-    fontSize: 18,
   },
   body: {
     flex: 1,
@@ -128,9 +126,6 @@ const styles = StyleSheet.create({
   removeButton: {
     padding: 4,
     marginLeft: 8,
-  },
-  removeIcon: {
-    fontSize: 16,
   },
 });
 

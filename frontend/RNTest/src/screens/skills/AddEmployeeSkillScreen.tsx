@@ -14,7 +14,7 @@ import { AppHeader } from '../../components/AppHeader';
 import { AppTextField } from '../../components/AppTextField';
 import { AppText } from '../../components/AppText';
 import { PrimaryButton } from '../../components/PrimaryButton';
-import { Card } from '../../components/Cards';
+import { Card, NEU_BACKGROUND } from '../../components/Cards';
 import { Skill } from '../../types/skills';
 import { lightTheme as theme } from '../../theme/theme';
 
@@ -100,10 +100,12 @@ export const AddEmployeeSkillScreen = () => {
                 Skill
               </AppText>
               <TouchableOpacity
-                style={[styles.pickerButton, { borderColor: theme.colors.border }]}
+                style={styles.pickerButton}
                 onPress={() => setIsSkillPickerVisible(true)}
               >
-                <AppText>{selectedSkillName || 'Select a skill'}</AppText>
+                <AppText style={{ color: selectedSkillName ? theme.colors.textPrimary : theme.colors.textSecondary }}>
+                  {selectedSkillName || 'Select a skill'}
+                </AppText>
               </TouchableOpacity>
               {errors.skillId && (
                 <AppText variant="caption" color={theme.colors.error} style={styles.errorText}>
@@ -210,7 +212,7 @@ export const AddEmployeeSkillScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: NEU_BACKGROUND,
   },
   keyboardView: {
     flex: 1,
@@ -244,9 +246,14 @@ const styles = StyleSheet.create({
   },
   pickerButton: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: theme.radius.m,
     paddingHorizontal: 12,
-    paddingVertical: 14,
+    height: 48,
+    justifyContent: 'center',
+    backgroundColor: '#EAEFF5',
+    borderColor: 'rgba(0,0,0,0.05)',
+    borderTopColor: 'rgba(0,0,0,0.1)',
+    borderLeftColor: 'rgba(0,0,0,0.1)',
   },
   switchContainer: {
     flexDirection: 'row',
@@ -261,8 +268,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 16,
-    backgroundColor: theme.colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.divider,
+    backgroundColor: NEU_BACKGROUND,
   },
 });

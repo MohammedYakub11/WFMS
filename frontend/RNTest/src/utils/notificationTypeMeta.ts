@@ -10,22 +10,23 @@ export interface NotificationTypeMeta {
 // Keyed by the known backend `type` enum values. `type` is treated as an
 // open-ended string (see types/notifications.ts) so any value not present
 // here falls back to a safe default via getNotificationTypeMeta — never throw
-// on an unrecognized type.
+// on an unrecognized type. `icon` values are Octicons glyph names (see
+// components/AppIcon.tsx) — the app's single icon family, not raw emoji.
 export const NOTIFICATION_TYPE_META: Record<string, NotificationTypeMeta> = {
-  INFO: { icon: 'ℹ️', color: LightColors.textSecondary, label: 'Info' },
-  SKILL_APPROVAL: { icon: '✅', color: LightColors.statusApproved, label: 'Skill Approved' },
-  SKILL_REJECTION: { icon: '❌', color: LightColors.statusRejected, label: 'Skill Rejected' },
-  SYSTEM: { icon: '⚙️', color: LightColors.textSecondary, label: 'System' },
-  REMINDER: { icon: '⏰', color: LightColors.warning, label: 'Reminder' },
-  EMPLOYEE_UPDATE: { icon: '👤', color: LightColors.primary, label: 'Employee Update' },
-  ROLE_ASSIGNED: { icon: '🛡️', color: LightColors.statusApproved, label: 'Role Assigned' },
-  ROLE_REVOKED: { icon: '🚫', color: LightColors.statusRejected, label: 'Role Revoked' },
-  SYSTEM_ANNOUNCEMENT: { icon: '📢', color: LightColors.primary, label: 'Announcement' },
-  SECURITY_ALERT: { icon: '⚠️', color: LightColors.error, label: 'Security Alert' },
+  INFO: { icon: 'info', color: LightColors.textSecondary, label: 'Info' },
+  SKILL_APPROVAL: { icon: 'check-circle', color: LightColors.statusApproved, label: 'Skill Approved' },
+  SKILL_REJECTION: { icon: 'x-circle', color: LightColors.statusRejected, label: 'Skill Rejected' },
+  SYSTEM: { icon: 'gear', color: LightColors.textSecondary, label: 'System' },
+  REMINDER: { icon: 'clock', color: LightColors.warning, label: 'Reminder' },
+  EMPLOYEE_UPDATE: { icon: 'person', color: LightColors.primary, label: 'Employee Update' },
+  ROLE_ASSIGNED: { icon: 'shield', color: LightColors.statusApproved, label: 'Role Assigned' },
+  ROLE_REVOKED: { icon: 'shield-x', color: LightColors.statusRejected, label: 'Role Revoked' },
+  SYSTEM_ANNOUNCEMENT: { icon: 'megaphone', color: LightColors.primary, label: 'Announcement' },
+  SECURITY_ALERT: { icon: 'alert', color: LightColors.error, label: 'Security Alert' },
 };
 
 const DEFAULT_META: Omit<NotificationTypeMeta, 'label'> = {
-  icon: '🔔',
+  icon: 'bell',
   color: LightColors.statusDisabled,
 };
 

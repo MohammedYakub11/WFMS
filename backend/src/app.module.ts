@@ -35,6 +35,9 @@ import { AuditLog } from './audit-logs/entities/audit-log.entity';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        console.log('DB_HOST:', configService.get('DB_HOST'));
+        console.log('DB_PORT:', configService.get('DB_PORT'));
+        console.log('DB_DATABASE:', configService.get('DB_DATABASE'));
         const config = {
           type: 'postgres' as const,
           host: configService.get<string>('DB_HOST', 'localhost'),
@@ -42,6 +45,9 @@ import { AuditLog } from './audit-logs/entities/audit-log.entity';
           username: configService.get<string>('DB_USERNAME', 'postgres'),
           password: configService.get<string>('DB_PASSWORD', ''),
           database: configService.get<string>('DB_DATABASE', 'wfms_db'),
+          ssl: {
+            rejectUnauthorized: false,
+          },
           entities: [
             Employee,
             ProfileMetadata,
@@ -56,7 +62,7 @@ import { AuditLog } from './audit-logs/entities/audit-log.entity';
             EmployeeRole,
             AuditLog,
           ],
-          synchronize: true,
+          synchronize: configService.get('NODE_ENV') !== 'production',
           migrationsRun: configService.get<string>('MIGRATIONS_RUN', 'true') === 'true',
         };
 

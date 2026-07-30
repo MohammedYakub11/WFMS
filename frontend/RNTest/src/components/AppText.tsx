@@ -9,6 +9,12 @@ export interface AppTextProps extends TextProps {
   weight?: 'regular' | 'medium' | 'semiBold' | 'bold';
   color?: string;
   align?: 'auto' | 'left' | 'right' | 'center' | 'justify';
+  // Shrinks the font to fit instead of truncating with an ellipsis — for text
+  // that must never be cut off (e.g. an employee name in a profile header).
+  // Wraps onto a 2nd line (default `numberOfLines`, overridable via the
+  // standard prop) only once shrinking to `minFontScale` still isn't enough.
+  autoSize?: boolean;
+  minFontScale?: number;
 }
 
 export const AppText: React.FC<AppTextProps> = ({
@@ -18,6 +24,11 @@ export const AppText: React.FC<AppTextProps> = ({
   align = 'left',
   style,
   children,
+  autoSize = false,
+  minFontScale = 0.6,
+  numberOfLines,
+  adjustsFontSizeToFit,
+  minimumFontScale,
   ...rest
 }) => {
   const isDarkMode = useSelector((state: RootState) => state.theme.isDarkMode);
@@ -38,7 +49,13 @@ export const AppText: React.FC<AppTextProps> = ({
   ]);
 
   return (
-    <Text style={textStyles} {...rest}>
+    <Text
+      style={textStyles}
+      numberOfLines={numberOfLines ?? (autoSize ? 2 : undefined)}
+      adjustsFontSizeToFit={autoSize || adjustsFontSizeToFit}
+      minimumFontScale={autoSize ? minFontScale : minimumFontScale}
+      {...rest}
+    >
       {children}
     </Text>
   );

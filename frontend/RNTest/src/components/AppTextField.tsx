@@ -23,15 +23,19 @@ export const AppTextField: React.FC<AppTextFieldProps> = ({
 
   return (
     <View style={styles.container}>
-      <AppText variant="inputLabel" weight="medium" color={theme.colors.textSecondary} style={styles.label}>
-        {label}
-      </AppText>
+      {label ? (
+        <AppText variant="inputLabel" weight="medium" color={theme.colors.textSecondary} style={styles.label}>
+          {label}
+        </AppText>
+      ) : null}
       <View
         style={[
           styles.inputContainer,
           {
-            backgroundColor: theme.colors.surface,
-            borderColor: error ? theme.colors.error : theme.colors.border,
+            backgroundColor: '#EAEFF5', // subtle inset dark background relative to NEU_BACKGROUND
+            borderColor: error ? theme.colors.error : 'rgba(0,0,0,0.05)',
+            borderTopColor: error ? theme.colors.error : 'rgba(0,0,0,0.1)',
+            borderLeftColor: error ? theme.colors.error : 'rgba(0,0,0,0.1)',
             borderRadius: theme.radius.m,
           },
           style,

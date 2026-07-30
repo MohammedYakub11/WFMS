@@ -32,7 +32,11 @@ const SkillAdminCardComponent: React.FC<SkillAdminCardProps> = ({
 
   return (
     <Card style={styles.card} onPress={onPress}>
-      <View style={styles.header}>
+      {/* Name, category chip, and status badge share one row — wrapping only
+          if the screen is too narrow to fit all three — instead of stacking
+          the chip/badge on their own row underneath, which wasted vertical
+          space on every card in what can be a long list. */}
+      <View style={styles.headerRow}>
         {selectionMode && (
           <Checkbox
             status={selected ? 'checked' : 'unchecked'}
@@ -47,22 +51,22 @@ const SkillAdminCardComponent: React.FC<SkillAdminCardProps> = ({
             </AppText>
           )}
         </View>
-      </View>
 
-      <View style={styles.metaRow}>
-        {skill.category?.categoryName && (
-          <Chip
-            style={[styles.chip, { backgroundColor: theme.colors.border }]}
-            textStyle={[styles.chipText, { color: theme.colors.textSecondary }]}
-            compact
-          >
-            {skill.category.categoryName}
-          </Chip>
-        )}
-        <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-          <AppText variant="caption" style={styles.statusText}>
-            {skill.isActive ? 'Active' : 'Inactive'}
-          </AppText>
+        <View style={styles.metaRow}>
+          {skill.category?.categoryName && (
+            <Chip
+              style={[styles.chip, { backgroundColor: theme.colors.border }]}
+              textStyle={[styles.chipText, { color: theme.colors.textSecondary }]}
+              compact
+            >
+              {skill.category.categoryName}
+            </Chip>
+          )}
+          <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+            <AppText variant="caption" style={styles.statusText}>
+              {skill.isActive ? 'Active' : 'Inactive'}
+            </AppText>
+          </View>
         </View>
       </View>
 
@@ -78,21 +82,31 @@ const SkillAdminCardComponent: React.FC<SkillAdminCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  // Matches the SkillCard/My Skills spacing convention: 8dp on each card
+  // yields a 16dp gap between consecutive cards, so each neumorphic surface
+  // has room for its shadow instead of blending into its neighbor.
   card: {
     marginHorizontal: 16,
+    marginVertical: 8,
   },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    flexWrap: 'wrap',
+    rowGap: 8,
   },
   titleContainer: {
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 1,
+    minWidth: '45%',
+    marginRight: 8,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 0,
     gap: 8,
+    marginLeft: 'auto',
   },
   chip: {},
   chipText: {

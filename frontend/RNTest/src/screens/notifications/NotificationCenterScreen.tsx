@@ -103,6 +103,13 @@ export const NotificationCenterScreen = () => {
     [handleItemPress, handleRemove],
   );
 
+  // Gap *between* cards only (never before the first or after the last), so
+  // each neumorphic card's shadow has room to render without touching its
+  // neighbor — an ItemSeparatorComponent avoids the "double spacing" a
+  // trailing card marginBottom would add on top of the list's own
+  // contentContainerStyle paddingBottom.
+  const renderSeparator = useCallback(() => <View style={styles.cardSeparator} />, [styles]);
+
   const renderEmptyState = () => {
     if (isLoading) return null;
     return (
@@ -170,6 +177,7 @@ export const NotificationCenterScreen = () => {
           keyExtractor={(item) => item.toString()}
           renderItem={() => <NotificationSkeleton />}
           contentContainerStyle={styles.listContent}
+          ItemSeparatorComponent={renderSeparator}
         />
       ) : isError ? (
         <EmptyState
@@ -184,6 +192,7 @@ export const NotificationCenterScreen = () => {
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
+          ItemSeparatorComponent={renderSeparator}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListEmptyComponent={renderEmptyState}
@@ -222,6 +231,12 @@ const createStyles = (theme: typeof lightTheme) =>
     },
     listContent: {
       paddingBottom: 24,
+    },
+    // 18dp gap between cards only — within the recommended 16-20dp range —
+    // so each neumorphic card's shadow has room to render as an independent
+    // floating surface instead of blending into its neighbor.
+    cardSeparator: {
+      height: 18,
     },
     markAllReadRow: {
       alignItems: 'flex-end',

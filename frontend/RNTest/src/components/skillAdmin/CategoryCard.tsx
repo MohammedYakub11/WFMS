@@ -65,8 +65,12 @@ const CategoryCardComponent: React.FC<CategoryCardProps> = ({ category, onPress,
 };
 
 const styles = StyleSheet.create({
+  // Matches the SkillCard/My Skills spacing convention: 8dp on each card
+  // yields a 16dp gap between consecutive cards, so each neumorphic surface
+  // has room for its shadow instead of blending into its neighbor.
   card: {
     marginHorizontal: 16,
+    marginVertical: 8,
   },
   header: {
     flexDirection: 'row',

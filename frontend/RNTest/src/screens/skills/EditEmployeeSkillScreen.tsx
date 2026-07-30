@@ -11,7 +11,7 @@ import { AppHeader } from '../../components/AppHeader';
 import { AppTextField } from '../../components/AppTextField';
 import { AppText } from '../../components/AppText';
 import { PrimaryButton } from '../../components/PrimaryButton';
-import { Card } from '../../components/Cards';
+import { Card, NEU_BACKGROUND } from '../../components/Cards';
 import { Loader } from '../../components/Loader';
 import { EmptyState } from '../../components/EmptyState';
 import { lightTheme as theme } from '../../theme/theme';
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   loader: { flex: 1 },
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: NEU_BACKGROUND,
   },
   keyboardView: {
     flex: 1,
@@ -218,8 +218,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 16,
-    backgroundColor: theme.colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.divider,
+    backgroundColor: NEU_BACKGROUND,
   },
 });

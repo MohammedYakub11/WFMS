@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { IconButton, Menu } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { AppHeader } from '../../components/AppHeader';
-import { renderAppIcon } from '../../components/AppIcon';
+import { AppIcon, renderAppIcon } from '../../components/AppIcon';
 import { AppText } from '../../components/AppText';
 import { Card } from '../../components/Cards';
 import { ConfirmationDialog } from '../../components/ConfirmationDialog';
@@ -90,9 +90,9 @@ export const ReportHistoryScreen = () => {
               return (
                 <Card key={entry.id} style={styles.entryCard}>
                   <View style={styles.entryRow}>
-                    <AppText style={styles.entryIcon}>{option?.icon ?? '📄'}</AppText>
+                    <AppIcon name={option?.icon ?? 'file'} size={24} color={theme.colors.primary} style={styles.entryIcon} />
                     <View style={styles.entryInfo}>
-                      <AppText weight="medium">{option?.label ?? entry.reportType}</AppText>
+                      <AppText weight="medium" numberOfLines={1}>{option?.label ?? entry.reportType}</AppText>
                       <AppText variant="caption" color={theme.colors.textSecondary}>
                         {entry.format.toUpperCase()} · {new Date(entry.generatedAt).toLocaleString()}
                       </AppText>
@@ -157,6 +157,6 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 16, paddingBottom: 40 },
   entryCard: { marginBottom: 12 },
   entryRow: { flexDirection: 'row', alignItems: 'center' },
-  entryIcon: { fontSize: 24, marginRight: 12 },
+  entryIcon: { marginRight: 12 },
   entryInfo: { flex: 1 },
 });

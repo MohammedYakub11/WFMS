@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, ScrollView } from 'react-native';
-import { Chip, IconButton } from 'react-native-paper';
+import { View, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import { Chip } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../../store';
@@ -12,7 +12,8 @@ import { AppHeader } from '../../components/AppHeader';
 import { AppTextField } from '../../components/AppTextField';
 import { EmptyState } from '../../components/EmptyState';
 import { Loader } from '../../components/Loader';
-import { renderAppIcon } from '../../components/AppIcon';
+import { renderAppIcon, AppIcon } from '../../components/AppIcon';
+import { NEU_BACKGROUND } from '../../components/Cards';
 import { lightTheme, darkTheme } from '../../theme/theme';
 
 export const WorkforceSearchScreen = () => {
@@ -35,6 +36,7 @@ export const WorkforceSearchScreen = () => {
 
   // `isFilterDrawerOpen` is UI-only local state, not a backend search field — the
   // API's ValidationPipe rejects unknown query params, so it must not be forwarded.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { isFilterDrawerOpen, ...searchQueryParams } = searchState;
   const { data, isLoading, isError, refetch } = useWorkforceSearch(searchQueryParams);
 
@@ -65,14 +67,9 @@ export const WorkforceSearchScreen = () => {
             onChangeText={setLocalKeyword}
             style={styles.searchField}
             rightIcon={
-              <IconButton
-                icon={renderAppIcon('filter-variant')}
-                size={20}
-                iconColor={hasActiveFilters ? theme.colors.primary : theme.colors.textSecondary}
-                style={styles.filterIconButton}
-                onPress={() => dispatch(toggleFilterDrawer())}
-                accessibilityLabel="Filter employees"
-              />
+              <TouchableOpacity onPress={() => dispatch(toggleFilterDrawer())} activeOpacity={0.7} style={styles.filterIconButton}>
+                <AppIcon name="filter-variant" size={20} color={hasActiveFilters ? theme.colors.primary : theme.colors.textSecondary} />
+              </TouchableOpacity>
             }
           />
         </View>
@@ -86,17 +83,17 @@ export const WorkforceSearchScreen = () => {
           contentContainerStyle={styles.activeFiltersContent}
         >
           {searchState.department && (
-            <Chip icon={renderAppIcon('close')} onPress={() => dispatch(setFilters({ department: null }))} style={styles.filterChip}>
+            <Chip icon={renderAppIcon('close')} onPress={() => dispatch(setFilters({ department: null }))} style={styles.filterChip} textStyle={styles.chipText}>
               {searchState.department}
             </Chip>
           )}
           {searchState.location && (
-            <Chip icon={renderAppIcon('close')} onPress={() => dispatch(setFilters({ location: null }))} style={styles.filterChip}>
+            <Chip icon={renderAppIcon('close')} onPress={() => dispatch(setFilters({ location: null }))} style={styles.filterChip} textStyle={styles.chipText}>
               {searchState.location}
             </Chip>
           )}
           {searchState.skill && (
-            <Chip icon={renderAppIcon('close')} onPress={() => dispatch(setFilters({ skill: null }))} style={styles.filterChip}>
+            <Chip icon={renderAppIcon('close')} onPress={() => dispatch(setFilters({ skill: null }))} style={styles.filterChip} textStyle={styles.chipText}>
               {searchState.skill}
             </Chip>
           )}
@@ -106,7 +103,7 @@ export const WorkforceSearchScreen = () => {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor: NEU_BACKGROUND }]}>
       <AppHeader title="Employee Search" showDrawer showNotification />
 
       {isLoading ? (
@@ -152,7 +149,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filterIconButton: {
-    margin: 0,
+    padding: 8,
   },
   activeFiltersRow: {
     marginTop: 8,
@@ -160,9 +157,16 @@ const styles = StyleSheet.create({
   activeFiltersContent: {
     paddingHorizontal: 16,
     gap: 8,
+    paddingBottom: 8,
   },
   filterChip: {
     marginRight: 0,
+    backgroundColor: 'rgba(0,0,0,0.03)',
+  },
+  chipText: {
+    color: lightTheme.colors.textSecondary,
+    fontFamily: lightTheme.typography.fontFamily.medium,
+    fontSize: 12,
   },
   listContent: {
     paddingBottom: 40,
