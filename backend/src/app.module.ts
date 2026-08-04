@@ -62,6 +62,7 @@ import { AuditLog } from './audit-logs/entities/audit-log.entity';
             EmployeeRole,
             AuditLog,
           ],
+          autoLoadEntities: true,
           synchronize: configService.get('NODE_ENV') !== 'production',
           migrationsRun: configService.get<string>('MIGRATIONS_RUN', 'true') === 'true',
         };

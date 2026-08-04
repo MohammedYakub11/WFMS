@@ -19,6 +19,10 @@ export const useAuthentication = () => {
       await AsyncStorage.setItem('authState', JSON.stringify({ accessToken, refreshToken, user }));
       return true;
     } catch (err: any) {
+      console.log('Axios Error:', err.toJSON?.());
+      console.log('Response:', err.response);
+      console.log('Request:', err.request);
+      console.log('Message:', err.message);
       console.log('Status:', err.response?.status);
       console.log('Response:', err.response?.data);
       console.log('Headers:', err.response?.headers);
